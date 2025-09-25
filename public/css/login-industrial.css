@@ -1,0 +1,59 @@
+/* login-industrial.css - Custom styles for login page only */
+
+.login-industrial {
+    background: #fff;
+    border-radius: 1.5rem;
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18);
+    padding: 2.5rem 2rem 2rem 2rem;
+    max-width: 410px;
+    margin: 2rem auto;
+}
+.login-industrial .logo {
+    height: 48px;
+    margin-bottom: 1.5rem;
+}
+.login-industrial .brand {
+    color: #222;
+    font-weight: 700;
+    font-size: 1.3rem;
+    letter-spacing: 1px;
+    margin-bottom: 1.5rem;
+}
+.login-industrial .form-label, .login-industrial .form-check-label, .login-industrial .form-text {
+    color: #222 !important;
+}
+.login-industrial .text-muted {
+    color: #555 !important;
+}
+.login-industrial .form-control {
+    background: #fff;
+    border: 1px solid #bbb;
+    color: #222;
+}
+.login-industrial .form-control:focus {
+    border-color: #f97316;
+    box-shadow: 0 0 0 0.2rem rgba(255,106,0,.15);
+}
+.login-industrial .btn-industrial {
+    background: #f97316;
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    transition: background 0.2s;
+}
+.login-industrial .btn-industrial:hover {
+    background: #f97316;
+    color: #fff;
+}
+.login-industrial .forgot-link, .login-industrial .create-link {
+    color: #f97316;
+    text-decoration: none;
+}
+.login-industrial .forgot-link:hover, .login-industrial .create-link:hover {
+    color: #222;
+    text-decoration: underline;
+}
+.login-industrial .form-check-input:checked {
+    background-color: #f97316;
+    border-color: #f97316;
+}

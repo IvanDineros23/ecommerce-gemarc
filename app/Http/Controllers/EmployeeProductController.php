@@ -30,7 +30,7 @@ class EmployeeProductController extends Controller
             'name' => $data['name'],
             'description' => $data['description'],
             'unit_price' => $data['unit_price'],
-            'stock_qty' => $data['stock_qty'],
+            'stock' => $data['stock_qty'],
             'slug' => Str::slug($data['name']) . '-' . uniqid(),
             'sku' => null,
             'is_active' => true,
@@ -67,7 +67,7 @@ class EmployeeProductController extends Controller
             'name' => $data['name'],
             'description' => $data['description'],
             'unit_price' => $data['unit_price'],
-            'stock_qty' => $data['stock_qty'],
+            'stock' => $data['stock_qty'],
         ]);
         if ($request->hasFile('image')) {
             // Remove old images

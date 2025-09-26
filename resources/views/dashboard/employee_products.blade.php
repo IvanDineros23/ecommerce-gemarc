@@ -14,6 +14,10 @@
     <div class="bg-white rounded-xl shadow p-6 mb-8">
         <h2 class="text-lg font-semibold text-green-700 mb-4">Add New Product</h2>
         <form method="POST" action="{{ route('employee.products.store') }}" enctype="multipart/form-data">
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-1">Stock Quantity</label>
+                <input type="number" name="stock_qty" class="w-full border border-gray-300 rounded px-3 py-2" min="0" step="1" required>
+            </div>
             @csrf
             <div class="mb-4">
                 <label class="block text-gray-700 mb-1">Product Name</label>
@@ -26,10 +30,6 @@
             <div class="mb-4">
                 <label class="block text-gray-700 mb-1">Unit Price</label>
                 <input type="number" name="unit_price" class="w-full border border-gray-300 rounded px-3 py-2" min="0" step="0.01" required>
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 mb-1">Stock Quantity</label>
-                <input type="number" name="stock_qty" class="w-full border border-gray-300 rounded px-3 py-2" min="0" step="1" required>
             </div>
             <div class="mb-4">
                 <label class="block text-gray-700 mb-1">Image</label>
@@ -133,7 +133,7 @@
                     <td class="py-2">{{ $product->name }}</td>
                     <td class="py-2">{{ $product->description }}</td>
                     <td class="py-2">₱{{ number_format($product->unit_price, 2) }}</td>
-                    <td class="py-2">{{ $product->stock_qty }}</td>
+                    <td class="py-2">{{ $product->stock }}</td>
                     <td class="py-2">
                         @php $img = $product->firstImagePath(); @endphp
                         @if($img)

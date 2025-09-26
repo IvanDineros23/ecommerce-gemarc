@@ -141,7 +141,7 @@ function searchBar() {
                         <img src="/images/gemarclogo.png" alt="No Image" class="mb-1 rounded max-h-20 object-contain">
                     @endif
                     <div class="font-semibold text-green-900 text-xs text-center line-clamp-2">{{ $product->name }}</div>
-                    <div class="text-orange-600 font-bold text-xs">₱{{ number_format($product->price,2) }}</div>
+                    <div class="text-orange-600 font-bold text-xs">₱{{ number_format($product->unit_price,2) }}</div>
                 </div>
             @empty
                 <div class="col-span-full text-center text-gray-400 py-8">No recommended products.</div>

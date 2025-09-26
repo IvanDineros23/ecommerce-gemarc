@@ -37,6 +37,7 @@ Route::middleware(['auth', 'verified'])->prefix('employee')->name('employee.')->
     Route::get('/orders', [EmployeeOrderController::class, 'index'])->name('orders.index');
     // Employee Quote Management
     Route::get('/quotes-management', [EmployeeQuoteController::class, 'index'])->name('quotes.management.index');
+    Route::post('/quotes-management/{quote}/upload', [EmployeeQuoteController::class, 'upload'])->name('quotes.upload');
     // Employee Quote Management (controller-based)
 });
 

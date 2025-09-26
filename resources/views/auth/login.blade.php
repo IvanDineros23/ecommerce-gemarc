@@ -50,7 +50,12 @@
                 <a class="forgot-link small" href="{{ route('password.request') }}">Forgot?</a>
               @endif
             </div>
-            <input id="password" type="password" name="password" required autocomplete="current-password" class="form-control @error('password') is-invalid @enderror" placeholder="Enter your password" onkeyup="checkCapsLock(event)" onkeydown="checkCapsLock(event)">
+            <div class="input-group">
+              <input id="password" type="password" name="password" required autocomplete="current-password" class="form-control @error('password') is-invalid @enderror" placeholder="Enter your password" onkeyup="checkCapsLock(event)" onkeydown="checkCapsLock(event)">
+              <button class="btn btn-outline-secondary" type="button" id="togglePassword" tabindex="-1" style="border:1px solid #ced4da; background: #fff;" onclick="togglePasswordVisibility('password', this)">
+                <svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 12a3 3 0 11-6 0 3 3 0 016 0z'/><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z'/></svg>
+              </button>
+            </div>
             <div id="caps-lock-alert" class="alert alert-warning py-2 px-3 mt-2 mb-0 small d-none" role="alert" style="font-size:0.95em;">
               <strong>Caps Lock is ON.</strong> Passwords are case-sensitive.
             </div>
@@ -74,6 +79,16 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = `<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.956 9.956 0 012.042-3.292m3.1-2.6A9.956 9.956 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.956 9.956 0 01-4.043 5.197M15 12a3 3 0 11-6 0 3 3 0 016 0z' /><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 3l18 18' /></svg>`;
+      } else {
+        input.type = 'password';
+        btn.innerHTML = `<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 12a3 3 0 11-6 0 3 3 0 016 0z'/><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z'/></svg>`;
+      }
+    }
       function checkCapsLock(e) {
         var caps = e.getModifierState && e.getModifierState('CapsLock');
         var alert = document.getElementById('caps-lock-alert');

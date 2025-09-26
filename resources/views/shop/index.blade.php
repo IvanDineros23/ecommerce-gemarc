@@ -10,7 +10,10 @@ function productModal() {
         show: false,
         modalProduct: { name: '', price: 0, description: '', image: '' },
         openModal(product) {
-            this.modalProduct = product;
+            this.modalProduct = {
+                ...product,
+                price: product.unit_price
+            };
             this.show = true;
         },
         close(){ this.show = false; }
@@ -53,7 +56,7 @@ function productModal() {
                         <div class="font-bold text-green-800 text-lg mb-1 line-clamp-1">{{ $product->name }}</div>
                         <div class="text-gray-600 text-sm mb-2 line-clamp-2">{{ $product->description }}</div>
                         <div class="mt-auto flex items-center justify-between gap-2">
-                            <div class="text-orange-600 font-bold text-lg">₱{{ number_format($product->price,2) }}</div>
+                            <div class="text-orange-600 font-bold text-lg">₱{{ number_format($product->unit_price,2) }}</div>
                             <div class="flex gap-2">
                                 @auth
                                     @php

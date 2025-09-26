@@ -76,12 +76,14 @@
   <div class="mt-8">
     <div class="text-lg font-bold text-green-800 mb-2">Recommended for You</div>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      @for ($i = 1; $i <= 4; $i++)
+      @foreach($recommendedProducts as $product)
+        @php $img = $product->firstImagePath(); @endphp
         <div class="bg-white rounded-xl shadow flex flex-col items-center p-4">
-          <img src="https://via.placeholder.com/120x80?text=Product+{{ $i }}" alt="Product {{ $i }}" class="mb-2 rounded">
-          <div class="font-semibold text-green-900">Product {{ $i }}</div>
+          <img src="{{ $img ? asset('storage/' . $img) : '/images/gemarclogo.png' }}" alt="{{ $product->name }}" class="mb-2 rounded w-28 h-20 object-contain bg-gray-100">
+          <div class="font-semibold text-green-900 text-center">{{ $product->name }}</div>
+          <div class="text-orange-600 font-bold text-md mt-1">₱{{ number_format($product->unit_price, 2) }}</div>
         </div>
-      @endfor
+      @endforeach
     </div>
   </div>
 

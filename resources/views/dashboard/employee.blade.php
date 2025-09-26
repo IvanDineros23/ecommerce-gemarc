@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return strlen($name) > 18 ? mb_substr($name, 0, 16) . '…' : $name;
             });
             $stockData = $products->pluck('stock');
-            $valueData = $products->map(function($p) { return $p->stock * $p->price; });
+            $valueData = $products->map(function($p) { return $p->stock * $p->unit_price; });
             $revenueLabelsMonth = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             $dbDriver = config('database.default');
             if ($dbDriver === 'sqlite') {

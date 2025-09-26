@@ -34,9 +34,37 @@ class QuoteController extends Controller
     // Store quote and generate PDF (stub)
     public function store(Request $request)
     {
-        // Validate and save quote logic here
-        // Generate PDF logic here
-        return back()->with('success', 'Quote created and PDF generated (stub).');
+        $request->validate([
+            'products' => 'required|array',
+            'products.*' => 'exists:products,id',
+            'quantities' => 'required|array',
+            'notes' => 'nullable|string',
+        ]);
+
+        $user = auth()->user();
+        $quote = new \App\Models\Quote();
+        $quote->user_id = $user->id;
+        $quote->status = 'open';
+        $quote->total = 0; // will compute below
+        $quote->save();
+
+        $total = 0;
+        foreach ($request->products as $productId) {
+            $qty = (int)($request->quantities[$productId] ?? 1);
+            $product = \App\Models\Product::find($productId);
+            $item = new \App\Models\QuoteItem();
+            $item->quote_id = $quote->id;
+            $item->product_id = $product->id;
+            $item->name = $product->name;
+            $item->quantity = $qty;
+            $item->unit_price = $product->unit_price;
+            $item->save();
+            $total += $product->unit_price * $qty;
+        }
+        $quote->total = $total;
+        $quote->save();
+
+        return back()->with('success', 'Quote request submitted!');
     }
 
     // Download/preview PDF (stub)
@@ -46,11 +74,11 @@ class QuoteController extends Controller
         return 'PDF generation for quote #' . $quoteId;
     }
 
-    // Employee: list all quotes (stub)
+    // Employee: list all quotes (actual)
     public function employeeIndex()
     {
-        // Fetch all quotes for employees
-        return view('placeholders.employee_quotes');
+        $quotes = \App\Models\Quote::with('user')->latest()->get();
+        return view('dashboard.employee_quotes', compact('quotes'));
     }
 
     // Employee: show a specific quote (stub)

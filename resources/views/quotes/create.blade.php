@@ -1,6 +1,16 @@
 @extends('layouts.app')
 @section('content')
 <div class="max-w-4xl mx-auto py-10">
+    @if(session('success'))
+        <div id="successModal" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40">
+            <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
+                <div class="text-green-600 text-3xl mb-2">✔️</div>
+                <div class="text-lg font-semibold mb-2">{{ session('success') }}</div>
+                <button onclick="document.getElementById('successModal').style.display='none'" class="mt-4 px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700">OK</button>
+            </div>
+        </div>
+        <script>setTimeout(()=>{document.getElementById('successModal').style.display='none'}, 3000);</script>
+    @endif
     <h1 class="text-2xl font-bold text-green-800 mb-6">Request a Quote</h1>
     <form method="GET" action="" class="mb-4" onsubmit="return false;">
         <div class="flex gap-2">
@@ -42,7 +52,7 @@
                         </td>
                         <td class="px-4 py-2 product-name">{{ $product->name }}</td>
                         <td class="px-4 py-2 text-sm text-gray-600 product-desc">{{ $product->description }}</td>
-                        <td class="px-4 py-2 text-right">₱{{ number_format($product->price, 2) }}</td>
+                        <td class="px-4 py-2 text-right">₱{{ number_format($product->unit_price, 2) }}</td>
                         <td class="px-4 py-2 text-center">
                             <input type="number" name="quantities[{{ $product->id }}]" min="0" max="9999" value="0" class="w-20 border rounded px-2 py-1 text-center">
                         </td>

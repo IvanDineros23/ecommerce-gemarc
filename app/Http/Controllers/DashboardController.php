@@ -58,6 +58,10 @@ class DashboardController extends Controller
             ->take(10)
             ->values(); // <-- keep as Collection (no ->all())
 
+        // Get the user's active cart and item count
+        $activeCart = Cart::where('user_id', $u->id)->whereNull('checked_out_at')->latest()->first();
+    $cartItemCount = $activeCart ? $activeCart->items()->sum('quantity') : 0;
+
         $data = [
             'recentOrders' => Order::where('user_id', $u->id)->latest()->limit(5)->get(),
             'kpis' => [
@@ -74,8 +78,7 @@ class DashboardController extends Controller
                                     ->orderBy('expires_at')->limit(5)->get(),
             'shipments'     => Shipment::where('user_id', $u->id)->latest()->limit(5)->get(),
             'savedLists'    => SavedList::where('user_id',$u->id)->latest()->limit(5)->get(),
-            'activeCarts'   => Cart::where('user_id',$u->id)->whereNull('checked_out_at')
-                                    ->latest()->limit(3)->get(),
+            'cartItemCount' => $cartItemCount,
             'recommendedProducts' => Product::where('is_active', true)->inRandomOrder()->limit(4)->get(),
         ];
 

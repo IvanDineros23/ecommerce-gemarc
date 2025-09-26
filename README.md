@@ -1,3 +1,70 @@
+## Gemarc Enterprises Inc. E-Commerce MVP
+
+This project is a Laravel-based e-commerce MVP for Gemarc Enterprises Inc.
+
+### Requirements
+
+- PHP 8.2+
+- Composer
+- Node.js & npm
+- MySQL
+
+### Setup Instructions
+
+1. **Clone the repository:**
+	```sh
+	git clone https://github.com/IvanDineros23/ecommerce-gemarc.git
+	cd ecommerce-gemarc
+	```
+
+2. **Install PHP dependencies:**
+	```sh
+	composer install
+	```
+
+3. **Install JS dependencies:**
+	```sh
+	npm install && npm run build
+	```
+
+4. **Copy and configure environment:**
+	```sh
+	cp .env.example .env
+	# Edit .env and set your DB credentials
+	php artisan key:generate
+	```
+
+5. **Run migrations and seeders:**
+	```sh
+	php artisan migrate --seed
+	```
+	This will create all tables and seed demo admin, employee, customer, and demo products with images.
+
+6. **(Optional) Refresh database:**
+	```sh
+	php artisan migrate:refresh --seed
+	```
+
+7. **Run the development server:**
+	```sh
+	php artisan serve
+	```
+
+### Default Demo Accounts
+
+- **Admin:** helpdesk@gemarcph.com / password
+- **Employee:** kitona@gemarcph.com / password
+- **Customer:** dom@gemarcph.com / password
+
+### Features
+
+- User/customer registration, login, and role-based dashboard
+- Product management (admin/employee)
+- Cart, checkout, and order management
+- Chat and notification system
+- Responsive UI (Blade, TailwindCSS, Alpine.js)
+
+---
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">

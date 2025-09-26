@@ -13,14 +13,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+    // Seed admin, employee, and normal user accounts
+    $this->call(CreateAdminUserSeeder::class);
+    $this->call(CreateEmployeeUserSeeder::class);
+    $this->call(CreateNormalUserSeeder::class);
 
-        // Create admin user
-        \App\Models\User::create([
-            'name' => 'Admin',
-            'email' => 'helpdesk@gemarcph.com',
-            'password' => bcrypt('Ivandineros23!'),
-            'role' => 'admin',
-        ]);
+    // Seed demo products and images for MVP
+    $this->call(\Database\Seeders\CreateDemoProductsSeeder::class);
     }
 }

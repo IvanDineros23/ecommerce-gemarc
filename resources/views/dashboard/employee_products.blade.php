@@ -24,8 +24,12 @@
                 <textarea name="description" class="w-full border border-gray-300 rounded px-3 py-2" required></textarea>
             </div>
             <div class="mb-4">
-                <label class="block text-gray-700 mb-1">Price</label>
-                <input type="number" name="price" class="w-full border border-gray-300 rounded px-3 py-2" min="0" step="0.01" required>
+                <label class="block text-gray-700 mb-1">Unit Price</label>
+                <input type="number" name="unit_price" class="w-full border border-gray-300 rounded px-3 py-2" min="0" step="0.01" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-1">Stock Quantity</label>
+                <input type="number" name="stock_qty" class="w-full border border-gray-300 rounded px-3 py-2" min="0" step="1" required>
             </div>
             <div class="mb-4">
                 <label class="block text-gray-700 mb-1">Image</label>
@@ -54,8 +58,12 @@
                     <textarea name="description" class="w-full border border-gray-300 rounded px-3 py-2" x-model="form.description" required></textarea>
                 </div>
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-1">Price</label>
-                    <input type="number" name="price" class="w-full border border-gray-300 rounded px-3 py-2" min="0" step="0.01" x-model="form.price" required>
+                    <label class="block text-gray-700 mb-1">Unit Price</label>
+                    <input type="number" name="unit_price" class="w-full border border-gray-300 rounded px-3 py-2" min="0" step="0.01" x-model="form.unit_price" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-1">Stock Quantity</label>
+                    <input type="number" name="stock_qty" class="w-full border border-gray-300 rounded px-3 py-2" min="0" step="1" x-model="form.stock_qty" required>
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700 mb-1">Image</label>
@@ -72,7 +80,7 @@
     function productModal() {
         return {
             show: false,
-            form: { name: '', description: '', price: '', image: '' },
+            form: { name: '', description: '', unit_price: '', stock_qty: '', image: '' },
             updateUrl: '',
             csrf: '{{ csrf_token() }}',
             showDelete: false,
@@ -80,7 +88,8 @@
             open(product) {
                 this.form.name = product.name;
                 this.form.description = product.description;
-                this.form.price = product.price;
+                this.form.unit_price = product.unit_price;
+                this.form.stock_qty = product.stock_qty;
                 this.form.image = product.image_url || '';
                 this.updateUrl = product.update_url;
                 this.show = true;
@@ -112,7 +121,8 @@
                 <tr class="text-left border-b">
                     <th class="py-2">Name</th>
                     <th class="py-2">Description</th>
-                    <th class="py-2">Price</th>
+                    <th class="py-2">Unit Price</th>
+                    <th class="py-2">Stock Qty</th>
                     <th class="py-2">Image</th>
                     <th class="py-2">Actions</th>
                 </tr>
@@ -122,7 +132,8 @@
                 <tr class="border-b">
                     <td class="py-2">{{ $product->name }}</td>
                     <td class="py-2">{{ $product->description }}</td>
-                    <td class="py-2">₱{{ number_format($product->price, 2) }}</td>
+                    <td class="py-2">₱{{ number_format($product->unit_price, 2) }}</td>
+                    <td class="py-2">{{ $product->stock_qty }}</td>
                     <td class="py-2">
                         @php $img = $product->firstImagePath(); @endphp
                         @if($img)
@@ -135,7 +146,8 @@
                         <button type="button" class="text-blue-600 hover:underline mr-2" @click="open({
                             name: '{{ $product->name }}',
                             description: `{{ str_replace('`', '\`', $product->description) }}`,
-                            price: '{{ $product->price }}',
+                            unit_price: '{{ $product->unit_price }}',
+                            stock_qty: '{{ $product->stock_qty }}',
                             image_url: '{{ $img ? asset('storage/' . $img) : '' }}',
                             update_url: '{{ route('employee.products.update', $product) }}'
                         })">Edit</button>

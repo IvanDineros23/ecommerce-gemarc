@@ -20,8 +20,8 @@ class CartController extends Controller
             'checked_out_at' => null,
         ]);
 
-        $items = $cart->items()->with('product:id,name,price')->get();
-        $total = $items->sum(fn (CartItem $i) => ($i->unit_price ?? optional($i->product)->price ?? 0) * $i->qty);
+    $items = $cart->items()->with('product:id,name,unit_price')->get();
+    $total = $items->sum(fn (CartItem $i) => ($i->unit_price ?? optional($i->product)->unit_price ?? 0) * $i->qty);
 
         return view('cart.index', compact('cart', 'items', 'total'));
     }
@@ -42,7 +42,7 @@ class CartController extends Controller
 
         $item = $cart->items()->firstOrNew(['product_id' => $request->product_id]);
         $item->qty        = ($item->qty ?? 0) + ($request->quantity ?? 1);
-        $item->unit_price = $product->price;
+    $item->unit_price = $product->unit_price;
         $item->save();
 
         return redirect()->route('cart.index')->with('status', 'Added to cart.');
@@ -76,14 +76,14 @@ class CartController extends Controller
             'checked_out_at' => null,
         ]);
 
-        $items = $cart->items()->with('product:id,name,price')->get();
+    $items = $cart->items()->with('product:id,name,unit_price')->get();
 
         if ($items->isEmpty()) {
             return redirect()->route('cart.index')->with('status', 'Your cart is empty.');
         }
 
         $subtotal = $items->sum(function (CartItem $i) {
-            $unit = $i->unit_price ?? optional($i->product)->price ?? 0;
+            $unit = $i->unit_price ?? optional($i->product)->unit_price ?? 0;
             return $unit * $i->qty;
         });
         $shipping = 0;
@@ -109,14 +109,14 @@ class CartController extends Controller
         ]);
 
         $cart = Cart::where('user_id', $user->id)->whereNull('checked_out_at')->firstOrFail();
-        $items = $cart->items()->with('product:id,name,price')->get();
+    $items = $cart->items()->with('product:id,name,unit_price')->get();
 
         if ($items->isEmpty()) {
             return redirect()->route('cart.index')->with('status', 'Your cart is empty.');
         }
 
         $subtotal = $items->sum(function (CartItem $i) {
-            $unit = $i->unit_price ?? optional($i->product)->price ?? 0;
+            $unit = $i->unit_price ?? optional($i->product)->unit_price ?? 0;
             return $unit * $i->qty;
         });
         $shipping = 0;
@@ -140,7 +140,7 @@ class CartController extends Controller
             ]);
 
             foreach ($items as $i) {
-                $unit = $i->unit_price ?? optional($i->product)->price ?? 0;
+                $unit = $i->unit_price ?? optional($i->product)->unit_price ?? 0;
                 OrderItem::create([
                     'order_id'   => $order->id,
                     'product_id' => $i->product_id,

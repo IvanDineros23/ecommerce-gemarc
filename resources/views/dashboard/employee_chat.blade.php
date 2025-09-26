@@ -34,7 +34,16 @@
         fetch("{{ url('/chat/users') }}")
             .then(r => r.json())
             .then(users => {
-                let html = users.map(u => `<li><button onclick='selectUser(${u.id}, \"${u.name}\")' class='w-full text-left px-2 py-1 rounded hover:bg-green-100 ${selectedUserId==u.id?'bg-green-200':''}'>${u.name}</button></li>`).join('');
+                // Sort users by last_message_at desc (already sorted from backend)
+                let html = users.map(u => `
+                    <li class='flex items-center gap-2 ${u.unread_count > 0 ? 'bg-yellow-100 animate-pulse' : ''}'>
+                        <button onclick='selectUser(${u.id}, \"${u.name}\")' class='flex-1 text-left px-2 py-1 rounded hover:bg-green-100 ${selectedUserId==u.id?'bg-green-200':''}'>
+                            ${u.name}
+                            ${u.unread_count > 0 ? `<span class='ml-2 inline-block bg-yellow-400 text-xs text-black rounded-full px-2 py-0.5'>${u.unread_count} new</span>` : ''}
+                        </button>
+                        <button onclick='deleteUserChat(${u.id})' title='Delete/Archive' class='text-red-600 hover:text-red-800 px-2 py-1 rounded'>&#128465;</button>
+                    </li>
+                `).join('');
                 document.getElementById('user-list').innerHTML = html;
             });
     }
@@ -60,6 +69,27 @@
     fetchUserList();
     setInterval(fetchUserList, 5000);
     setInterval(fetchChat, 3000);
+    function deleteUserChat(userId) {
+        if (!confirm('Are you sure you want to delete/archive this chat?')) return;
+        fetch("{{ url('/chat/clear') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ to_user_id: userId })
+        }).then(r => r.json()).then(res => {
+            if (res.success) {
+                if (selectedUserId == userId) {
+                    document.getElementById('chat-messages').innerHTML = '';
+                    document.getElementById('chat-header').innerText = '';
+                    document.getElementById('chat-form').style.display = 'none';
+                    selectedUserId = null;
+                }
+                fetchUserList();
+            }
+        });
+    }
     document.getElementById('chat-form').onsubmit = function(e) {
         e.preventDefault();
         let msg = document.getElementById('chat-input').value;

@@ -9,8 +9,9 @@ class EmployeeInventoryController extends Controller
 {
     public function index()
     {
-        $products = Product::orderBy('name')->get();
-        return view('dashboard.employee_inventory', compact('products'));
+    $products = Product::orderBy('name')->get();
+    $notifications = [];
+    return view('dashboard.employee_inventory', compact('products', 'notifications'));
     }
 
     public function update(Request $request, Product $product)

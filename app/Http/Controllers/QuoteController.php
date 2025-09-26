@@ -7,6 +7,12 @@ use App\Models\Quote;
 
 class QuoteController extends Controller
 {
+    // User: list all quotes (stub)
+    public function userIndex()
+    {
+        // Fetch all quotes for the logged-in user
+        return view('placeholders.user_quotes');
+    }
     // Show create quote form
     public function create(Request $request)
     {

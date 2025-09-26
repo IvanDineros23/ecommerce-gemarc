@@ -1,4 +1,15 @@
 <?php
+// User quotes index route
+Route::middleware(['auth', 'verified'])->get('/quotes', [QuoteController::class, 'userIndex'])->name('quotes.index');
+// Employee dashboard route (restrict to employees, pass notifications)
+Route::middleware(['auth', 'verified'])->get('/employee/dashboard', function () {
+    if (!auth()->user() || !method_exists(auth()->user(), 'isEmployee') || !auth()->user()->isEmployee()) {
+        abort(403, 'Unauthorized');
+    }
+    $notifications = [];
+    return view('dashboard.employee', compact('notifications'));
+})->name('employee.dashboard');
+
 use App\Http\Controllers\SavedListController;
 // Saved Items (Wishlist)
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -12,6 +23,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Employee Management (Inventory, Products, Quotes)
 use App\Http\Controllers\EmployeeInventoryController;
 use App\Http\Controllers\EmployeeProductController;
+use App\Http\Controllers\EmployeeOrderController;
+use App\Http\Controllers\EmployeeQuoteController;
 Route::middleware(['auth', 'verified'])->prefix('employee')->name('employee.')->group(function () {
     Route::get('/inventory', [EmployeeInventoryController::class, 'index'])->name('inventory.index');
     Route::patch('/inventory/{product}', [EmployeeInventoryController::class, 'update'])->name('inventory.update');
@@ -20,12 +33,17 @@ Route::middleware(['auth', 'verified'])->prefix('employee')->name('employee.')->
     Route::get('/products/{product}/edit', [EmployeeProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/{product}', [EmployeeProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [EmployeeProductController::class, 'destroy'])->name('products.destroy');
+    // Employee Order Management
+    Route::get('/orders', [EmployeeOrderController::class, 'index'])->name('orders.index');
+    // Employee Quote Management
+    Route::get('/quotes-management', [EmployeeQuoteController::class, 'index'])->name('quotes.management.index');
     // Employee Quote Management (controller-based)
 });
 
 // Employee chat/messages management page
 Route::middleware(['auth', 'verified'])->get('/employee/chats', function () {
-    return view('dashboard.employee_chat');
+    $notifications = [];
+    return view('dashboard.employee_chat', compact('notifications'));
 })->name('employee.chat.page');
 
 // User chat/messages page

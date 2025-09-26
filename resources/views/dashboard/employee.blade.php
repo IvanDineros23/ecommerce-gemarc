@@ -28,7 +28,7 @@
             <div class="font-bold text-orange-600 text-center">Inventory</div>
             <div class="text-xs text-gray-500 text-center">View and update stock levels</div>
         </a>
-        <a href="#" class="flex-1 max-w-xs bg-white rounded-xl shadow p-4 flex flex-col items-center hover:bg-green-50 transition mx-auto md:mx-0">
+    <a href="{{ route('employee.orders.index') }}" class="flex-1 max-w-xs bg-white rounded-xl shadow p-4 flex flex-col items-center hover:bg-green-50 transition mx-auto md:mx-0">
             <!-- Modern Order Management Icon -->
             <svg class="w-16 h-16 mb-2 text-green-800" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <rect x="4" y="6" width="16" height="12" rx="2" fill="#bbf7d0"/>
@@ -50,7 +50,7 @@
             <div class="font-bold text-blue-600 text-center">Chat Management</div>
             <div class="text-xs text-gray-500 text-center">View and manage chats</div>
         </a>
-        <a href="{{ route('employee.quotes.index') }}" class="flex-1 max-w-xs bg-white rounded-xl shadow p-4 flex flex-col items-center hover:bg-green-50 transition mx-auto md:mx-0">
+    <a href="{{ route('employee.quotes.management.index') }}" class="flex-1 max-w-xs bg-white rounded-xl shadow p-4 flex flex-col items-center hover:bg-green-50 transition mx-auto md:mx-0">
             <!-- Quote Management Icon -->
             <svg class="w-16 h-16 mb-2 text-purple-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <rect x="3" y="7" width="18" height="10" rx="2" fill="#ede9fe"/>
@@ -82,52 +82,45 @@
             <canvas id="revenueChart" height="80" style="max-width: 100%; max-height: 220px;"></canvas>
         </div>
     </div>
-    <div class="bg-white rounded-xl shadow p-6">
-        <div class="text-lg font-bold text-green-800 mb-2">Messages & Notifications</div>
-        <ul class="divide-y">
-            @forelse ($notifications as $notif)
-                <li class="flex items-center justify-between py-4">
-                    <div>
-                        @if ($notif['type'] === 'chat')
-                            <div class="font-semibold">{{ $notif['user'] }}</div>
-                            <div class="text-xs text-gray-500">{{ $notif['created_at']->format('Y-m-d H:i') }}</div>
-                            <div class="mt-1">{{ $notif['message'] }}</div>
-                        @elseif ($notif['type'] === 'cart')
-                            <div class="font-semibold text-orange-700">Add to Cart Activity</div>
-                            <div class="text-xs text-gray-500">{{ $notif['created_at']->format('Y-m-d H:i') }}</div>
-                            <div class="mt-1">{{ $notif['user'] }} added <b>{{ $notif['qty'] }}</b> of <b>{{ $notif['product'] }}</b> to cart.</div>
-                        @endif
-                    </div>
-                </li>
-            @empty
-                <li class="py-4 text-gray-400">No messages or notifications yet.</li>
-            @endforelse
-        </ul>
-    </div>
-</div>
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     if (window.Chart) {
         @php
             $products = \App\Models\Product::all();
-            $stockLabels = $products->pluck('name');
+            // Truncate long product names for chart labels
+            $stockLabels = $products->pluck('name')->map(function($name) {
+                return strlen($name) > 18 ? mb_substr($name, 0, 16) . '…' : $name;
+            });
             $stockData = $products->pluck('stock');
             $valueData = $products->map(function($p) { return $p->stock * $p->price; });
             $revenueLabelsMonth = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            $revenueRawMonth = \App\Models\Order::whereYear('created_at', now()->year)
-                ->where('status', 'paid')
-                ->selectRaw('MONTH(created_at) as month, SUM(total_amount) as revenue')
-                ->groupBy('month')
-                ->pluck('revenue', 'month')->toArray();
+            $dbDriver = config('database.default');
+            if ($dbDriver === 'sqlite') {
+                $revenueRawMonth = \App\Models\Order::whereRaw("strftime('%Y', created_at) = ?", [now()->format('Y')])
+                    ->where('status', 'paid')
+                    ->selectRaw("cast(strftime('%m', created_at) as integer) as month, SUM(total_amount) as revenue")
+                    ->groupBy('month')
+                    ->pluck('revenue', 'month')->toArray();
+                $revenueRawYear = \App\Models\Order::where('status', 'paid')
+                    ->selectRaw("cast(strftime('%Y', created_at) as integer) as year, SUM(total_amount) as revenue")
+                    ->groupBy('year')
+                    ->pluck('revenue', 'year')->toArray();
+            } else {
+                $revenueRawMonth = \App\Models\Order::whereYear('created_at', now()->year)
+                    ->where('status', 'paid')
+                    ->selectRaw('MONTH(created_at) as month, SUM(total_amount) as revenue')
+                    ->groupBy('month')
+                    ->pluck('revenue', 'month')->toArray();
+                $revenueRawYear = \App\Models\Order::where('status', 'paid')
+                    ->selectRaw('YEAR(created_at) as year, SUM(total_amount) as revenue')
+                    ->groupBy('year')
+                    ->pluck('revenue', 'year')->toArray();
+            }
             $revenueArrMonth = array_fill(0, 12, 0);
             foreach ($revenueRawMonth as $month => $value) {
                 $revenueArrMonth[$month-1] = $value;
             }
-            $revenueRawYear = \App\Models\Order::where('status', 'paid')
-                ->selectRaw('YEAR(created_at) as year, SUM(total_amount) as revenue')
-                ->groupBy('year')
-                ->pluck('revenue', 'year')->toArray();
             $revenueLabelsYear = array_keys($revenueRawYear);
             $revenueArrYear = array_values($revenueRawYear);
         @endphp

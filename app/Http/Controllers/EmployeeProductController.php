@@ -12,8 +12,9 @@ class EmployeeProductController extends Controller
 {
     public function index()
     {
-        $products = Product::orderByDesc('created_at')->get();
-        return view('dashboard.employee_products', compact('products'));
+    $products = Product::orderByDesc('created_at')->get();
+    $notifications = [];
+    return view('dashboard.employee_products', compact('products', 'notifications'));
     }
 
     public function store(Request $request)
@@ -21,16 +22,17 @@ class EmployeeProductController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
+            'unit_price' => 'required|numeric|min:0',
+            'stock_qty' => 'required|integer|min:0',
             'image' => 'nullable|image|max:2048',
         ]);
         $product = Product::create([
             'name' => $data['name'],
             'description' => $data['description'],
-            'price' => $data['price'],
+            'unit_price' => $data['unit_price'],
+            'stock_qty' => $data['stock_qty'],
             'slug' => Str::slug($data['name']) . '-' . uniqid(),
             'sku' => null,
-            'stock' => 0,
             'is_active' => true,
         ]);
         if ($request->hasFile('image')) {
@@ -57,13 +59,15 @@ class EmployeeProductController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
+            'unit_price' => 'required|numeric|min:0',
+            'stock_qty' => 'required|integer|min:0',
             'image' => 'nullable|image|max:2048',
         ]);
         $product->update([
             'name' => $data['name'],
             'description' => $data['description'],
-            'price' => $data['price'],
+            'unit_price' => $data['unit_price'],
+            'stock_qty' => $data['stock_qty'],
         ]);
         if ($request->hasFile('image')) {
             // Remove old images
@@ -78,6 +82,7 @@ class EmployeeProductController extends Controller
                 'sort_order' => 0,
             ]);
         }
+        // If no new image is uploaded, keep the old images (do nothing)
         return redirect()->route('employee.products.index')->with('success', 'Product updated!');
     }
 

@@ -28,10 +28,18 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         $user = Auth::user();
-        if ($user && method_exists($user, 'isAdmin') && $user->isAdmin()) {
-            return redirect()->intended(route('admin.dashboard', absolute: false));
+        if ($user) {
+            if (method_exists($user, 'isAdmin') && $user->isAdmin()) {
+                return redirect()->intended(route('admin.dashboard', absolute: false));
+            } elseif (method_exists($user, 'isEmployee') && $user->isEmployee()) {
+                // Always redirect to employee dashboard, not intended
+                return redirect(route('employee.dashboard', absolute: false));
+            } elseif (method_exists($user, 'isUser') && $user->isUser()) {
+                return redirect()->intended(route('dashboard', absolute: false));
+            }
         }
-        return redirect()->intended(route('dashboard', absolute: false));
+        // fallback
+        return redirect('/');
     }
 
     /**

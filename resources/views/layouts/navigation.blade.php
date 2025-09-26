@@ -18,15 +18,41 @@
             <!-- Cart Icon and User Dropdown on the right (hide cart for employees) -->
             <div class="hidden sm:flex sm:items-center sm:ms-6 gap-4">
                 @if(auth()->user()->isEmployee())
-                <!-- Messages Button for Employee -->
-                <div class="relative group flex items-center ml-2">
-                    <a href="{{ route('employee.chat.page') }}" class="relative">
+                <!-- Notification Bell for Employee -->
+                <div class="relative group flex items-center ml-2" x-data="{ open: false }">
+                    <button @click="open = !open" class="relative focus:outline-none" aria-label="Notifications">
                         <svg class="w-7 h-7 text-green-700 group-hover:text-orange-600 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4-4.03 7-9 7-1.18 0-2.31-.13-3.36-.38-.37-.09-.77-.08-1.12.07l-2.13.85a1 1 0 01-1.32-1.32l.85-2.13c.15-.35.16-.75.07-1.12A7.96 7.96 0 013 12c0-4 4.03-7 9-7s9 3 9 7z" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                    </a>
-                    <div class="absolute left-1/2 -translate-x-1/2 mt-10 opacity-0 group-hover:opacity-100 pointer-events-none transition bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-50 shadow-lg">
-                        Chat Management
+                        @if(isset($notifications) && count($notifications))
+                            <span class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full px-1.5 py-0.5">{{ count($notifications) }}</span>
+                        @endif
+                    </button>
+                    <!-- Dropdown: improved position, max height, scroll, and shadow -->
+                    <div x-show="open" @click.away="open = false" style="right:0;left:auto;top:2.5rem;" class="absolute w-80 bg-white border border-gray-200 rounded-lg shadow-2xl z-50 max-h-[260px] overflow-y-auto transition-all duration-200" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
+                        <div class="sticky top-0 bg-white p-3 font-bold text-green-800 border-b z-10">Notifications</div>
+                        <ul class="divide-y divide-gray-100 max-h-80 overflow-y-auto">
+                            @forelse (collect($notifications)->sortByDesc('created_at')->take(10) as $notif)
+                                <li class="p-3 hover:bg-green-50 cursor-pointer">
+                                    @if ($notif['type'] === 'chat')
+                                        <div class="font-semibold">{{ $notif['user'] }}</div>
+                                        <div class="text-xs text-gray-500">{{ $notif['created_at']->format('Y-m-d H:i') }}</div>
+                                        <div class="mt-1">{{ $notif['message'] }}</div>
+                                    @elseif ($notif['type'] === 'cart')
+                                        <div class="font-semibold text-orange-700">Add to Cart Activity</div>
+                                        <div class="text-xs text-gray-500">{{ $notif['created_at']->format('Y-m-d H:i') }}</div>
+                                        <div class="mt-1">{{ $notif['user'] }} added <b>{{ $notif['qty'] }}</b> of <b>{{ $notif['product'] }}</b> to cart.</div>
+                                    @endif
+                                </li>
+                            @empty
+                                <li class="p-3 text-gray-400">No notifications</li>
+                            @endforelse
+                        </ul>
+                        @if(count($notifications) > 10)
+                            <div class="text-center p-2 bg-white sticky bottom-0 z-10">
+                                <a href="#" class="text-green-700 hover:underline text-sm">Load more</a>
+                            </div>
+                        @endif
                     </div>
                 </div>
                 @endif
@@ -39,8 +65,8 @@
                             <circle cx="9" cy="21" r="1"/>
                             <circle cx="20" cy="21" r="1"/>
                         </svg>
-                        @if(isset($activeCarts) && count($activeCarts))
-                            <span class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full px-1.5 py-0.5">{{ count($activeCarts) }}</span>
+                        @if(isset($cartItemCount) && $cartItemCount > 0)
+                            <span class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full px-1.5 py-0.5">{{ $cartItemCount }}</span>
                         @endif
                     </a>
                     <div class="absolute left-1/2 -translate-x-1/2 mt-10 opacity-0 group-hover:opacity-100 pointer-events-none transition bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-50 shadow-lg">

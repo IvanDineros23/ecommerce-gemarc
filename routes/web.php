@@ -38,6 +38,9 @@ Route::middleware(['auth', 'verified'])->prefix('employee')->name('employee.')->
     // Employee Quote Management
     Route::get('/quotes-management', [EmployeeQuoteController::class, 'index'])->name('quotes.management.index');
     Route::post('/quotes-management/{quote}/upload', [EmployeeQuoteController::class, 'upload'])->name('quotes.upload');
+    Route::delete('/quotes-management/{quote}', [EmployeeQuoteController::class, 'destroy'])->name('quotes.management.destroy');
+    Route::patch('/quotes-management/{quote}/done', [EmployeeQuoteController::class, 'markAsDone'])->name('quotes.management.done');
+    Route::patch('/quotes-management/{quote}/cancel', [EmployeeQuoteController::class, 'cancel'])->name('quotes.management.cancel');
     // Employee Quote Management (controller-based)
 });
 

@@ -8,6 +8,19 @@ use App\Models\User;
 
 class EmployeeQuoteController extends Controller
 {
+    public function markAsDone(Quote $quote)
+    {
+        $quote->status = 'done';
+        $quote->save();
+        return redirect()->route('employee.quotes.management.index')->with('success', 'Quote marked as done.');
+    }
+
+    public function cancel(Quote $quote)
+    {
+        $quote->status = 'cancelled';
+        $quote->save();
+        return redirect()->route('employee.quotes.management.index')->with('success', 'Quote cancelled.');
+    }
     public function index()
     {
         // Fetch all quotes with user info
@@ -26,5 +39,11 @@ class EmployeeQuoteController extends Controller
         $quote->response_file = $path;
         $quote->save();
         return back()->with('success', 'PDF quotation uploaded successfully!');
+    }
+
+    public function destroy(Quote $quote)
+    {
+        $quote->delete();
+        return redirect()->route('employee.quotes.management.index')->with('success', 'Quote deleted successfully.');
     }
 }

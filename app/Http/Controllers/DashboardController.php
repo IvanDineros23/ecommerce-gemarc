@@ -60,7 +60,7 @@ class DashboardController extends Controller
 
         // Get the user's active cart and item count
         $activeCart = Cart::where('user_id', $u->id)->whereNull('checked_out_at')->latest()->first();
-    $cartItemCount = $activeCart ? $activeCart->items()->sum('quantity') : 0;
+    $cartItemCount = $activeCart ? $activeCart->items()->sum('qty') : 0;
 
         $data = [
             'recentOrders' => Order::where('user_id', $u->id)->latest()->limit(5)->get(),

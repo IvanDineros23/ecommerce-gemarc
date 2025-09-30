@@ -57,11 +57,12 @@
       border-radius:50%;
     }
     .hero-card{
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.2);
-      backdrop-filter:blur(10px);
-      border-radius:18px;
-      box-shadow:0 20px 50px rgba(0,0,0,.18);
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.2);
+  backdrop-filter:blur(10px);
+  border-radius:18px;
+  box-shadow:0 20px 50px rgba(0,0,0,.18);
+  margin-left:-64px;
     }
     .section-title{
       font-weight:800; letter-spacing:.3px;
@@ -146,6 +147,12 @@
             <img src="{{ asset('images/gemarclogo.png') }}" alt="Gemarc" class="mb-4" style="height:74px">
             <h1 class="display-5 fw-bold mb-3">Welcome to <span style="color:var(--gem-amber)">GEMARC Ecommerce</span></h1>
             <p class="lead mb-4">Your trusted supplier for industrial and commercial needs. Order products, request quotes, and track shipments— all in one place.</p>
+            <div class="d-flex flex-wrap gap-2"></div>
+            <style>
+              @media (min-width: 992px) {
+                .hero-card { margin-left: -32px; }
+              }
+            </style>
             <div class="d-flex flex-wrap gap-2">
               <a href="#featured" class="btn btn-pill btn-amber"><i class="bi bi-cart3"></i> Shop Now</a>
               <a href="{{ route('register') }}" class="btn btn-pill btn-outline-light"><i class="bi bi-person-plus"></i> Create Account</a>
@@ -154,9 +161,9 @@
         </div>
 
         <div class="col-lg-6" id="featured">
-          <h3 class="section-title text-white mb-3">Featured Products</h3>
+          <h3 class="section-title text-white mb-3" style="margin-left:48px;">Featured Products</h3>
 
-          <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel" style="margin-left:48px;">
             <div class="carousel-inner">
               @forelse(($featuredProducts ?? []) as $i => $product)
                 <div class="carousel-item @if($i===0) active @endif">
@@ -185,11 +192,11 @@
             </div>
 
             @if(($featuredProducts ?? [])->count() > 1)
-              <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev" style="top:50%; left:-32px; width:48px; height:48px; background:#218838; border-radius:50%; border:none; box-shadow:0 2px 8px rgba(33,136,56,0.15);">
+              <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev" style="position:absolute; top:50%; left:-56px; transform:translateY(-50%); width:48px; height:48px; background:#218838; border-radius:50%; border:none; box-shadow:0 2px 8px rgba(33,136,56,0.15); z-index:2;">
                 <i class="bi bi-chevron-left fs-4 text-white"></i>
                 <span class="visually-hidden">Previous</span>
               </button>
-              <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next" style="top:50%; right:-32px; width:48px; height:48px; background:#218838; border-radius:50%; border:none; box-shadow:0 2px 8px rgba(33,136,56,0.15);">
+              <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next" style="position:absolute; top:50%; right:-56px; transform:translateY(-50%); width:48px; height:48px; background:#218838; border-radius:50%; border:none; box-shadow:0 2px 8px rgba(33,136,56,0.15); z-index:2;">
                 <i class="bi bi-chevron-right fs-4 text-white"></i>
                 <span class="visually-hidden">Next</span>
               </button>

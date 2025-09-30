@@ -120,8 +120,23 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    $products = \App\Models\Product::where('is_active', 1)->orderByDesc('created_at')->get();
+    return view('welcome', ['featuredProducts' => $products]);
 });
+
+// Dedicated login/signup welcome page
+Route::get('/auth/welcome', function () {
+    return view('auth.welcome');
+})->name('auth.welcome');
+
+// Newsletter subscription route
+use Illuminate\Http\Request;
+Route::post('/newsletter/subscribe', function (Request $request) {
+    $request->validate(['email' => 'required|email']);
+    // You can add logic here to save the email to a database or send to a service
+    // For now, just redirect back with a success message
+    return redirect()->back()->with('success', 'Thank you for subscribing!');
+})->name('newsletter.subscribe');
 
 
 // Dashboard with widgets (main landing page)
@@ -178,6 +193,12 @@ Route::get('/shop', function (\Illuminate\Http\Request $request) {
         ->get();
     return view('shop.index', compact('products', 'q'));
 })->name('shop.index');
+
+// Product details route for landing page links
+Route::get('/products/{product}', [App\Http\Controllers\EmployeeProductController::class, 'show'])->name('products.show');
+
+// Product details route for landing page links
+Route::get('/products/{product}', [EmployeeProductController::class, 'show'])->name('products.show');
 
 // Example route to show real-time date and time using Carbon
 use Carbon\Carbon;

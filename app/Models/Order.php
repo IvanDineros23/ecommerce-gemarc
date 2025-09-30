@@ -10,6 +10,8 @@ class Order extends Model
         'user_id',
         'reference_number',
         'status',
+        'payment_method',
+        'delivery_method',
         'subtotal_amount',
         'shipping_amount',
         'tax_amount',
@@ -24,5 +26,11 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    // Relationship: Order belongs to User
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

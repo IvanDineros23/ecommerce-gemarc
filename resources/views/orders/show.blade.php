@@ -8,6 +8,8 @@
             <div class="text-gray-700 mb-2">Reference #: <span class="font-semibold">{{ $order->reference_number }}</span></div>
             <div class="text-gray-700 mb-2">Order Date: <span class="font-semibold">{{ $order->created_at->format('F d, Y h:i A') }}</span></div>
             <div class="text-gray-700 mb-2">Status: <span class="font-semibold">{{ ucfirst($order->status) }}</span></div>
+            <div class="text-gray-700 mb-2">Mode of Payment: <span class="font-semibold">{{ $order->payment_method ?? 'N/A' }}</span></div>
+            <div class="text-gray-700 mb-2">Mode of Delivery: <span class="font-semibold">{{ $order->delivery_method ?? 'N/A' }}</span></div>
         </div>
         <table class="w-full mb-6 text-sm">
             <thead>

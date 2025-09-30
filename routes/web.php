@@ -1,6 +1,6 @@
 <?php
-// User quotes index route
-Route::middleware(['auth', 'verified'])->get('/quotes', [QuoteController::class, 'userIndex'])->name('quotes.index');
+// User quote requests page
+Route::middleware(['auth', 'verified'])->get('/dashboard/quotes', [App\Http\Controllers\QuoteController::class, 'userQuotes'])->name('dashboard.user.quotes');
 // Employee dashboard route (restrict to employees, pass notifications)
 Route::middleware(['auth', 'verified'])->get('/employee/dashboard', function () {
     if (!auth()->user() || !method_exists(auth()->user(), 'isEmployee') || !auth()->user()->isEmployee()) {
@@ -35,6 +35,9 @@ Route::middleware(['auth', 'verified'])->prefix('employee')->name('employee.')->
     Route::delete('/products/{product}', [EmployeeProductController::class, 'destroy'])->name('products.destroy');
     // Employee Order Management
     Route::get('/orders', [EmployeeOrderController::class, 'index'])->name('orders.index');
+    Route::patch('/orders/{order}/done', [EmployeeOrderController::class, 'markAsDone'])->name('orders.done');
+    Route::post('/orders/{order}/upload', [EmployeeOrderController::class, 'uploadReceipt'])->name('orders.upload');
+    Route::delete('/orders/{order}', [EmployeeOrderController::class, 'destroy'])->name('orders.destroy');
     // Employee Quote Management
     Route::get('/quotes-management', [EmployeeQuoteController::class, 'index'])->name('quotes.management.index');
     Route::post('/quotes-management/{quote}/upload', [EmployeeQuoteController::class, 'upload'])->name('quotes.upload');

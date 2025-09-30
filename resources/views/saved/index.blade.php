@@ -21,7 +21,7 @@
                         <div class="flex-1">
                             <div class="font-bold text-green-800 text-lg">{{ $product->name ?? 'Product not found' }}</div>
                             <div class="text-gray-600 text-sm mb-2 line-clamp-2">{{ $product->description ?? '' }}</div>
-                            <div class="text-orange-600 font-bold text-lg mb-2">₱{{ number_format($product->price ?? 0,2) }}</div>
+                            <div class="text-orange-600 font-bold text-lg mb-2">₱{{ number_format($product->unit_price ?? 0,2) }}</div>
                             <form method="POST" action="{{ route('saved.destroy', $item->id) }}" onsubmit="return confirm('Remove this item from saved?')">
                                 @csrf
                                 @method('DELETE')

@@ -73,6 +73,18 @@
                         See your cart
                     </div>
                 </div>
+                <!-- View My Quotes Button -->
+                <div class="relative group flex items-center ml-2">
+                    <a href="{{ url('/dashboard/quotes') }}" class="relative">
+                        <svg class="w-7 h-7 text-orange-600 group-hover:text-green-700 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M4 4h16v16H4z" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 8h8v8H8z" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                    <div class="absolute left-1/2 -translate-x-1/2 mt-10 opacity-0 group-hover:opacity-100 pointer-events-none transition bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-50 shadow-lg">
+                        View My Quotes
+                    </div>
+                </div>
                 <!-- Chat/Messages Button -->
                 <div class="relative group flex items-center ml-2">
                     <a href="{{ route('chat.page') }}" class="relative">

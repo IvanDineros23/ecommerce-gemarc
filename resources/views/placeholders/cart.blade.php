@@ -21,9 +21,9 @@
                     @foreach($items as $item)
                     <tr class="border-b">
                         <td class="py-2">{{ $item->product->name }}</td>
-                        <td class="py-2">₱{{ number_format($item->product->price, 2) }}</td>
+                        <td class="py-2">₱{{ number_format($item->product->unit_price, 2) }}</td>
                         <td class="py-2">{{ $item->quantity }}</td>
-                        <td class="py-2">₱{{ number_format($item->product->price * $item->quantity, 2) }}</td>
+                        <td class="py-2">₱{{ number_format($item->product->unit_price * $item->quantity, 2) }}</td>
                     </tr>
                     @endforeach
                 </tbody>

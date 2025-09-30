@@ -7,11 +7,12 @@ use App\Models\Quote;
 
 class QuoteController extends Controller
 {
-    // User: list all quotes (stub)
-    public function userIndex()
+    // User: list all quotes (actual)
+    public function userQuotes()
     {
-        // Fetch all quotes for the logged-in user
-        return view('placeholders.user_quotes');
+        $user = auth()->user();
+        $quotes = Quote::where('user_id', $user->id)->orderByDesc('created_at')->get();
+        return view('dashboard.user_quotes', compact('quotes'));
     }
     // Show create quote form
     public function create(Request $request)

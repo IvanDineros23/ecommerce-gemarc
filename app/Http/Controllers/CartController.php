@@ -42,7 +42,8 @@ class CartController extends Controller
 
         $item = $cart->items()->firstOrNew(['product_id' => $request->product_id]);
         $item->qty        = ($item->qty ?? 0) + ($request->quantity ?? 1);
-    $item->unit_price = $product->unit_price;
+        $item->unit_price = $product->unit_price;
+        $item->user_id    = Auth::id();
         $item->save();
 
         return redirect()->route('cart.index')->with('status', 'Added to cart.');
@@ -101,11 +102,12 @@ class CartController extends Controller
     {
         $user = $request->user();
 
-        // Ginawang optional ang fields para tugma sa kasalukuyang form mo (walang inputs)
         $data = $request->validate([
             'ship_to_name'    => 'nullable|string|max:120',
             'ship_to_address' => 'nullable|string|max:255',
             'notes'           => 'nullable|string|max:1000',
+            'payment_method'  => 'required|string|max:32',
+            'delivery_method' => 'required|string|max:32',
         ]);
 
         $cart = Cart::where('user_id', $user->id)->whereNull('checked_out_at')->firstOrFail();
@@ -137,6 +139,8 @@ class CartController extends Controller
                 'ship_to_name'     => $data['ship_to_name'] ?? null,
                 'ship_to_address'  => $data['ship_to_address'] ?? null,
                 'notes'            => $data['notes'] ?? null,
+                'payment_method'   => $data['payment_method'],
+                'delivery_method'  => $data['delivery_method'],
             ]);
 
             foreach ($items as $i) {
@@ -145,17 +149,18 @@ class CartController extends Controller
                     'order_id'   => $order->id,
                     'product_id' => $i->product_id,
                     'name'       => optional($i->product)->name,
-                    'qty'        => $i->qty,
+                    'quantity'   => $i->qty,
                     'unit_price' => $unit,
                     'line_total' => $unit * $i->qty,
                 ]);
             }
 
+            $cart->items()->delete(); // Remove all items from cart after checkout
             $cart->update(['checked_out_at' => now()]);
         });
 
-    // Instead of redirect, show success modal and then redirect via JS
-    return redirect()->route('cart.checkout')->with('checkout_success', true);
+    // Redirect to dashboard with success modal
+    return redirect()->route('dashboard')->with('checkout_success', true);
     }
 
     // GET /orders/{order}/receipt

@@ -1,6 +1,21 @@
 @extends('layouts.app')
 
 @section('content')
+@if(session('checkout_success'))
+<div x-data="{ show: true }" x-show="show" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40">
+  <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
+    <div class="text-green-600 text-4xl mb-2">&#10003;</div>
+    <h2 class="text-xl font-bold mb-2">Order Successful!</h2>
+    <p class="mb-4">Thank you for your order. You have been redirected to your dashboard.</p>
+    <button @click="show = false" class="bg-green-600 text-white px-4 py-2 rounded font-semibold hover:bg-green-700">Close</button>
+  </div>
+</div>
+<script>
+document.addEventListener('alpine:init', () => {
+  Alpine.data('successModal', () => ({ show: true }));
+});
+</script>
+@endif
 <div class="py-6">
   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-8">
     @php $cards = [
@@ -24,6 +39,11 @@
     <a href="{{ route('bom.upload') }}" class="rounded-xl bg-white border border-green-300 text-green-900 flex flex-col items-center justify-center py-6 px-4 text-lg font-semibold shadow hover:bg-green-100 transition">Upload BOM (CSV/XLSX)</a>
     <a href="{{ route('quotes.create') }}" class="rounded-xl bg-orange-400 text-gray-900 flex flex-col items-center justify-center py-6 px-4 text-lg font-semibold shadow hover:bg-orange-300 transition">Start a Quote</a>
     <a href="{{ route('lists.create') }}" class="rounded-xl bg-gray-200 text-gray-900 flex flex-col items-center justify-center py-6 px-4 text-lg font-semibold shadow hover:bg-gray-300 transition">New Saved List</a>
+  </div>
+  <div class="flex justify-center mb-8">
+    <a href="{{ url('/dashboard/quotes') }}" class="rounded-xl bg-green-600 text-white flex items-center justify-center py-4 px-6 text-lg font-semibold shadow hover:bg-green-700 transition">
+      📄 View My Quote Requests
+    </a>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -70,6 +90,9 @@
           <li class="px-6 py-4 text-gray-400">No open quotes.</li>
         @endforelse
       </ul>
+      <div class="mt-4 text-right">
+        <a href="{{ route('dashboard.user.quotes') }}" class="text-purple-700 hover:underline text-sm font-semibold">View All My Quote Requests</a>
+      </div>
     </div>
   </div>
 

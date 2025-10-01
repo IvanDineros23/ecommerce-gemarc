@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
 
+use App\Helpers\AuditLogger;
+
 class OrderController extends Controller
 {
     // GET /orders
@@ -24,6 +26,18 @@ class OrderController extends Controller
             abort(403, 'Unauthorized');
         }
         $order->load('items');
+
+        // Audit log: user viewed order
+        $user = auth()->user();
+        AuditLogger::log(
+            $user ? $user->id : null,
+            'user',
+            'view_order',
+            [
+                'order_id' => $order->id,
+                'total' => $order->total ?? null,
+            ]
+        );
         return view('orders.show', compact('order'));
     }
 }

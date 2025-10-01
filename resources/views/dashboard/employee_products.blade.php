@@ -154,7 +154,7 @@
                         <form :id="'deleteForm' + {{ $product->id }}" action="{{ route('employee.products.destroy', $product) }}" method="POST" class="inline">
                             @csrf
                             @method('DELETE')
-                            <button type="button" class="text-red-600 hover:underline" @click="openDelete({ id: {{ $product->id }}, name: '{{ $product->name }}' })">Delete</button>
+                            <button type="submit" class="text-red-600 hover:underline" @click.prevent="openDelete({ id: {{ $product->id }}, name: '{{ $product->name }}' })">Delete</button>
                         </form>
                     </td>
                 </tr>

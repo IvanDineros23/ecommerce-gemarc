@@ -18,13 +18,22 @@ document.addEventListener('alpine:init', () => {
 @endif
 <div class="py-6">
   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-8">
-    @php $cards = [
-      ['Open Orders', $kpis['openOrders'] ?? 0, route('orders.index',['status'=>'open']), 'bg-green-700', 'text-white', '🛒'],
-      ['Open Quotes', $kpis['openQuotes'] ?? 0, route('quotes.index',['status'=>'open']), 'bg-orange-400', 'text-gray-900', '📄'],
-      ['In Transit',  $kpis['inTransit'] ?? 0,  route('shipments.index'), 'bg-green-500', 'text-white', '🚚'],
-      ['Invoices Due','₱'.number_format($kpis['invoicesDue'] ?? 0,2), route('invoices.index',['status'=>'unpaid']), 'bg-orange-600', 'text-white', '🧾'],
-      ['Backorders',  $kpis['backorders'] ?? 0, route('orders.index',['filter'=>'backorders']), 'bg-gray-500', 'text-white', '⏳']
-    ]; @endphp
+    @php
+      $cards = [
+        ['Open Orders', $kpis['openOrders'] ?? 0, route('orders.index',['status'=>'open']), 'bg-green-700', 'text-white', '🛒'],
+        // Only show Open Quotes card if user is employee (has quotes.index route)
+        ...(Route::has('quotes.index') && auth()->user() && method_exists(auth()->user(), 'isEmployee') && auth()->user()->isEmployee()
+          ? [['Open Quotes', $kpis['openQuotes'] ?? 0, route('quotes.index',['status'=>'open']), 'bg-orange-400', 'text-gray-900', '📄']]
+          : []),
+        ...(Route::has('shipments.index') && auth()->user() && method_exists(auth()->user(), 'isEmployee') && auth()->user()->isEmployee()
+          ? [['In Transit',  $kpis['inTransit'] ?? 0,  route('shipments.index'), 'bg-green-500', 'text-white', '🚚']]
+          : []),
+        ...(Route::has('invoices.index')
+          ? [['Invoices Due','₱'.number_format($kpis['invoicesDue'] ?? 0,2), route('invoices.index',['status'=>'unpaid']), 'bg-orange-600', 'text-white', '🧾']]
+          : []),
+        ['Backorders',  $kpis['backorders'] ?? 0, route('orders.index',['filter'=>'backorders']), 'bg-gray-500', 'text-white', '⏳']
+      ];
+    @endphp
     @foreach ($cards as [$label, $value, $link, $bg, $text, $emoji])
       <a href="{{ $link }}" class="rounded-xl shadow-md flex flex-col items-center justify-center p-5 transition hover:scale-105 {{ $bg }} {{ $text }}">
         <div class="text-3xl mb-2">{{ $emoji }}</div>
@@ -35,10 +44,16 @@ document.addEventListener('alpine:init', () => {
   </div>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-    <a href="{{ route('quick-order.show') }}" class="rounded-xl bg-green-900 text-white flex flex-col items-center justify-center py-6 px-4 text-lg font-semibold shadow hover:bg-green-800 transition">Quick Order (SKU)</a>
-    <a href="{{ route('bom.upload') }}" class="rounded-xl bg-white border border-green-300 text-green-900 flex flex-col items-center justify-center py-6 px-4 text-lg font-semibold shadow hover:bg-green-100 transition">Upload BOM (CSV/XLSX)</a>
+    @if(Route::has('quick-order.show'))
+      <a href="{{ route('quick-order.show') }}" class="rounded-xl bg-green-900 text-white flex flex-col items-center justify-center py-6 px-4 text-lg font-semibold shadow hover:bg-green-800 transition">Quick Order (SKU)</a>
+    @endif
+    @if(Route::has('bom.upload'))
+      <a href="{{ route('bom.upload') }}" class="rounded-xl bg-white border border-green-300 text-green-900 flex flex-col items-center justify-center py-6 px-4 text-lg font-semibold shadow hover:bg-green-100 transition">Upload BOM (CSV/XLSX)</a>
+    @endif
     <a href="{{ route('quotes.create') }}" class="rounded-xl bg-orange-400 text-gray-900 flex flex-col items-center justify-center py-6 px-4 text-lg font-semibold shadow hover:bg-orange-300 transition">Start a Quote</a>
-    <a href="{{ route('lists.create') }}" class="rounded-xl bg-gray-200 text-gray-900 flex flex-col items-center justify-center py-6 px-4 text-lg font-semibold shadow hover:bg-gray-300 transition">New Saved List</a>
+    @if(Route::has('lists.create'))
+      <a href="{{ route('lists.create') }}" class="rounded-xl bg-gray-200 text-gray-900 flex flex-col items-center justify-center py-6 px-4 text-lg font-semibold shadow hover:bg-gray-300 transition">New Saved List</a>
+    @endif
   </div>
   <div class="flex justify-center mb-8">
     <a href="{{ url('/dashboard/quotes') }}" class="rounded-xl bg-green-600 text-white flex items-center justify-center py-4 px-6 text-lg font-semibold shadow hover:bg-green-700 transition">

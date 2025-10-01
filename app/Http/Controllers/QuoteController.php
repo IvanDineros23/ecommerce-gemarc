@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Quote;
 
+use App\Helpers\AuditLogger;
+
 class QuoteController extends Controller
 {
     // User: list all quotes (actual)
@@ -64,6 +66,18 @@ class QuoteController extends Controller
         }
         $quote->total = $total;
         $quote->save();
+
+        // Audit log: user created quote
+        $user = auth()->user();
+        // Audit log: user created quote (detailed)
+        $productDetails = [];
+        foreach ($request->products as $productId) {
+            $product = \App\Models\Product::find($productId);
+            $qty = (int)($request->quantities[$productId] ?? 1);
+            $productDetails[] = $product ? ($product->name . ' (ID: ' . $product->id . ', Qty: ' . $qty . ')') : ('ID: ' . $productId . ', Qty: ' . $qty);
+        }
+        $details = "User '{$user->name}' (ID: {$user->id}) submitted a quote request for: " . implode(', ', $productDetails) . ". Total: ₱" . number_format($quote->total, 2);
+        AuditLogger::log('submit_quote', 'quote', $quote->id, null, null, $details);
 
         return back()->with('success', 'Quote request submitted!');
     }

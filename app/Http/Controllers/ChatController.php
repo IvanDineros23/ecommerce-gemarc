@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\AuditLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +13,11 @@ class ChatController extends Controller
     {
         $user = Auth::user();
         $withUserId = $request->input('with_user_id');
+
+        // If not an AJAX request, show 404
+        if (!$request->ajax() && !$request->wantsJson()) {
+            abort(404);
+        }
 
         // If employee, fetch messages with selected user
         if ($user->isEmployee() && $withUserId) {
@@ -49,6 +55,14 @@ class ChatController extends Controller
             return response()->json($messages->reverse()->values());
         }
 
+        // If admin, fetch all messages
+        if ($user->isAdmin()) {
+            $messages = DB::table('chat_messages')
+                ->orderBy('created_at', 'desc')
+                ->limit(50)
+                ->get();
+            return response()->json($messages->reverse()->values());
+        }
         return response()->json([]);
     }
 
@@ -71,6 +85,11 @@ class ChatController extends Controller
             'message' => $request->message,
             'created_at' => now(),
         ]);
+        // Log to audit trail
+        $sender = \App\Models\User::find($senderId);
+        $receiver = \App\Models\User::find($receiverId);
+        $details = "Chat message from '" . ($sender ? $sender->name : $senderId) . "' (ID: $senderId, Role: " . ($sender ? $sender->role : '-') . ") to '" . ($receiver ? $receiver->name : $receiverId) . "' (ID: $receiverId, Role: " . ($receiver ? $receiver->role : '-') . "): '" . $request->message . "'";
+        AuditLogger::log('chat_message', 'chat', $msg, null, null, $details);
         return response()->json(['success' => true]);
     }
 

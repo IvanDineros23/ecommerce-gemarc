@@ -7,7 +7,7 @@ return new class extends Migration {
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('reference_number')->unique()->after('user_id');
+            $table->string('reference_number')->nullable()->unique()->after('user_id');
         });
     }
     public function down()

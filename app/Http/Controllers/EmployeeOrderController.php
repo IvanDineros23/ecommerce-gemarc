@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 
+use App\Helpers\AuditLogger;
+use Illuminate\Support\Facades\Auth;
+
 class EmployeeOrderController extends Controller
 {
     public function index()
@@ -19,10 +22,22 @@ class EmployeeOrderController extends Controller
 
     public function destroy(Order $order)
     {
+        $orderId = $order->id;
+        $orderDetails = [
+            'order_id' => $order->id,
+            'user_id' => $order->user_id,
+            'total' => $order->total ?? null,
+        ];
         $order->delete();
 
-        // Or change to a named route if you have one:
-        // return redirect()->route('employee.orders.index')->with('success', 'Order deleted successfully.');
+        // Audit log: employee deleted order
+        $employee = Auth::user();
+        AuditLogger::log(
+            $employee ? $employee->id : null,
+            'employee',
+            'delete_order',
+            $orderDetails
+        );
         return redirect()->back()->with('success', 'Order deleted successfully.');
     }
 }

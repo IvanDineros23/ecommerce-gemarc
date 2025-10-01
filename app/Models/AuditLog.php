@@ -7,7 +7,7 @@ class AuditLog extends Model
 {
     protected $table = 'audit_logs';
     protected $fillable = [
-        'actor_user_id', 'action', 'entity', 'entity_id', 'before_json', 'after_json',
+        'actor_user_id', 'action', 'entity', 'entity_id', 'before_json', 'after_json', 'details',
     ];
 
     public function actor()

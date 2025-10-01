@@ -10,103 +10,40 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
 
-  <!-- Theme styles -->
   <style>
     :root{
-      --gem-green:#198754; /* bootstrap success base */
-      --gem-green-600:#157347;
-      --gem-amber:#ffb703;
-      --gem-orange:#f97316;
-      --ink:#1f2937;
-      --muted:#6b7280;
-      --card:#ffffffaa;
+      --gem-green:#198754; --gem-green-600:#157347;
+      --gem-amber:#ffb703; --gem-orange:#f97316;
+      --ink:#1f2937; --muted:#6b7280;
     }
     html,body{background:#fff;color:var(--ink);scroll-behavior:smooth}
-    .navbar{
-      backdrop-filter:saturate(120%) blur(6px);
-      box-shadow:0 2px 12px rgba(0,0,0,.06);
-    }
-    .navbar .nav-link{font-weight:600}
-    .btn-pill{
-      border-radius:999px;
-      padding:.55rem 1.1rem;
-      font-weight:700;
-      transition:transform .12s ease, box-shadow .12s ease;
-    }
+    .btn-pill{border-radius:999px;padding:.55rem 1.1rem;font-weight:700;transition:transform .12s,box-shadow .12s}
     .btn-pill:active{transform:translateY(1px)}
     .btn-gem{background:var(--gem-green);border-color:var(--gem-green);color:#fff}
     .btn-gem:hover{background:var(--gem-green-600);border-color:var(--gem-green-600)}
     .btn-amber{background:var(--gem-amber);border-color:var(--gem-amber);color:#1a1a1a}
     .btn-amber:hover{filter:brightness(.95)}
 
-    /* HERO */
-    .hero{
-      position:relative;
-      min-height:680px;
-      display:grid;
-      place-items:center;
-      background:linear-gradient(100deg, var(--gem-green) 0%, #2ea36d 35%, var(--gem-orange) 100%);
-      color:#fff;
-      overflow:hidden;
-    }
-    .hero:before{
-      content:"";
-      position:absolute; inset:auto -20% -35% -20%;
-      height:55%;
-      background:#fff; opacity:.06; filter:blur(60px);
-      border-radius:50%;
-    }
-    .hero-card{
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.2);
-  backdrop-filter:blur(10px);
-  border-radius:18px;
-  box-shadow:0 20px 50px rgba(0,0,0,.18);
-  margin-left:-64px;
-    }
-    .section-title{
-      font-weight:800; letter-spacing:.3px;
-    }
+    .hero{position:relative;min-height:680px;display:grid;place-items:center;
+      background:linear-gradient(100deg,var(--gem-green) 0%,#2ea36d 35%,var(--gem-orange) 100%);color:#fff;overflow:hidden}
+    .hero:before{content:"";position:absolute;inset:auto -20% -35% -20%;height:55%;background:#fff;opacity:.06;filter:blur(60px);border-radius:50%}
+    .hero-card{background:transparent;border:none;box-shadow:none;border-radius:18px}
+    @media (min-width: 992px){ .hero-card{ margin-left:-32px; } }
+    .section-title{font-weight:800;letter-spacing:.3px}
 
-    /* PRODUCT CARD */
-    .product-card{
-      border:0;
-      border-radius:18px;
-      overflow:hidden;
-      box-shadow:0 8px 28px rgba(0,0,0,.06);
-      transition:transform .18s ease, box-shadow .18s ease;
-      background:#fff;
-    }
-    .product-card:hover{
-      transform:translateY(-4px);
-      box-shadow:0 14px 36px rgba(0,0,0,.10);
-    }
-    .product-img{
-      height:220px; object-fit:contain; background:#fff;
-    }
+    .product-card{border:0;border-radius:18px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.06);
+      transition:transform .18s, box-shadow .18s;background:#fff}
+    .product-card:hover{transform:translateY(-4px);box-shadow:0 14px 36px rgba(0,0,0,.10)}
+    .product-img{height:220px;object-fit:contain;background:#fff}
 
-    /* CAROUSEL CONTROLS */
-    .carousel-control-next, .carousel-control-prev{width:56px}
-    .c-dot{
-      background:#fff; color:var(--gem-green);
-      width:52px; height:52px; border-radius:50%;
-      display:grid; place-items:center;
-      border:3px solid #fff; box-shadow:0 10px 24px rgba(0,0,0,.15);
-      transition:transform .18s ease, box-shadow .18s ease;
-    }
-    .carousel-control-next:hover .c-dot,
-    .carousel-control-prev:hover .c-dot{transform:scale(1.06)}
-    .carousel-indicators [data-bs-target]{background:#fff; opacity:.35}
+    .carousel-control-next,.carousel-control-prev{width:56px}
+    .c-dot{background:#fff;color:var(--gem-green);width:52px;height:52px;border-radius:50%;display:grid;place-items:center;
+      border:3px solid #fff;box-shadow:0 10px 24px rgba(0,0,0,.15);transition:transform .18s, box-shadow .18s}
+    .carousel-control-next:hover .c-dot,.carousel-control-prev:hover .c-dot{transform:scale(1.06)}
+    .carousel-indicators [data-bs-target]{background:#fff;opacity:.35}
     .carousel-indicators .active{opacity:1}
 
-    /* TESTIMONIAL */
-    .testimonial{
-      background:#f7f8fb;
-      border-radius:16px;
-      box-shadow:0 6px 18px rgba(0,0,0,.06);
-    }
-
-    /* FOOTER */
+    .testimonial{background:#f7f8fb;border-radius:16px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
     footer{border-top:1px solid #eee}
     .text-muted-2{color:var(--muted)}
   </style>
@@ -114,19 +51,14 @@
 <body>
 
   <!-- NAV -->
-  <nav class="navbar navbar-expand-lg bg-white sticky-top">
+  <nav class="navbar navbar-expand-lg bg-white shadow-sm">
     <div class="container">
-      <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="/">
-        <img src="{{ asset('images/gemarclogo.png') }}" alt="Gemarc" height="28" />
-      </a>
-
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
         <span class="navbar-toggler-icon"></span>
       </button>
-
       <div id="nav" class="collapse navbar-collapse">
         <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
-          <li class="nav-item"><a class="nav-link" href="#browse">Browse</a></li>
+          <li class="nav-item"><a class="nav-link fw-bold" href="{{ route('browse') }}">Browse</a></li>
           <li class="nav-item d-none d-lg-block ms-2">
             <a class="btn btn-pill btn-amber" href="{{ route('register') }}"><i class="bi bi-person-plus"></i> Sign Up</a>
           </li>
@@ -147,12 +79,6 @@
             <img src="{{ asset('images/gemarclogo.png') }}" alt="Gemarc" class="mb-4" style="height:74px">
             <h1 class="display-5 fw-bold mb-3">Welcome to <span style="color:var(--gem-amber)">GEMARC Ecommerce</span></h1>
             <p class="lead mb-4">Your trusted supplier for industrial and commercial needs. Order products, request quotes, and track shipments— all in one place.</p>
-            <div class="d-flex flex-wrap gap-2"></div>
-            <style>
-              @media (min-width: 992px) {
-                .hero-card { margin-left: -32px; }
-              }
-            </style>
             <div class="d-flex flex-wrap gap-2">
               <a href="#featured" class="btn btn-pill btn-amber"><i class="bi bi-cart3"></i> Shop Now</a>
               <a href="{{ route('register') }}" class="btn btn-pill btn-outline-light"><i class="bi bi-person-plus"></i> Create Account</a>
@@ -174,7 +100,6 @@
                       @if(!empty($product->short_description))
                         <p class="text-muted-2 small mb-3">{{ Str::limit($product->short_description, 80) }}</p>
                       @endif
-                      <a href="{{ route('products.show', $product) }}" class="btn btn-pill btn-gem">View Details</a>
                     </div>
                   </div>
                 </div>
@@ -192,11 +117,13 @@
             </div>
 
             @if(($featuredProducts ?? [])->count() > 1)
-              <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev" style="position:absolute; top:50%; left:-56px; transform:translateY(-50%); width:48px; height:48px; background:#218838; border-radius:50%; border:none; box-shadow:0 2px 8px rgba(33,136,56,0.15); z-index:2;">
+              <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev"
+                style="position:absolute;top:50%;left:-56px;transform:translateY(-50%);width:48px;height:48px;background:#218838;border-radius:50%;border:none;box-shadow:0 2px 8px rgba(33,136,56,0.15);z-index:2;">
                 <i class="bi bi-chevron-left fs-4 text-white"></i>
                 <span class="visually-hidden">Previous</span>
               </button>
-              <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next" style="position:absolute; top:50%; right:-56px; transform:translateY(-50%); width:48px; height:48px; background:#218838; border-radius:50%; border:none; box-shadow:0 2px 8px rgba(33,136,56,0.15); z-index:2;">
+              <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next"
+                style="position:absolute;top:50%;right:-56px;transform:translateY(-50%);width:48px;height:48px;background:#218838;border-radius:50%;border:none;box-shadow:0 2px 8px rgba(33,136,56,0.15);z-index:2;">
                 <i class="bi bi-chevron-right fs-4 text-white"></i>
                 <span class="visually-hidden">Next</span>
               </button>
@@ -212,21 +139,33 @@
     <div class="container">
       <div class="d-flex align-items-end justify-content-between mb-3">
         <h3 class="section-title mb-0">Browse Products</h3>
-  <a href="{{ route('shop.index') }}" class="btn btn-link fw-semibold">See all <i class="bi bi-arrow-right"></i></a>
+        <a href="{{ route('browse') }}" class="btn btn-link fw-semibold">See all <i class="bi bi-arrow-right"></i></a>
       </div>
 
       <div class="row g-4">
-        @forelse(($latestProducts ?? ($products ?? [])) as $product)
+        @forelse(($products ?? ($latestProducts ?? [])) as $product)
+          @php
+            $img = $product->firstImagePath() ? asset('storage/'.$product->firstImagePath()) : asset('images/gemarclogo.png');
+            $name = e($product->name);
+            $desc = e($product->description ?? '');
+          @endphp
           <div class="col-6 col-md-4 col-lg-3">
             <div class="card product-card h-100">
-              <img class="product-img" src="{{ $product->firstImagePath() ? asset('storage/'.$product->firstImagePath()) : asset('images/gemarclogo.png') }}" alt="{{ $product->name }}">
+              <img class="product-img" src="{{ $img }}" alt="{{ $name }}">
               <div class="card-body d-flex flex-column">
-                <h6 class="fw-bold mb-1">{{ $product->name }}</h6>
-                @if(isset($product->price))
-                  <div class="text-muted-2 small mb-2">₱{{ number_format($product->price, 2) }}</div>
-                @endif
+                <h6 class="fw-bold mb-1">{{ $name }}</h6>
                 <div class="mt-auto d-grid gap-2">
-                  <a href="{{ route('products.show', $product) }}" class="btn btn-pill btn-outline-secondary">Details</a>
+                  <!-- QUICK VIEW button -->
+                  <button
+                    type="button"
+                    class="btn btn-pill btn-outline-secondary btn-quick-view"
+                    data-bs-toggle="modal"
+                    data-bs-target="#productQuickView"
+                    data-name="{{ $name }}"
+                    data-desc="{{ $desc }}"
+                    data-img="{{ $img }}"
+                  >Details</button>
+
                   <a href="{{ route('login') }}" class="btn btn-pill btn-gem">Add to Quote</a>
                 </div>
               </div>
@@ -246,7 +185,7 @@
       <div class="row justify-content-center">
         <div class="col-md-8">
           <div id="testimonialCarousel" class="carousel slide testimonial" data-bs-ride="carousel">
-            <div class="carousel-inner p-4 p-md-5">
+            <div class="carousel-inner p-4 p-md-5 position-relative">
               <div class="carousel-item active">
                 <figure class="mb-0">
                   <blockquote class="blockquote fs-5">“Super fast delivery and genuine products! Highly recommended.”</blockquote>
@@ -266,11 +205,11 @@
                 </figure>
               </div>
             </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+            <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev" style="position:absolute;top:50%;left:-60px;transform:translateY(-50%);z-index:2;">
               <span class="c-dot"><i class="bi bi-chevron-left fs-5"></i></span>
               <span class="visually-hidden">Previous</span>
             </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+            <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next" style="position:absolute;top:50%;right:-60px;transform:translateY(-50%);z-index:2;">
               <span class="c-dot"><i class="bi bi-chevron-right fs-5"></i></span>
               <span class="visually-hidden">Next</span>
             </button>
@@ -336,23 +275,31 @@
     </div>
   </footer>
 
-  <!-- Optional Auth Modal (kept for future use) -->
-  <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+  <!-- QUICK VIEW MODAL (Bootstrap) -->
+  <div class="modal fade" id="productQuickView" tabindex="-1" aria-labelledby="productQuickViewLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="authModalLabel">Account</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          <h5 class="modal-title" id="productQuickViewLabel">Product</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <ul class="nav nav-tabs mb-3" id="authTab" role="tablist">
-            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#login">Login</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#register">Create Account</button></li>
-          </ul>
-          <div class="tab-content">
-            <div class="tab-pane fade show active" id="login"> <!-- login form here --> </div>
-            <div class="tab-pane fade" id="register"> <!-- register form here --> </div>
+          <div class="row g-4 align-items-start">
+            <div class="col-md-5">
+              <img id="qvImage" src="" alt="" class="img-fluid rounded border" style="background:#fafafa;object-fit:contain;max-height:320px;width:100%">
+            </div>
+            <div class="col-md-7">
+              <h4 id="qvName" class="mb-2"></h4>
+              <p id="qvDesc" class="text-muted"></p>
+              <div class="d-flex gap-2 mt-3">
+                <a href="{{ route('login') }}" class="btn btn-pill btn-gem"><i class="bi bi-box-arrow-in-right"></i> Login to Quote</a>
+                <a href="{{ route('register') }}" class="btn btn-pill btn-outline-secondary">Create Account</a>
+              </div>
+            </div>
           </div>
+        </div>
+        <div class="modal-footer">
+          <small class="text-muted">Tip: Create an account to request quotes faster.</small>
         </div>
       </div>
     </div>
@@ -360,5 +307,24 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Fill and show Quick View modal
+    document.addEventListener('click', function(e){
+      const btn = e.target.closest('.btn-quick-view');
+      if(!btn) return;
+
+      // Read product data from data-* attributes
+      const name = btn.getAttribute('data-name') || 'Product';
+      const desc = btn.getAttribute('data-desc') || '';
+      const img  = btn.getAttribute('data-img')  || '{{ asset('images/gemarclogo.png') }}';
+
+      // Populate modal
+      document.getElementById('qvName').textContent = name;
+      document.getElementById('qvDesc').textContent = desc;
+      document.getElementById('qvImage').setAttribute('src', img);
+      document.getElementById('productQuickViewLabel').textContent = name;
+      // (Bootstrap handles showing because the button already has data-bs-toggle="modal")
+    });
+  </script>
 </body>
 </html>

@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
+use App\Helpers\AuditLogger;
+
 class AuthenticatedSessionController extends Controller
 {
     /**
@@ -28,6 +30,22 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         $user = Auth::user();
+        // Audit log: user login
+        if ($user) {
+            $role = method_exists($user, 'isAdmin') && $user->isAdmin() ? 'admin' : (method_exists($user, 'isEmployee') && $user->isEmployee() ? 'employee' : 'user');
+            $details = "User '{$user->name}' (ID: {$user->id}, Role: {$role}) logged in.";
+            AuditLogger::log(
+                'login',
+                $role,
+                null,
+                [
+                    'ip' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                ],
+                null,
+                $details
+            );
+        }
         if ($user) {
             if (method_exists($user, 'isAdmin') && $user->isAdmin()) {
                 return redirect()->intended(route('admin.dashboard', absolute: false));
@@ -47,6 +65,23 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $user = Auth::user();
+        // Audit log: user logout
+        if ($user) {
+            $role = method_exists($user, 'isAdmin') && $user->isAdmin() ? 'admin' : (method_exists($user, 'isEmployee') && $user->isEmployee() ? 'employee' : 'user');
+            $details = "User '{$user->name}' (ID: {$user->id}, Role: {$role}) logged out.";
+            AuditLogger::log(
+                'logout',
+                $role,
+                null,
+                [
+                    'ip' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                ],
+                null,
+                $details
+            );
+        }
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

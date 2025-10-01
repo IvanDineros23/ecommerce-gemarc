@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\SavedList;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
+use App\Helpers\AuditLogger;
 
 class SavedListController extends Controller
 {
@@ -43,6 +44,10 @@ class SavedListController extends Controller
                 'saved_list_id' => $savedList->id,
                 'product_id' => $request->product_id,
             ]);
+            // Audit log for saving product
+            $product = Product::find($request->product_id);
+            $details = "User '{$user->name}' (ID: {$user->id}) saved product '{$product->name}' (ID: {$product->id}) to saved items.";
+            AuditLogger::log('save_product', 'product', $product->id, null, null, $details);
         }
         return redirect()->route('saved.index')->with('success', 'Product saved!');
     }

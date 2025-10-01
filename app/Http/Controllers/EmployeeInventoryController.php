@@ -19,8 +19,17 @@ class EmployeeInventoryController extends Controller
         $request->validate([
             'stock' => 'required|integer|min:0',
         ]);
+        $before = $product->toArray();
+        $oldStock = $before['stock'] ?? null;
         $product->stock = $request->stock;
         $product->save();
+        $employee = auth()->user();
+        $role = method_exists($employee, 'isEmployee') && $employee->isEmployee() ? 'employee' : 'user';
+        $newStock = $product->stock;
+        $details = ($oldStock !== $newStock)
+            ? "$role '{$employee->name}' (ID: {$employee->id}) updated stock for product '{$product->name}' (ID: {$product->id}) from {$oldStock} to {$newStock}."
+            : "$role '{$employee->name}' (ID: {$employee->id}) updated product '{$product->name}' (ID: {$product->id}).";
+        \App\Helpers\AuditLogger::log('update', $role, $product->id, $before, $product->toArray(), $details);
         return redirect()->route('employee.inventory.index')->with('success', 'Stock updated!');
     }
 }

@@ -18,6 +18,9 @@ class DatabaseSeeder extends Seeder
     $this->call(CreateEmployeeUserSeeder::class);
     $this->call(CreateNormalUserSeeder::class);
 
+    // Seed Dom Sales employee
+    $this->call(CreateDomSalesUserSeeder::class);
+
     // Seed demo products and images for MVP
     $this->call(\Database\Seeders\CreateDemoProductsSeeder::class);
     }

@@ -14,7 +14,7 @@ return new class extends Migration {
     }
 
     public function down() {
-        // Optionally clear reference_number for rollback
-        DB::statement("UPDATE orders SET reference_number = NULL WHERE reference_number LIKE 'GEI-%'");
+    // Optionally clear reference_number for rollback (set to empty string instead of NULL)
+    DB::statement("UPDATE orders SET reference_number = '' WHERE reference_number LIKE 'GEI-%'");
     }
 };

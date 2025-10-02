@@ -17,7 +17,8 @@
             <svg :class="{'rotate-180': open}" class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
         </button>
         <div x-show="open" class="px-6 pb-6 pt-2">
-            <form x-data="{ email: '', confirm: '', match: true }" @input="match = (email === confirm)">
+            <form x-data="{ email: '', confirm: '', match: true }" @input="match = (email === confirm)" method="POST" action="{{ route('settings.saveBasicInfo') }}">
+                @csrf
                 <div class="mb-4">
                     <label class="block text-gray-700 mb-1">Name</label>
                     <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100 cursor-not-allowed" value="{{ Auth::user()->name }}" readonly disabled>
@@ -25,6 +26,10 @@
                 <div class="mb-4">
                     <label class="block text-gray-700 mb-1">Current Email</label>
                     <input type="email" class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100 cursor-not-allowed" value="{{ Auth::user()->email }}" readonly disabled>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-1">Contact Number</label>
+                    <input type="text" name="contact_no" class="w-full border border-gray-300 rounded px-3 py-2" value="{{ old('contact_no', Auth::user()->contact_no) }}" placeholder="09XXXXXXXXX">
                 </div>
                 @if(!$isEmployee)
                     <div class="mb-4">
@@ -41,7 +46,7 @@
                             </div>
                         </template>
                     </div>
-                    <button type="button" :disabled="!match || !email || !confirm" :class="['px-4 py-2 rounded font-semibold mb-4 transition', match && email && confirm ? 'bg-green-700 text-white hover:bg-green-800' : 'bg-gray-300 text-gray-500 cursor-not-allowed']">Save Basic Info</button>
+                    <button type="submit" :disabled="!match || !email || !confirm" :class="['px-4 py-2 rounded font-semibold mb-4 transition', match && email && confirm ? 'bg-green-700 text-white hover:bg-green-800' : 'bg-gray-300 text-gray-500 cursor-not-allowed']">Save Basic Info</button>
                 @endif
             </form>
         </div>
@@ -170,35 +175,20 @@
     @endif
 
     @if(!$isEmployee)
-        <!-- Delivery Address Dropdown -->
-        <div x-data="{ open: false, category: '{{ old('category', Auth::user()->delivery_option['category'] ?? 'home') }}' }" class="bg-white rounded-xl shadow mb-4">
+        <!-- Address Dropdown -->
+        <div x-data="{ open: false }" class="bg-white rounded-xl shadow mb-4">
             <button @click="open = !open" class="w-full flex justify-between items-center px-6 py-4 text-lg font-semibold text-green-700 focus:outline-none">
-                Delivery Address
+                Address
                 <svg :class="{'rotate-180': open}" class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
             </button>
             <div x-show="open" class="px-6 pb-6 pt-2">
-                <form method="POST" action="{{ route('settings.saveDeliveryAddress') }}" x-data="{ category: '{{ old('category', Auth::user()->delivery_option['category'] ?? 'home') }}' }">
+                <form method="POST" action="{{ route('settings.saveDeliveryAddress') }}">
                     @csrf
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-1">Address</label>
-                        <input type="text" name="address" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="123 Main St, City, Province" value="{{ old('address', Auth::user()->delivery_option['address'] ?? '') }}" required>
+                        <input type="text" name="address" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="123 Main St, City, Province" value="{{ old('address', Auth::user()->address ?? Auth::user()->delivery_option['address'] ?? '') }}" required>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 mb-1">Category</label>
-                        <select name="category" x-model="category" class="w-full border border-gray-300 rounded px-3 py-2" required>
-                            <option value="home">Home</option>
-                            <option value="office">Office</option>
-                            <option value="school">School</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <template x-if="category === 'other'">
-                        <div class="mb-4">
-                            <label class="block text-gray-700 mb-1">Other Category</label>
-                            <input type="text" name="other_category" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="Specify category" value="{{ old('other_category') }}">
-                        </div>
-                    </template>
-                    <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 font-semibold">Save Delivery Address</button>
+                    <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 font-semibold">Save Address</button>
                 </form>
             </div>
         </div>

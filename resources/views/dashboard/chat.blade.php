@@ -50,7 +50,11 @@
         echo $emp ? $emp->id : 1;
     @endphp;
     function fetchChat() {
-        fetch("{{ url('/chat/fetch') }}")
+        fetch("{{ url('/chat/fetch') }}", {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
             .then(r => r.json())
             .then(msgs => {
                 let html = msgs.map(m => `<div><b>${m.sender_id == {{ auth()->id() }} ? 'You' : 'Employee'}:</b> ${m.message}</div>`).join('');

@@ -155,6 +155,16 @@ class CartController extends Controller
                 ]);
             }
 
+            // Push employee notification for new order
+            \App\Helpers\EmployeeNotification::push('order', [
+                'user' => $user->name,
+                'user_id' => $user->id,
+                'order_id' => $order->id,
+                'reference' => $order->reference_number,
+                'total' => $order->total_amount,
+                'created_at' => now(),
+            ]);
+
             $cart->items()->delete(); // Remove all items from cart after checkout
             $cart->update(['checked_out_at' => now()]);
         });

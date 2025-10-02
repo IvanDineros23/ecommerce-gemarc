@@ -24,10 +24,97 @@
     .btn-amber{background:var(--gem-amber);border-color:var(--gem-amber);color:#1a1a1a}
     .btn-amber:hover{filter:brightness(.95)}
 
-    .hero{position:relative;min-height:680px;display:grid;place-items:center;
-      background:linear-gradient(100deg,var(--gem-green) 0%,#2ea36d 35%,var(--gem-orange) 100%);color:#fff;overflow:hidden}
-    .hero:before{content:"";position:absolute;inset:auto -20% -35% -20%;height:55%;background:#fff;opacity:.06;filter:blur(60px);border-radius:50%}
-    .hero-card{background:transparent;border:none;box-shadow:none;border-radius:18px}
+    .hero {
+      position:relative;min-height:680px;display:grid;place-items:center;
+      background: url('{{ asset('images/360_F_1589025175_1DxdWO4V6n1gbYRWoVjD0eef0QEi9yq4.jpg') }}') center center/cover no-repeat;
+      color:#fff;overflow:hidden;
+    }
+    .hero:before {
+      content:"";position:absolute;inset:0;z-index:1;
+      width:100%;height:100%;
+      background:rgba(20,20,20,0.82); /* darker overlay for more contrast */
+      opacity:0.82;
+    }
+    .hero .container, .hero .row, .hero .col-lg-6 {
+      position:relative;z-index:2;
+    }
+    .hero-content {
+      padding-top: 60px;
+      padding-bottom: 60px;
+      text-align: left;
+      color: #fff;
+      text-shadow: 0 4px 32px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.32);
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .hero-content .hero-logo {
+      display: block;
+      margin: 0 auto 2.2rem auto;
+      height: 110px;
+      max-width: 320px;
+      filter: drop-shadow(0 6px 32px rgba(0,0,0,0.25)) brightness(1.15) contrast(1.15) saturate(1.2);
+      background: rgba(255,255,255,0.18);
+      border-radius: 18px;
+      padding: 10px 24px 10px 24px;
+    }
+    .hero-content h1 {
+      font-size: 3.8rem;
+      font-weight: 900;
+      line-height: 1.08;
+      margin-bottom: 1.2rem;
+      text-align: center;
+      letter-spacing: -1px;
+      color: #fff;
+      text-shadow: 0 6px 32px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.32);
+    }
+    .hero-content h1 span {
+      color: #ffb703;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.18);
+    }
+    .hero-content p {
+      font-size: 1.45rem;
+      margin-bottom: 2.2rem;
+      font-weight: 400;
+      text-align: center;
+      color: #e6e6e6;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.32);
+    }
+    .hero-content .btn {
+      font-size: 1.18rem;
+      font-weight: 700;
+      padding: 0.8rem 2.3rem;
+      border-radius: 999px;
+      margin-right: 1rem;
+      margin-bottom: 0.5rem;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      border: none;
+      transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+    }
+    .hero-content .btn-amber {
+      background: linear-gradient(90deg, #ffb703 0%, #f97316 100%);
+      color: #222;
+      border: none;
+    }
+    .hero-content .btn-amber:hover, .hero-content .btn-amber:focus {
+      background: linear-gradient(90deg, #f97316 0%, #ffb703 100%);
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(255,183,3,0.18);
+    }
+    .hero-content .btn-outline-light {
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      border: 2px solid #fff;
+    }
+    .hero-content .btn-outline-light:hover, .hero-content .btn-outline-light:focus {
+      background: #fff;
+      color: #222;
+      border: 2px solid #ffb703;
+      box-shadow: 0 4px 24px rgba(255,255,255,0.18);
+    }
     @media (min-width: 992px){ .hero-card{ margin-left:-32px; } }
     .section-title{font-weight:800;letter-spacing:.3px}
 
@@ -53,6 +140,9 @@
   <!-- NAV -->
   <nav class="navbar navbar-expand-lg bg-white shadow-sm">
     <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="/">
+        <img src="{{ asset('images/gemarclogo.png') }}" alt="Gemarc Logo" style="height: 48px; width: auto; margin-right: 10px;">
+      </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -75,13 +165,12 @@
     <div class="container py-5">
       <div class="row align-items-center g-5">
         <div class="col-lg-6">
-          <div class="p-4 p-md-5 hero-card">
-            <img src="{{ asset('images/gemarclogo.png') }}" alt="Gemarc" class="mb-4" style="height:74px">
-            <h1 class="display-5 fw-bold mb-3">Welcome to <span style="color:var(--gem-amber)">GEMARC Ecommerce</span></h1>
-            <p class="lead mb-4">Your trusted supplier for industrial and commercial needs. Order products, request quotes, and track shipments— all in one place.</p>
-            <div class="d-flex flex-wrap gap-2">
-              <a href="#featured" class="btn btn-pill btn-amber"><i class="bi bi-cart3"></i> Shop Now</a>
-              <a href="{{ route('register') }}" class="btn btn-pill btn-outline-light"><i class="bi bi-person-plus"></i> Create Account</a>
+          <div class="hero-content">
+            <h1>Welcome to <span style="color:var(--gem-amber)">GEMARC Ecommerce</span></h1>
+            <p>Your trusted supplier for industrial and commercial needs. Order products, request quotes, and track shipments— all in one place.</p>
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+              <a href="#featured" class="btn btn-amber"><i class="bi bi-cart3"></i> Shop Now</a>
+              <a href="{{ route('register') }}" class="btn btn-outline-light"><i class="bi bi-person-plus"></i> Create Account</a>
             </div>
           </div>
         </div>

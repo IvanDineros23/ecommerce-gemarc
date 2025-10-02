@@ -3,8 +3,8 @@
 @section('content')
 <div class="py-8">
     <div class="flex flex-col items-center justify-center mb-8 text-center">
-        <h1 class="text-3xl font-bold text-purple-800 mb-2">Quote Management</h1>
-        <p class="text-gray-700">View and manage all customer quote requests here.</p>
+        <h1 class="text-3xl font-bold text-purple-800 mb-2 text-center">Quote Management</h1>
+        <p class="text-gray-700 text-center">View and manage all customer quote requests here.</p>
     </div>
 
     <div class="bg-white rounded-xl shadow p-6">
@@ -36,25 +36,37 @@
         </form>
 
         {{-- Table --}}
-        <table class="min-w-full text-sm">
+        <table class="min-w-full text-sm text-center">
             <thead>
-            <tr class="text-left border-b">
-                <th class="py-2">Quote #</th>
-                <th class="py-2">Customer</th>
-                <th class="py-2">Date</th>
-                <th class="py-2">Status</th>
+            <tr class="border-b">
+                <th class="py-2 text-center">Quote #</th>
+                <th class="py-2 text-center">Customer</th>
+                <th class="py-2 text-center">Date</th>
+                <th class="py-2 text-center">Status</th>
                 <th class="py-2 text-center">Action</th>
             </tr>
             </thead>
             <tbody>
             @foreach($quotes as $quote)
-                <tr class="border-b">
-                    <td class="py-2 font-mono">{{ $quote->id }}</td>
-                    <td class="py-2">{{ $quote->user->name ?? 'N/A' }}</td>
-                    <td class="py-2">{{ $quote->created_at->format('Y-m-d H:i') }}</td>
-                    <td class="py-2">{{ ucfirst($quote->status ?? 'pending') }}</td>
+                <tr class="border-b text-center">
+                    <td class="py-2 font-mono text-center">
+                        {{ $quote->number ?? ('GEI-GDS-' . date('Y', strtotime($quote->created_at)) . '-' . str_pad($quote->id, 4, '0', STR_PAD_LEFT)) }}
+                    </td>
+                    <td class="py-2 text-center">{{ $quote->user->name ?? 'N/A' }}</td>
+                    <td class="py-2 text-center">{{ $quote->created_at->format('Y-m-d H:i') }}</td>
+                    <td class="py-2 text-center">{{ ucfirst($quote->status ?? 'pending') }}</td>
                     <td class="py-2 text-center">
-                        <div class="inline-flex gap-2">
+                        <div class="inline-flex gap-2 justify-center flex-wrap">
+                            <a href="{{ route('quotes.pdf', $quote->id) }}" target="_blank"
+                               class="bg-blue-100 text-blue-900 px-3 py-1 rounded hover:bg-blue-200 border-2 border-blue-900 flex items-center gap-1 min-w-[110px]">
+                                <span>📄</span><span>View PDF</span>
+                            </a>
+
+                            <a href="{{ route('employee.quotes.edit', $quote->id) }}"
+                               class="bg-yellow-500 text-black px-3 py-1 rounded hover:bg-yellow-600 flex items-center gap-1 min-w-[110px]">
+                                <span>✏️</span><span>Edit</span>
+                            </a>
+
                             <button type="button"
                                     class="bg-purple-100 text-purple-800 px-3 py-1 rounded hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 flex items-center gap-1 font-semibold min-w-[110px]"
                                     onclick="showQuoteModal({{ $quote->id }})">
@@ -69,26 +81,35 @@
                             @endif
 
                             <form method="POST" action="{{ route('employee.quotes.management.destroy', $quote->id) }}"
-                                  class="inline-block min-w-[110px]" onsubmit="return confirm('Delete this quote?');">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1">
+                                  class="inline-block min-w-[110px] confirmable-form"
+                                  data-confirm="Are you sure you want to delete this quote?">
+                                @csrf
+                                @method('DELETE')
+                                <button type="button"
+                                        class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1 confirm-btn">
                                     <span>🗑️</span><span>Delete</span>
                                 </button>
                             </form>
 
                             <form method="POST" action="{{ route('employee.quotes.management.done', $quote->id) }}"
-                                  class="inline-block min-w-[110px]" onsubmit="return confirm('Mark as done?');">
-                                @csrf @method('PATCH')
-                                <button type="submit" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 flex items-center gap-1">
+                                  class="inline-block min-w-[110px] confirmable-form"
+                                  data-confirm="Mark this quote as done?">
+                                @csrf
+                                @method('PATCH')
+                                <button type="button"
+                                        class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 flex items-center gap-1 confirm-btn">
                                     <span>✔️</span><span>Mark as Done</span>
                                 </button>
                             </form>
 
                             <form method="POST" action="{{ route('employee.quotes.management.cancel', $quote->id) }}"
-                                  class="inline-block min-w-[110px]" onsubmit="return confirm('Cancel this quote?');">
-                                @csrf @method('PATCH')
-                                <button type="submit" class="bg-yellow-500 text-black px-3 py-1 rounded hover:bg-yellow-600 flex items-center gap-1">
-                                    <span>🚫</span><span>Cancel</span>
+                                  class="inline-block min-w-[110px] confirmable-form"
+                                  data-confirm="Cancel this quote?">
+                                @csrf
+                                @method('PATCH')
+                                <button type="button"
+                                        class="bg-yellow-500 text-black px-3 py-1 rounded hover:bg-yellow-600 flex items-center gap-1 confirm-btn">
+                                        <span>🚫</span><span>Cancel</span>
                                 </button>
                             </form>
                         </div>
@@ -98,105 +119,196 @@
             </tbody>
         </table>
 
-        {{-- MODALS: render one per quote (AFTER the table) --}}
-        @foreach($quotes as $quote)
-            <div id="quote-modal-{{ $quote->id }}" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
-                {{-- Backdrop (click to close) --}}
-                <div class="absolute inset-0 bg-black/50" onclick="closeQuoteModal({{ $quote->id }})"></div>
-
-                {{-- Centered wrapper with comfortable margins --}}
-                <div class="relative flex min-h-full items-center justify-center p-4 md:p-10 lg:p-16">
-                    <div
-                        class="relative w-full max-w-3xl rounded-2xl bg-white shadow-xl ring-1 ring-black/5
-                               max-h-[85vh] overflow-hidden
-                               transform transition-all duration-200
-                               hover:shadow-2xl hover:-translate-y-0.5 hover:scale-[1.01]">
-
-                        {{-- Close button (top-right) --}}
-                        <button type="button"
-                                onclick="closeQuoteModal({{ $quote->id }})"
-                                class="absolute top-3 right-3 inline-flex items-center justify-center
-                                       h-10 w-10 rounded-full text-gray-500 hover:text-gray-700
-                                       hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-300"
-                                aria-label="Close">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
-                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                            </svg>
-                        </button>
-
-                        {{-- Scrollable content --}}
-                        <div class="p-6 md:p-10 space-y-6 overflow-y-auto max-h-[85vh]">
-                            <div class="text-center">
-                                <h2 class="text-xl font-bold text-purple-800">Quote #{{ $quote->id }}</h2>
-                                <div class="mt-2 text-sm text-gray-600">
-                                    Customer:
-                                    <span class="font-semibold text-gray-900">{{ $quote->user->name ?? 'N/A' }}</span>
-                                </div>
-                                <div class="text-sm text-gray-600">
-                                    Date: {{ $quote->created_at->format('Y-m-d H:i') }}
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="font-semibold mb-3">Requested Items:</div>
-                                <div class="overflow-x-auto">
-                                    <table class="min-w-full text-xs border">
-                                        <thead>
-                                        <tr class="bg-gray-100">
-                                            <th class="py-1 px-2 text-left">Product</th>
-                                            <th class="py-1 px-2 text-center">Qty</th>
-                                            <th class="py-1 px-2 text-right">Unit Price</th>
-                                            <th class="py-1 px-2 text-right">Subtotal</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        @foreach($quote->items as $item)
-                                            <tr class="border-t">
-                                                <td class="py-1 px-2">{{ $item->name }}</td>
-                                                <td class="py-1 px-2 text-center">{{ $item->quantity }}</td>
-                                                <td class="py-1 px-2 text-right">₱{{ number_format($item->unit_price, 2) }}</td>
-                                                <td class="py-1 px-2 text-right">₱{{ number_format($item->unit_price * $item->quantity, 2) }}</td>
-                                            </tr>
-                                        @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div class="w-full flex justify-end font-bold text-lg text-purple-700 mt-4">
-                                    Total: ₱{{ number_format($quote->total, 2) }}
-                                </div>
-                            </div>
-
-                            <form method="POST" action="{{ route('employee.quotes.upload', $quote->id) }}"
-                                  enctype="multipart/form-data" class="border-t pt-6 text-center">
-                                @csrf
-                                <label class="block mb-2 font-semibold">Upload Quotation (PDF only):</label>
-                                <input type="file" name="quote_file" accept="application/pdf" class="mb-3" required>
-                                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-                                    Upload PDF
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+        {{-- Confirmation Modal (default: hidden only; JS toggles flex) --}}
+        <div id="confirmation-modal" class="fixed inset-0 z-50 hidden bg-black/40 items-center justify-center">
+            <div class="bg-white rounded-xl shadow-lg p-8 max-w-xs w-full text-center relative">
+                <div id="confirmation-message" class="mb-6 text-lg text-gray-800 font-semibold">Are you sure?</div>
+                <div class="flex justify-center gap-4">
+                    <button id="confirm-yes" class="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-700 font-bold">Yes</button>
+                    <button id="confirm-no" class="bg-gray-300 text-gray-800 px-5 py-2 rounded hover:bg-gray-400 font-bold">Cancel</button>
                 </div>
             </div>
-        @endforeach
-        {{-- /MODALS --}}
+        </div>
+
+     {{-- MODALS: render one per quote (AFTER the table) --}}
+@foreach($quotes as $quote)
+  <div id="quote-modal-{{ $quote->id }}"
+       class="fixed inset-0 z-50 hidden items-center justify-center"
+       role="dialog" aria-modal="true" aria-labelledby="quote-title-{{ $quote->id }}">
+    <!-- overlay -->
+    <div class="absolute inset-0 bg-black/40" onclick="closeQuoteModal({{ $quote->id }})"></div>
+
+    <!-- modal container (relative so absolute children anchor properly) -->
+    <div class="relative bg-white rounded-xl shadow-lg w-[92vw] max-w-3xl p-6 md:p-8 border border-purple-100">
+
+      <!-- CLOSE BUTTON — hard-right, hard-top -->
+      <button type="button"
+              onclick="closeQuoteModal({{ $quote->id }})"
+              class="inline-flex items-center justify-center w-9 h-9 rounded-full text-gray-500 hover:text-purple-700 hover:bg-gray-100 focus:outline-none"
+              aria-label="Close"
+              style="position:absolute; right:0.75rem; top:0.75rem;">
+        <span class="text-2xl leading-none">&times;</span>
+      </button>
+
+      <!-- header (center) -->
+      <div class="text-center">
+        <div class="text-[11px] tracking-widest text-gray-400 uppercase mb-1">Quote Reference</div>
+        <h2 id="quote-title-{{ $quote->id }}" class="text-2xl md:text-3xl font-extrabold text-purple-800">
+          {{ $quote->number ?? ('GEI-GDS-' . date('Y', strtotime($quote->created_at)) . '-' . str_pad($quote->id, 4, '0', STR_PAD_LEFT)) }}
+        </h2>
+      </div>
+
+      <!-- meta (top-left) -->
+      <div class="mt-4 text-gray-700 text-sm">
+        <div><span class="font-semibold">Customer:</span> {{ $quote->user->name ?? 'N/A' }}</div>
+        <div><span class="font-semibold">Date:</span> {{ $quote->created_at->format('Y-m-d H:i') }}</div>
+      </div>
+
+      <!-- content (centered) -->
+      <div class="mt-6">
+        <div class="font-semibold mb-2 text-gray-700 text-center">Requested Items</div>
+
+        <div class="mx-auto max-w-[720px] overflow-x-auto rounded border border-gray-200 bg-gray-50">
+          <table class="w-full text-xs">
+            <thead>
+              <tr class="bg-gray-100">
+                <th class="py-2 px-3 text-left">Product</th>
+                <th class="py-2 px-3 text-center">Qty</th>
+                <th class="py-2 px-3 text-right">Unit Price</th>
+                <th class="py-2 px-3 text-right">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach($quote->items as $item)
+                <tr class="border-t border-gray-200">
+                  <td class="py-2 px-3">{{ $item->name }}</td>
+                  <td class="py-2 px-3 text-center">{{ $item->quantity }}</td>
+                  <td class="py-2 px-3 text-right">₱{{ number_format($item->unit_price, 2) }}</td>
+                  <td class="py-2 px-3 text-right">₱{{ number_format($item->unit_price * $item->quantity, 2) }}</td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
+
+        <div class="w-full flex justify-center">
+          <div class="font-bold text-lg text-purple-700 mt-4">Total: ₱{{ number_format($quote->total, 2) }}</div>
+        </div>
+      </div>
+
+      <!-- upload (centered) -->
+      <form method="POST" action="{{ route('employee.quotes.upload', $quote->id) }}"
+            enctype="multipart/form-data"
+            class="mt-6 pt-6 border-t text-center">
+        @csrf
+        <label class="block mb-2 font-semibold text-gray-700">Upload Quotation (PDF only):</label>
+        <div class="flex flex-col md:flex-row items-center justify-center gap-3">
+          <input type="file" name="quote_file" accept="application/pdf" class="border rounded px-3 py-2" required>
+          <button type="submit" class="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 font-semibold">
+            Upload PDF
+          </button>
+        </div>
+      </form>
     </div>
-</div>
+  </div>
+@endforeach
+{{-- /MODALS --}}
+
 
 <script>
-    function showQuoteModal(id) {
-        document.querySelectorAll('[id^=quote-modal-]').forEach(m => m.classList.add('hidden'));
-        document.getElementById('quote-modal-' + id).classList.remove('hidden');
-    }
-    function closeQuoteModal(id) {
-        document.getElementById('quote-modal-' + id).classList.add('hidden');
-    }
-    document.addEventListener('keydown', e => {
+    // --- Confirmation modal logic (toggle hidden <-> flex) ---
+    let confirmForm = null;
+    const confirmModal = document.getElementById('confirmation-modal');
+    const confirmNo = document.getElementById('confirm-no');
+    const confirmYes = document.getElementById('confirm-yes');
+
+
+  // --- Confirmation modal logic (toggle hidden <-> flex) ---
+  let confirmEscListener = null;
+  document.querySelectorAll('.confirm-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const form = btn.closest('form');
+      confirmForm = form;
+      document.getElementById('confirmation-message').textContent =
+        form.getAttribute('data-confirm') || 'Are you sure?';
+      // show: remove hidden, add flex
+      confirmModal.classList.remove('hidden');
+      confirmModal.classList.add('flex');
+      document.body.classList.add('overflow-hidden');
+      // ESC close for confirmation modal
+      confirmEscListener = function(e) {
         if (e.key === 'Escape') {
-            document.querySelectorAll('[id^=quote-modal-]').forEach(m => m.classList.add('hidden'));
+          confirmModal.classList.add('hidden');
+          confirmModal.classList.remove('flex');
+          document.body.classList.remove('overflow-hidden');
+          confirmForm = null;
+          document.removeEventListener('keydown', confirmEscListener);
         }
+      };
+      document.addEventListener('keydown', confirmEscListener);
     });
+  });
+
+  confirmNo.onclick = function() {
+    // hide: add hidden, remove flex
+    confirmModal.classList.add('hidden');
+    confirmModal.classList.remove('flex');
+    document.body.classList.remove('overflow-hidden');
+    confirmForm = null;
+    if (confirmEscListener) {
+      document.removeEventListener('keydown', confirmEscListener);
+      confirmEscListener = null;
+    }
+  };
+
+  confirmYes.onclick = function() {
+    if (confirmForm) confirmForm.submit();
+    confirmModal.classList.add('hidden');
+    confirmModal.classList.remove('flex');
+    document.body.classList.remove('overflow-hidden');
+    confirmForm = null;
+    if (confirmEscListener) {
+      document.removeEventListener('keydown', confirmEscListener);
+      confirmEscListener = null;
+    }
+  };
+
+    // --- Quote modals (toggle hidden <-> flex) ---
+    function showQuoteModal(id) {
+        // hide all open quote modals first
+        document.querySelectorAll('[id^=quote-modal-]').forEach(m => {
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        });
+
+        const modal = document.getElementById('quote-modal-' + id);
+        // show: remove hidden, add flex
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.classList.add('overflow-hidden');
+
+        // ESC close for this modal only
+        function escListener(e) {
+            if (e.key === 'Escape') {
+                closeQuoteModal(id);
+            }
+        }
+        modal._escListener = escListener;
+        document.addEventListener('keydown', escListener);
+    }
+
+    function closeQuoteModal(id) {
+        const modal = document.getElementById('quote-modal-' + id);
+        // hide: add hidden, remove flex
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.classList.remove('overflow-hidden');
+
+        if (modal._escListener) {
+            document.removeEventListener('keydown', modal._escListener);
+            modal._escListener = null;
+        }
+    }
 </script>
 @endsection

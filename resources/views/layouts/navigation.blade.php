@@ -24,20 +24,64 @@
                         <svg class="w-7 h-7 text-green-700 group-hover:text-orange-600 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                        @if(isset($notifications) && count($notifications))
-                            <span class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full px-1.5 py-0.5">{{ count($notifications) }}</span>
+                        @php
+                            $employeeNotifs = \App\Helpers\EmployeeNotification::all();
+                        @endphp
+                        @if(count($employeeNotifs))
+                            <span class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full px-1.5 py-0.5">{{ count($employeeNotifs) }}</span>
                         @endif
                     </button>
                     <!-- Dropdown: improved position, max height, scroll, and shadow -->
-                    <div x-show="open" @click.away="open = false" style="right:0;left:auto;top:2.5rem;" class="absolute w-80 bg-white border border-gray-200 rounded-lg shadow-2xl z-50 max-h-[260px] overflow-y-auto transition-all duration-200" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
-                        <div class="sticky top-0 bg-white p-3 font-bold text-green-800 border-b z-10">Notifications</div>
-                        <ul class="divide-y divide-gray-100 max-h-80 overflow-y-auto">
-                            @forelse (collect($notifications)->sortByDesc('created_at')->take(10) as $notif)
-                                <li class="p-3 hover:bg-green-50 cursor-pointer">
-                                    @if ($notif['type'] === 'chat')
-                                        <div class="font-semibold">{{ $notif['user'] }}</div>
-                                        <div class="text-xs text-gray-500">{{ $notif['created_at']->format('Y-m-d H:i') }}</div>
-                                        <div class="mt-1">{{ $notif['message'] }}</div>
+                    <div x-show="open" @click.away="open = false" style="right:0;left:auto;top:2.5rem;" class="absolute w-80 bg-white border border-gray-200 rounded-lg shadow-2xl z-50 max-h-80 transition-all duration-200" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
+                        <div class="sticky top-0 bg-white p-2 font-bold text-green-800 border-b z-10 flex items-center justify-between">
+                            <span>Notifications</span>
+                            <button id="clear-notifications-btn" class="text-xs text-red-600 hover:text-red-800 px-2 py-1 rounded border border-red-200 ml-2" type="button">Clear</button>
+                        </div>
+                        <ul id="notification-list" class="divide-y divide-gray-100 max-h-56 overflow-y-auto">
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var clearBtn = document.getElementById('clear-notifications-btn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+            fetch('/notifications/clear', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            }).then(r => r.json()).then(res => {
+                if (res.success) {
+                    // Remove all notifications from the list
+                    var notifList = document.getElementById('notification-list');
+                    if (notifList) notifList.innerHTML = '<li class="p-3 text-gray-400">No notifications</li>';
+                    // Remove badge
+                    var badge = document.querySelector('.absolute.-top-2.-right-2.bg-orange-500');
+                    if (badge) badge.remove();
+                }
+            });
+        });
+    }
+});
+</script>
+@endpush
+                            @php
+                                $employeeNotifs = \App\Helpers\EmployeeNotification::all();
+                            @endphp
+                            @forelse (collect($employeeNotifs)->sortByDesc(fn($n) => $n['created_at']) as $notif)
+                                <li class="px-3 py-2 hover:bg-green-50 cursor-pointer text-sm">
+                                    @if ($notif['type'] === 'order')
+                                        <div class="font-semibold text-green-700">New Order</div>
+                                        <div class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($notif['data']['created_at'])->format('Y-m-d H:i') }}</div>
+                                        <div class="mt-1">Order #{{ $notif['data']['reference'] }} by <b>{{ $notif['data']['user'] }}</b> (₱{{ number_format($notif['data']['total'],2) }})</div>
+                                    @elseif ($notif['type'] === 'quote')
+                                        <div class="font-semibold text-blue-700">New Quote Request</div>
+                                        <div class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($notif['data']['created_at'])->format('Y-m-d H:i') }}</div>
+                                        <div class="mt-1">Quote #{{ $notif['data']['quote_id'] }} by <b>{{ $notif['data']['user'] }}</b> (₱{{ number_format($notif['data']['total'],2) }})</div>
+                                    @elseif ($notif['type'] === 'chat')
+                                        <div class="font-semibold text-purple-700">New Chat Message</div>
+                                        <div class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($notif['data']['created_at'])->format('Y-m-d H:i') }}</div>
+                                        <div class="mt-1"><b>{{ $notif['data']['user'] ?? 'User' }}</b>: <span class="truncate block">{{ $notif['data']['message'] ?? '' }}</span></div>
                                     @elseif ($notif['type'] === 'cart')
                                         <div class="font-semibold text-orange-700">Add to Cart Activity</div>
                                         <div class="text-xs text-gray-500">{{ $notif['created_at']->format('Y-m-d H:i') }}</div>
@@ -48,11 +92,7 @@
                                 <li class="p-3 text-gray-400">No notifications</li>
                             @endforelse
                         </ul>
-                        @if(count($notifications) > 10)
-                            <div class="text-center p-2 bg-white sticky bottom-0 z-10">
-                                <a href="#" class="text-green-700 hover:underline text-sm">Load more</a>
-                            </div>
-                        @endif
+                        {{-- No need for load more, scroll handles overflow --}}
                     </div>
                 </div>
                 @endif

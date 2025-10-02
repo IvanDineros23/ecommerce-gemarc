@@ -44,12 +44,16 @@ class QuoteController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $user = auth()->user();
-        $quote = new \App\Models\Quote();
-        $quote->user_id = $user->id;
-        $quote->status = 'open';
-        $quote->total = 0; // will compute below
-        $quote->save();
+    $user = auth()->user();
+    $quote = new \App\Models\Quote();
+    $quote->user_id = $user->id;
+    $quote->status = 'open';
+    $quote->total = 0; // will compute below
+    // Generate quote number: GEI-GDS-YYYY-XXXX
+    $year = date('Y');
+    $random = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+    $quote->number = 'GEI-GDS-' . $year . '-' . $random;
+    $quote->save();
 
         $total = 0;
         foreach ($request->products as $productId) {
@@ -79,14 +83,25 @@ class QuoteController extends Controller
         $details = "User '{$user->name}' (ID: {$user->id}) submitted a quote request for: " . implode(', ', $productDetails) . ". Total: ₱" . number_format($quote->total, 2);
         AuditLogger::log('submit_quote', 'quote', $quote->id, null, null, $details);
 
+        // Push employee notification for new quote
+        \App\Helpers\EmployeeNotification::push('quote', [
+            'user' => $user->name,
+            'user_id' => $user->id,
+            'quote_id' => $quote->id,
+            'products' => $productDetails,
+            'total' => $quote->total,
+            'created_at' => now(),
+        ]);
+
         return back()->with('success', 'Quote request submitted!');
     }
 
-    // Download/preview PDF (stub)
+    // Download/preview PDF
     public function pdf($quoteId)
     {
-        // Fetch quote and generate PDF logic here
-        return 'PDF generation for quote #' . $quoteId;
+        $quote = \App\Models\Quote::with('items')->findOrFail($quoteId);
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('quotes.pdf', compact('quote'));
+        return $pdf->stream('quotation-' . ($quote->number ?? $quote->id) . '.pdf');
     }
 
     // Employee: list all quotes (actual)

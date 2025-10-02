@@ -31,7 +31,9 @@
     let selectedUserId = null;
     let selectedUserName = '';
     function fetchUserList() {
-        fetch("{{ url('/chat/users') }}")
+        fetch("{{ url('/chat/users') }}", {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
             .then(r => r.json())
             .then(users => {
                 // Sort users by last_message_at desc (already sorted from backend)
@@ -49,7 +51,9 @@
     }
     function fetchChat() {
         if (!selectedUserId) return;
-        fetch(`{{ url('/chat/fetch') }}?with_user_id=${selectedUserId}`)
+        fetch(`{{ url('/chat/fetch') }}?with_user_id=${selectedUserId}`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
             .then(r => r.json())
             .then(msgs => {
                 let html = msgs.map(m => `<div><b>${m.sender_id == {{ auth()->id() }} ? 'You' : selectedUserName}:</b> ${m.message}</div>`).join('');

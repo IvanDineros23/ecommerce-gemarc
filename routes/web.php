@@ -1,4 +1,7 @@
 <?php
+// Employee notification clear route
+Route::middleware(['auth', 'verified'])->post('/notifications/clear', [\App\Http\Controllers\NotificationController::class, 'clear'])->name('notifications.clear');
+
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -122,6 +125,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('/settings', 'dashboard.settings')->name('settings');
     Route::post('/settings/delivery-address', [SettingsController::class, 'saveDeliveryAddress'])->name('settings.saveDeliveryAddress');
     Route::post('/settings/payment-details',  [SettingsController::class, 'savePaymentDetails'])->name('settings.savePaymentDetails');
+    Route::post('/settings/basic-info', [SettingsController::class, 'saveBasicInfo'])->name('settings.saveBasicInfo');
 
     // Quotes (user flow)
     Route::get('/quotes/create', [QuoteController::class, 'create'])->name('quotes.create');
@@ -161,6 +165,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Employee: Inventory / Products / Orders / Quotes
     Route::prefix('employee')->name('employee.')->group(function () {
+
+    // Employee edit quote
+    Route::get('/quotes-management/{quote}/edit', [\App\Http\Controllers\EmployeeQuoteController::class, 'edit'])->name('quotes.edit');
 
         // Inventory
         Route::get('/inventory',                 [EmployeeInventoryController::class, 'index'])->name('inventory.index');

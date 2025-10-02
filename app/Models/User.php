@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -7,10 +6,23 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+
+    // Always return address, fallback to delivery_option['address'] if empty
+    public function getAddressAttribute($value)
+    {
+        if (!empty($value)) {
+            return $value;
+        }
+        if (is_array($this->delivery_option) && !empty($this->delivery_option['address'])) {
+            return $this->delivery_option['address'];
+        }
+        return null;
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -20,6 +32,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'address',
+        'contact_no',
         'password',
         'payment_details',
         'delivery_option',

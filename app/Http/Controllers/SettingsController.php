@@ -6,6 +6,17 @@ use Illuminate\Support\Facades\Auth;
 
 class SettingsController extends Controller
 {
+    public function saveBasicInfo(Request $request)
+    {
+        $request->validate([
+            'contact_no' => 'nullable|string|max:32',
+        ]);
+        $user = Auth::user();
+        $user->contact_no = $request->contact_no;
+        $user->save();
+        return redirect()->route('settings')->with('success', 'Basic info saved!');
+    }
+
     public function savePaymentDetails(Request $request)
     {
         $request->validate([
@@ -47,17 +58,10 @@ class SettingsController extends Controller
     {
         $request->validate([
             'address' => 'required|string|max:255',
-            'category' => 'required|string|max:32',
-            'other_category' => 'nullable|string|max:32',
         ]);
         $user = Auth::user();
-        $category = $request->category === 'other' && $request->filled('other_category')
-            ? $request->other_category : $request->category;
-        $user->delivery_option = [
-            'address' => $request->address,
-            'category' => $category,
-        ];
+        $user->address = $request->address;
         $user->save();
-        return redirect()->route('settings')->with('success', 'Delivery address saved!');
+        return redirect()->route('settings')->with('success', 'Address saved!');
     }
 }

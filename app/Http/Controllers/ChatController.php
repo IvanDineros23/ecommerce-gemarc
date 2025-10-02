@@ -90,6 +90,17 @@ class ChatController extends Controller
         $receiver = \App\Models\User::find($receiverId);
         $details = "Chat message from '" . ($sender ? $sender->name : $senderId) . "' (ID: $senderId, Role: " . ($sender ? $sender->role : '-') . ") to '" . ($receiver ? $receiver->name : $receiverId) . "' (ID: $receiverId, Role: " . ($receiver ? $receiver->role : '-') . "): '" . $request->message . "'";
         AuditLogger::log('chat_message', 'chat', $msg, null, null, $details);
+
+        // Push employee notification for new chat message (only if user is sender)
+        if ($sender && $sender->isUser()) {
+            \App\Helpers\EmployeeNotification::push('chat', [
+                'user' => $sender->name,
+                'user_id' => $sender->id,
+                'receiver_id' => $receiverId,
+                'message' => $request->message,
+                'created_at' => now(),
+            ]);
+        }
         return response()->json(['success' => true]);
     }
 

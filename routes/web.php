@@ -186,7 +186,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/orders/{order}/upload',    [EmployeeOrderController::class, 'uploadReceipt'])->name('orders.upload');
         Route::delete('/orders/{order}',         [EmployeeOrderController::class, 'destroy'])->name('orders.destroy');
 
-        // Quotes (employee manages)
+    // Employee create quote
+    Route::get('/quotes-management/create', [EmployeeQuoteController::class, 'create'])->name('quotes.create');
+    Route::post('/quotes-management', [EmployeeQuoteController::class, 'store'])->name('quotes.store');
+    Route::put('/quotes-management/{quote}', [EmployeeQuoteController::class, 'update'])->name('quotes.update');
+    // Quotes (employee manages)
         Route::get('/quotes-management',                 [EmployeeQuoteController::class, 'index'])->name('quotes.management.index');
         Route::post('/quotes-management/{quote}/upload', [EmployeeQuoteController::class, 'upload'])->name('quotes.upload');
         Route::patch('/quotes-management/{quote}/done',  [EmployeeQuoteController::class, 'markAsDone'])->name('quotes.management.done');

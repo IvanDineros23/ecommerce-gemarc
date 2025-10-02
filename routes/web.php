@@ -1,4 +1,8 @@
 <?php
+
+
+
+
 // Employee notification clear route
 Route::middleware(['auth', 'verified'])->post('/notifications/clear', [\App\Http\Controllers\NotificationController::class, 'clear'])->name('notifications.clear');
 
@@ -188,6 +192,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Employee create quote
     Route::get('/quotes-management/create', [EmployeeQuoteController::class, 'create'])->name('quotes.create');
+    Route::post('/quotes-management/manual', [EmployeeQuoteController::class, 'manualCreate'])->name('quotes.manual.create');
+    // Manual quote creation form (missing route)
+    Route::get('/quotes-management/manual/create', [EmployeeQuoteController::class, 'manualCreateForm'])->name('quotes.manual.create.form');
     Route::post('/quotes-management', [EmployeeQuoteController::class, 'store'])->name('quotes.store');
     Route::put('/quotes-management/{quote}', [EmployeeQuoteController::class, 'update'])->name('quotes.update');
     // Quotes (employee manages)

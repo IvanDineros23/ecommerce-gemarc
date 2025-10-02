@@ -7,7 +7,38 @@
         <p class="text-gray-700 text-center">View and manage all customer quote requests here.</p>
     </div>
 
-    <div class="bg-white rounded-xl shadow p-6">
+
+  <div class="flex justify-between items-center mb-8">
+  <!-- Removed repetitive 'Quote Management' heading as requested -->
+  <a href="{{ route('employee.quotes.manual.create.form') }}" class="bg-green-600 text-white px-5 py-2 rounded shadow hover:bg-green-700 font-bold">+ Create Manual Quote</a>
+  </div>
+<script>
+// Manual quote item adder for create form
+document.addEventListener('DOMContentLoaded', function() {
+  const addBtn = document.getElementById('add-manual-quote-item');
+  const list = document.getElementById('manual-quote-items-list');
+  let idx = 0;
+  if (addBtn && list) {
+    addBtn.addEventListener('click', function() {
+      const row = document.createElement('div');
+      row.className = 'flex flex-wrap items-center gap-2 item-row bg-gray-50 p-2 rounded';
+      row.innerHTML = `
+        <input type="text" name="items[${idx}][name]" class="border rounded p-2 min-w-[180px]" required placeholder="Item name">
+        <input type="number" name="items[${idx}][quantity]" value="1" min="1" class="border rounded p-2 w-20 min-w-[80px]" required placeholder="Qty">
+        <input type="number" name="items[${idx}][unit_price]" value="0" min="0" step="0.01" class="border rounded p-2 w-28 min-w-[100px]" required placeholder="Unit Price">
+        <button type="button" class="remove-item bg-red-500 text-white px-2 py-1 rounded">Remove</button>
+      `;
+      list.appendChild(row);
+      idx++;
+    });
+    list.addEventListener('click', function(e) {
+      if (e.target.classList.contains('remove-item')) {
+        e.target.closest('.item-row').remove();
+      }
+    });
+  }
+});
+</script>
 
         {{-- Filters --}}
         <form method="GET" action="" class="mb-4 flex flex-wrap gap-2 items-center justify-between">

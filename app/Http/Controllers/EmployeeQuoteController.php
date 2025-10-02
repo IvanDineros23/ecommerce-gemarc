@@ -11,7 +11,62 @@ use App\Helpers\AuditLogger;
 class EmployeeQuoteController extends Controller
 {
     /**
-     * List quotes for employees (with filters compatible to your Blade).
+     * Show the manual quote creation form page.
+     */
+    public function manualCreateForm()
+    {
+        return view('dashboard.employee_quote_manual_create');
+    }
+
+    /**
+     * Store a manually created quote (all fields manual, including employee name).
+     */
+    public function manualCreate(Request $request)
+    {
+        $validated = $request->validate([
+            'employee_name'    => 'required|string|max:255',
+            'customer_name'    => 'required|string|max:255',
+            'customer_email'   => 'required|email',
+            'customer_address' => 'required|string',
+            'customer_contact' => 'required|string',
+            'items'            => 'required|array|min:1',
+            'items.*.name'       => 'required|string',
+            'items.*.quantity'   => 'required|integer|min:1',
+            'items.*.unit_price' => 'required|numeric|min:0',
+        ]);
+
+        $quote = new Quote();
+        $quote->number = null;   // generate later if you have a mutator
+        $quote->status = 'open';
+        $quote->total  = 0;
+        $quote->save();
+
+        $total = 0;
+        foreach ($validated['items'] as $item) {
+            $quote->items()->create([
+                'name'       => $item['name'],
+                'quantity'   => (int) $item['quantity'],
+                'unit_price' => (float) $item['unit_price'],
+            ]);
+            $total += (int)$item['quantity'] * (float)$item['unit_price'];
+        }
+
+        $quote->total = $total;
+        $quote->save();
+
+        AuditLogger::log(Auth::id(), 'employee', 'manual_create_quote', [
+            'quote_id'      => $quote->id,
+            'employee_name' => $validated['employee_name'],
+            'items_count'   => count($validated['items']),
+            'total'         => $total,
+        ]);
+
+        return redirect()->route('employee.quotes.management.index')
+            ->with('success', 'Manual quote created successfully!');
+    }
+
+    /**
+     * List quotes for employees (supports search/status/sort).
      */
     public function index(Request $request)
     {
@@ -48,6 +103,7 @@ class EmployeeQuoteController extends Controller
     {
         $quote->load(['user', 'items']);
         $products = Product::where('is_active', 1)->orderBy('name')->get();
+
         return view('dashboard.employee_quote_edit', compact('quote', 'products'));
     }
 
@@ -62,12 +118,11 @@ class EmployeeQuoteController extends Controller
             'customer_address' => 'required|string',
             'customer_contact' => 'required|string',
             'items'            => 'required|array|min:1',
-            'items.*.name'         => 'required|string',
-            'items.*.quantity'     => 'required|integer|min:1',
-            'items.*.unit_price'   => 'required|numeric|min:0',
+            'items.*.name'       => 'required|string',
+            'items.*.quantity'   => 'required|integer|min:1',
+            'items.*.unit_price' => 'required|numeric|min:0',
         ]);
 
-        // Update related user (if editable)
         if ($quote->user) {
             $quote->user->name       = $validated['customer_name'];
             $quote->user->email      = $validated['customer_email'];
@@ -76,7 +131,6 @@ class EmployeeQuoteController extends Controller
             $quote->user->save();
         }
 
-        // Replace items
         $quote->items()->delete();
 
         $total = 0;
@@ -86,10 +140,10 @@ class EmployeeQuoteController extends Controller
                 'quantity'   => (int) $item['quantity'],
                 'unit_price' => (float) $item['unit_price'],
             ]);
-            $total += ((int) $item['quantity']) * ((float) $item['unit_price']);
+            $total += (int)$item['quantity'] * (float)$item['unit_price'];
         }
 
-        $quote->total = $total; // keep as-is; adjust if you later track VAT/subtotal
+        $quote->total = $total;
         $quote->save();
 
         AuditLogger::log(Auth::id(), 'employee', 'update_quote', [
@@ -98,8 +152,7 @@ class EmployeeQuoteController extends Controller
             'items'    => count($validated['items']),
         ]);
 
-        return redirect()
-            ->route('employee.quotes.management.index')
+        return redirect()->route('employee.quotes.management.index')
             ->with('success', 'Quotation updated successfully!');
     }
 
@@ -147,7 +200,7 @@ class EmployeeQuoteController extends Controller
                     'quantity'   => 1,
                     'unit_price' => $product->price ?? 0,
                 ]);
-                $total += (float) ($product->price ?? 0);
+                $total += (float)($product->price ?? 0);
             }
         }
 
@@ -159,10 +212,10 @@ class EmployeeQuoteController extends Controller
         AuditLogger::log(Auth::id(), 'employee', 'create_quote', [
             'quote_id' => $quote->id,
             'mode'     => $validated['item_mode'],
+            'total'    => $quote->total,
         ]);
 
-        return redirect()
-            ->route('employee.quotes.management.index')
+        return redirect()->route('employee.quotes.management.index')
             ->with('success', 'Quotation created successfully!');
     }
 
@@ -180,7 +233,8 @@ class EmployeeQuoteController extends Controller
             'status'   => $quote->status,
         ]);
 
-        return redirect()->route('employee.quotes.management.index')->with('success', 'Quote marked as done.');
+        return redirect()->route('employee.quotes.management.index')
+            ->with('success', 'Quote marked as done.');
     }
 
     /**
@@ -191,13 +245,14 @@ class EmployeeQuoteController extends Controller
         $quote->status = 'cancelled';
         $quote->save();
 
-        AuditLogger::log('cancel_quote', 'employee', $quote->id, [
+        AuditLogger::log(Auth::id(), 'employee', 'cancel_quote', [
             'quote_id' => $quote->id,
             'user_id'  => $quote->user_id,
             'status'   => $quote->status,
         ]);
 
-        return redirect()->route('employee.quotes.management.index')->with('success', 'Quote cancelled.');
+        return redirect()->route('employee.quotes.management.index')
+            ->with('success', 'Quote cancelled.');
     }
 
     /**
@@ -213,7 +268,7 @@ class EmployeeQuoteController extends Controller
         $quote->response_file = $path;
         $quote->save();
 
-        AuditLogger::log('upload_quote_pdf', 'employee', $quote->id, [
+        AuditLogger::log(Auth::id(), 'employee', 'upload_quote_pdf', [
             'quote_id' => $quote->id,
             'file'     => $path,
         ]);
@@ -228,11 +283,12 @@ class EmployeeQuoteController extends Controller
     {
         $quote->delete();
 
-        AuditLogger::log('delete_quote', 'employee', $quote->id, [
+        AuditLogger::log(Auth::id(), 'employee', 'delete_quote', [
             'quote_id' => $quote->id,
             'user_id'  => $quote->user_id,
         ]);
 
-        return redirect()->route('employee.quotes.management.index')->with('success', 'Quote deleted successfully.');
+        return redirect()->route('employee.quotes.management.index')
+            ->with('success', 'Quote deleted successfully.');
     }
 }

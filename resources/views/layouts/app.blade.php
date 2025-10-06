@@ -46,7 +46,7 @@
               @endif
 
               {{-- Page content --}}
-              <div class="container py-4">
+              <div class="w-full py-4">
                 @if (isset($slot))
                     {{ $slot }}              {{-- component mode: <x-app-layout> --}}
                 @else

@@ -1,11 +1,11 @@
 @extends('layouts.app')
 @section('content')
-<div class="py-8">
+<div class="py-8 w-full">
     <!-- Search Bar -->
     <!-- Removed duplicate search bar -->
-    <div class="flex flex-col items-center justify-center mb-8">
-        <form x-data="searchBar()" @submit.prevent="onSearch" class="w-full max-w-2xl flex flex-col items-center">
-            <div class="relative w-full flex items-center" style="max-width: 600px;">
+    <div class="flex flex-col items-center justify-center mb-8 w-full">
+        <form x-data="searchBar()" @submit.prevent="onSearch" class="w-full flex flex-col items-center">
+            <div class="relative w-full flex items-center">
                 <input type="text" x-model="query" @focus="showSuggestions = true" @input="onInput" @keydown.escape="showSuggestions = false" placeholder="Search products, orders, etc..." class="w-full border border-green-300 rounded px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-orange-400 text-lg" autocomplete="off" style="position:relative;">
                 <button type="button" x-show="query.length" @click="clearQuery" class="absolute right-28 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none bg-transparent p-2" style="z-index:2;">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -101,7 +101,7 @@ function searchBar() {
 @endpush
     <!-- Centered Request a Quote and Recent Orders section -->
     <div class="flex flex-col items-center justify-center w-full mb-8">
-        <div class="flex flex-col md:flex-row gap-6 w-full max-w-4xl justify-center">
+        <div class="flex flex-col md:flex-row gap-6 w-full justify-center">
             <!-- Create/Request Quote -->
             <div class="bg-white rounded-xl shadow p-4 flex flex-col flex-1 min-w-[260px] max-w-[350px] items-center">
                 <div class="text-lg font-bold text-green-800 mb-2 flex items-center gap-2">📝 Request a Quote</div>
@@ -127,11 +127,19 @@ function searchBar() {
                     @endforelse
                 </ul>
             </div>
+            <!-- Company Brochure -->
+            <div class="bg-white rounded-xl shadow p-6 flex flex-col flex-1 min-w-[260px] max-w-[350px] items-center">
+                <div class="text-lg font-bold text-green-800 mb-2 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                    Download our company brochure here
+                </div>
+                <a href="/GEI%202025%20brochure%20(1).pdf" class="text-orange-600 hover:underline font-semibold" target="_blank">Gemarc Enterprises Incorporated Company Brochure (PDF)</a>
+            </div>
         </div>
     </div>
     <div class="bg-white rounded-xl shadow p-6">
         <div class="text-lg font-bold text-orange-600 mb-2">Recommended for You</div>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
             @forelse ($recommendedProducts as $product)
                 <div class="bg-gray-50 rounded-xl shadow flex flex-col items-center p-2 min-h-[120px]">
                     @php $img = $product->firstImagePath(); @endphp

@@ -1,6 +1,29 @@
 <?php
-
-
+// AJAX product search for landing page
+Route::get('/landing-search', function (\Illuminate\Http\Request $request) {
+    $q = $request->input('q');
+    $products = \App\Models\Product::where('is_active', 1)
+        ->where(function($query) use ($q) {
+            $query->where('name', 'like', "%$q%")
+                  ->orWhere('description', 'like', "%$q%")
+                  ->orWhere('unit_price', 'like', "%$q%")
+                  ->orWhere('sku', 'like', "%$q%")
+                  ;
+        })
+        ->orderByDesc('created_at')
+        ->limit(10)
+        ->get();
+    $results = $products->map(function($p) {
+        return [
+            'id' => $p->id,
+            'name' => $p->name,
+            'sku' => $p->sku,
+            'price' => $p->unit_price,
+            'image_url' => method_exists($p, 'firstImagePath') && $p->firstImagePath() ? asset('storage/'.$p->firstImagePath()) : asset('images/gemarclogo.png'),
+        ];
+    });
+    return response()->json($results);
+})->name('landing.search');
 
 
 // Employee notification clear route
@@ -35,15 +58,11 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 |--------------------------------------------------------------------------
 */
 
-// Home / Landing (loads featured + latest products)
-Route::get('/', function () {
-    $products = Product::where('is_active', 1)->orderByDesc('created_at')->get();
+// Home / Landing now redirects to /landing
+Route::redirect('/', '/landing');
 
-    return view('welcome', [
-        'featuredProducts' => $products,
-        'products'         => $products,
-    ]);
-})->name('home');
+// Another landing page
+Route::view('/landing', 'landing')->name('landing');
 
 // Browse listing (simple page)
 Route::get('/browse', function () {

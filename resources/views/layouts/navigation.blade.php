@@ -1,17 +1,47 @@
 <nav x-data="{ open: false }" class="bg-white border-b border-green-600 shadow-lg">
     <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
+
+    <div class="max-w-screen-2xl mx-auto">
+        <div class="flex justify-between items-center h-16 px-6 lg:px-20">
+
+            <div class="flex items-center justify-between w-full">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto" />
+                    <a href="{{ url('/') }}">
+                        <x-application-logo class="block h-16 w-auto" />
                     </a>
                 </div>
 
-                <!-- Navigation Links (no cart icon here) -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex items-center">
+                <!-- Spacer to push menu to right -->
+                <div class="flex-1"></div>
+
+                <!-- Custom Navbar Menu: Separate Dropdowns/Links (right side) -->
+                <div class="hidden sm:flex items-center gap-2">
+                    <!-- News Dropdown -->
+                    <div x-data="{ open: false }" class="relative">
+                        <button @click="open = !open" @keydown.escape="open = false" type="button" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none" id="newsDropdown" aria-haspopup="true" x-bind:aria-expanded="open">
+                            News
+                            <svg class="ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 w-44 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50" x-cloak>
+                            <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="newsDropdown">
+                                <!-- Example subcategory, add more as needed -->
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">All News</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Products Link -->
+                    <a href="#" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">Products</a>
+                    <!-- Services Link -->
+                    <a href="#" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">Services</a>
+                    <!-- About Link -->
+                    <a href="#" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">About</a>
+                    <!-- Get Quote Button -->
+                    <a href="#" class="ml-4 inline-flex items-center px-4 py-2 border border-green-600 text-green-700 font-semibold rounded-md bg-white hover:bg-green-50 transition">Get Quote</a>
+                    <!-- Call Now Button -->
+                    <a href="tel:+639123456789" class="ml-2 inline-flex items-center px-4 py-2 border border-orange-600 text-orange-700 font-semibold rounded-md bg-white hover:bg-orange-50 transition">Call Now</a>
                 </div>
             </div>
 
@@ -137,7 +167,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
                 @endif
-                <!-- User Dropdown -->
+                <!-- User Dropdown: Hide on landing page -->
+                @if (!request()->routeIs('landing'))
                 <x-dropdown align="right" width="56">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
@@ -166,6 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </x-slot>
                 </x-dropdown>
+                @endif
             </div>
 
             <!-- Hamburger -->

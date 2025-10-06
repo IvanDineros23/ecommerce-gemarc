@@ -332,36 +332,119 @@
   </section>
 
   <!-- FOOTER -->
-  <footer class="bg-white py-4">
-    <div class="container">
-      <div class="row gy-4">
-        <div class="col-md-6">
-          <h5>Gemarc Enterprises Inc</h5>
-          <p class="mb-0 text-muted-2">Your trusted supplier for industrial and commercial needs.</p>
-        </div>
-        <div class="col-md-3">
-          <h6>Quick Links</h6>
-          <ul class="list-unstyled">
-            <li><a class="text-decoration-none" href="/">Home</a></li>
-            <li><a class="text-decoration-none" href="{{ route('login') }}">Login</a></li>
-            <li><a class="text-decoration-none" href="{{ route('register') }}">Sign Up</a></li>
-          </ul>
-        </div>
-        <div class="col-md-3">
-          <h6>Contact</h6>
-          <ul class="list-unstyled">
-            <li class="text-muted-2">Email: info@gemarc.com.ph</li>
-            <li class="text-muted-2">Phone: (02) 1234-5678</li>
-            <li class="mt-2">
-              <a href="#" class="me-2"><i class="bi bi-facebook"></i></a>
-              <a href="#" class="me-2"><i class="bi bi-twitter-x"></i></a>
-              <a href="#"><i class="bi bi-instagram"></i></a>
-            </li>
-          </ul>
-        </div>
+  <!-- Footer Styles -->
+  <style>
+  .footer {
+    background: #f8f9fa;
+    padding: 32px 0 0 0;
+    margin-top: 32px;
+    font-family: 'Inter', Arial, sans-serif;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+    width: 100%;
+    position: static;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .footer .container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  .footer-content {
+    width: 100%;
+    margin: 0;
+    padding: 0 0 24px 0;
+    box-sizing: border-box;
+  }
+    .footer-content {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 0;
+        border-bottom: 2px solid #e5e7eb;
+        padding-bottom: 24px;
+        width: 100%;
+    }
+    .footer-section {
+        flex: 1 1 0;
+        min-width: 220px;
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+        padding: 0 20px 0 32px;
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .footer-section h4 {
+        color: #198754;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: none;
+    }
+    .footer-section h4 i {
+        color: #ff8800;
+        font-size: 1.2rem;
+    }
+    .footer-section p {
+        color: #333;
+        font-size: 1rem;
+        margin: 0;
+        line-height: 1.5;
+    }
+    .footer-bottom {
+        text-align: center;
+        padding: 18px 0 8px 0;
+        color: #fff;
+        background: linear-gradient(90deg, #198754 60%, #ff8800 100%);
+        border-radius: 0 0 12px 12px;
+        font-size: 1rem;
+        font-weight: 500;
+        margin-top: 0;
+    }
+    @media (max-width: 900px) {
+        .footer-content {
+            flex-direction: column;
+            gap: 18px;
+        }
+        .footer-section {
+            min-width: 0;
+            padding: 0 12px;
+        }
+    }
+  </style>
+  <!-- Footer -->
+  <footer class="footer">
+      <div class="container">
+          <div class="footer-content">
+              <div class="footer-section">
+                  <h4><i class="fas fa-map-marker-alt"></i> Office Address</h4>
+                  <p>No. 15 Chile St. Ph1 Greenheights Subdivision, Concepcion 1, Marikina City, Philippines 1807</p>
+              </div>
+              <div class="footer-section">
+                  <h4><i class="fas fa-phone"></i> Telephone Numbers</h4>
+                  <p>(632)8-997-7959 | (632)8-584-5572</p>
+              </div>
+              <div class="footer-section">
+                  <h4><i class="fas fa-mobile-alt"></i> Mobile Numbers</h4>
+                  <p>+63 909 087 9416<br>+63 928 395 3532 | +63 918 905 8316</p>
+              </div>
+              <div class="footer-section">
+                  <h4><i class="fas fa-envelope"></i> Email Address</h4>
+                  <p>sales@gemarcph.com<br>technical@gemarcph.com</p>
+              </div>
+          </div>
+          <div class="footer-bottom">
+              <p>&copy; 2025 Gemarc Enterprises Incorporated. All rights reserved.</p>
+          </div>
       </div>
-      <div class="text-center mt-3 text-muted-2">&copy; {{ date('Y') }} Gemarc Enterprises Inc. All rights reserved.</div>
-    </div>
   </footer>
 
   <!-- QUICK VIEW MODAL (Bootstrap) -->

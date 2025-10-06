@@ -16,19 +16,9 @@
                     <li><a href="{{ route('admin.dashboard') }}" class="block py-2 px-3 rounded hover:bg-gray-800 font-semibold">Dashboard</a></li>
                     <li><a href="{{ route('admin.orders') }}" class="block py-2 px-3 rounded hover:bg-gray-800">All Orders</a></li>
                     <li><a href="{{ route('admin.quotes') }}" class="block py-2 px-3 rounded hover:bg-gray-800">Quotes Management</a></li>
-                    <li><a href="{{ route('admin.uploads') }}" class="block py-2 px-3 rounded hover:bg-gray-800">Bulk Uploads</a></li>
-                    <li><a href="{{ route('admin.approvals') }}" class="block py-2 px-3 rounded hover:bg-gray-800">Order Approvals</a></li>
-                    <li><a href="{{ route('admin.export') }}" class="block py-2 px-3 rounded hover:bg-gray-800">Export Orders</a></li>
                     <li><a href="{{ route('admin.products') }}" class="block py-2 px-3 rounded hover:bg-gray-800">Manage Products</a></li>
-                    <li><a href="{{ route('admin.stock') }}" class="block py-2 px-3 rounded hover:bg-gray-800">Stock & Lead Time</a></li>
-                    <li><a href="{{ route('admin.pricing') }}" class="block py-2 px-3 rounded hover:bg-gray-800">Pricing Tiers</a></li>
-                    <li><a href="{{ route('admin.documents') }}" class="block py-2 px-3 rounded hover:bg-gray-800">Documents</a></li>
-                    <li><a href="{{ route('admin.brands') }}" class="block py-2 px-3 rounded hover:bg-gray-800">Brands & Standards</a></li>
                     <li><a href="{{ route('admin.user_management') }}" class="block py-2 px-3 rounded hover:bg-gray-800">User Management</a></li>
-                    <li><a href="{{ route('admin.business') }}" class="block py-2 px-3 rounded hover:bg-gray-800">Business Info</a></li>
                     <li><a href="{{ route('admin.audit') }}" class="block py-2 px-3 rounded hover:bg-gray-800">Audit Log</a></li>
-                    <li><a href="{{ route('admin.freight') }}" class="block py-2 px-3 rounded hover:bg-gray-800">Freight & Logistics</a></li>
-                    <li><a href="{{ route('admin.site_settings') }}" class="block py-2 px-3 rounded hover:bg-gray-800">Site Settings</a></li>
                     <li><a href="{{ route('admin.settings') }}" class="block py-2 px-3 rounded hover:bg-gray-800">Settings</a></li>
                     <li><a href="{{ route('logout') }}" class="block py-2 px-3 rounded hover:bg-red-700 text-red-300"
                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a></li>

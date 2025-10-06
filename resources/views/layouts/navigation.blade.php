@@ -152,8 +152,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     <x-slot name="content">
                         <div class="py-3 px-2 grid gap-1">
-                            <a href="{{ route('orders.index') }}" class="block rounded-md px-5 py-2 text-[15px] font-normal text-gray-700 hover:bg-gray-100 transition">Orders</a>
-                            <a href="{{ route('saved.index') }}" class="block rounded-md px-5 py-2 text-[15px] font-normal text-gray-700 hover:bg-gray-100 transition">Saved Items</a>
+                            @if(!auth()->user() || !auth()->user()->isEmployee())
+                                <a href="{{ route('orders.index') }}" class="block rounded-md px-5 py-2 text-[15px] font-normal text-gray-700 hover:bg-gray-100 transition">Orders</a>
+                                <a href="{{ route('saved.index') }}" class="block rounded-md px-5 py-2 text-[15px] font-normal text-gray-700 hover:bg-gray-100 transition">Saved Items</a>
+                            @endif
                             <a href="{{ route('settings') }}" class="block rounded-md px-5 py-2 text-[15px] font-normal text-gray-700 hover:bg-gray-100 transition">Settings</a>
                             <div class="border-t border-gray-200 my-2"></div>
                             <!-- Authentication -->

@@ -15,6 +15,10 @@
             <option value="delete">Delete</option>
         </select>
     </div>
+    <div class="flex gap-2 mb-4">
+        <a href="{{ route('admin.audit.printAll') }}" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Print All Logs</a>
+        <a href="{{ route('admin.audit.saveAll') }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow">Save All Logs</a>
+    </div>
     <div class="overflow-x-auto bg-white rounded shadow">
         <table class="min-w-full text-sm" id="audit-table">
             <thead>

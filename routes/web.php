@@ -225,6 +225,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'verified', 'can:access-admin'])->prefix('admin')->name('admin.')->group(function () {
+    // User Management (redirect /users to /user-management)
+    Route::redirect('/users', '/admin/user-management');
+    Route::get('/user-management', [\App\Http\Controllers\Admin\UserManagementController::class, 'index'])->name('user_management');
+    Route::get('/user-management/{id}/view', [\App\Http\Controllers\Admin\UserManagementController::class, 'view'])->name('user_management.view');
+    Route::get('/user-management/{id}/edit', [\App\Http\Controllers\Admin\UserManagementController::class, 'edit'])->name('user_management.edit');
+    Route::put('/user-management/{id}/edit', [\App\Http\Controllers\Admin\UserManagementController::class, 'update'])->name('user_management.edit');
+    Route::delete('/user-management/{id}/delete', [\App\Http\Controllers\Admin\UserManagementController::class, 'delete'])->name('user_management.delete');
     Route::view('/brands',          'admin.placeholders.brands')->name('brands');
     Route::view('/business',        'admin.placeholders.business')->name('business');
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
@@ -265,14 +272,17 @@ Route::middleware(['auth', 'verified', 'can:access-admin'])->prefix('admin')->na
     Route::view('/roles',           'admin.placeholders.roles')->name('roles');
     Route::view('/business',        'admin.placeholders.business')->name('business');
     Route::get('/audit', [\App\Http\Controllers\Admin\AuditLogController::class, 'index'])->name('audit');
+    Route::get('/audit/print-all', [\App\Http\Controllers\Admin\AuditLogController::class, 'printAll'])->name('audit.printAll');
+    Route::get('/audit/save-all', [\App\Http\Controllers\Admin\AuditLogController::class, 'saveAll'])->name('audit.saveAll');
     Route::view('/freight',         'admin.placeholders.freight')->name('freight');
     Route::view('/site-settings',   'admin.placeholders.site_settings')->name('site_settings');
-    Route::view('/user-management', 'admin.placeholders.user_management')->name('user_management');
 });
 
 // Admin AJAX route for audit log filtering/search
 Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::get('/audit/filter', [\App\Http\Controllers\Admin\AuditLogAjaxController::class, 'filter'])->name('admin.audit.filter');
+    // Export all logs for printing/exporting
+    Route::get('/audit/export/all', [\App\Http\Controllers\Admin\AuditLogExportController::class, 'all'])->name('admin.audit.export.all');
 });
 
 /*

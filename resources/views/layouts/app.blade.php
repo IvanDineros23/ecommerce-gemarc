@@ -12,25 +12,51 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
         
-        <!-- Font Awesome - Using jsDelivr CDN for better reliability -->
+        <!-- Tailwind CSS -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        
+        <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
         
-        <!-- AOS Animation Library -->
-        <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-        
-        <!-- AOS Animation Library -->
-        <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-
         <!-- Website Styles -->
         <link rel="stylesheet" href="{{ asset('website/styles.css') }}">
         <link rel="stylesheet" href="{{ asset('css/highlights.css') }}">
         <link rel="stylesheet" href="{{ asset('css/modern-cta.css') }}">
         <link rel="stylesheet" href="{{ asset('css/fontawesome-fix.css') }}">
+        
+        <!-- Custom Styles for better homepage appearance -->
+        <style>
+            /* Hide scrollbar for product carousel */
+            .no-scrollbar::-webkit-scrollbar {
+                display: none;
+            }
+            .no-scrollbar {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            
+            /* Custom styling for hero section */
+            .hero-section {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 70vh;
+            }
+            
+            /* Product card hover effects */
+            .product-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            }
+            
+            /* Feature grid styling */
+            .feature-card {
+                transition: all 0.3s ease;
+            }
+            
+            .feature-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            }
+        </style>
         {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
     </head>
     <body class="font-sans antialiased">
@@ -176,11 +202,12 @@
   /* FOOTER */
   .site-footer {
     flex-shrink: 0;
-    background: #f8f9fa;
-    padding: 0;              /* walang padding sa labas */
-    margin: 0;               /* lapat sa ibaba */
+    background: #2E7D32; /* Dark green background */
+    padding: 0;
+    margin: 0;
     width: 100%;
-    border-top: 1px solid #e5e7eb;
+    border-top: none;
+    color: white;
   }
   .site-footer__wrap {
     max-width: 1400px;
@@ -191,29 +218,30 @@
   .site-footer__grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0;                  /* walang pagitan sa pagitan ng columns */
+    gap: 0;
+    background-color: #2E7D32; /* Dark green */
   }
   .site-footer__item {
-    padding: 20px;           /* loob lang ng column may padding para readable */
-    border-right: 1px solid #e5e7eb;
+    padding: 30px 20px;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
   }
   .site-footer__item:last-child { border-right: 0; }
 
   .site-footer__title {
     display: flex; align-items: center; gap: 8px;
-    color: #198754; font-size: 1.05rem; font-weight: 600;
-    margin: 0 0 6px 0;
+    color: white; font-size: 1.05rem; font-weight: 600;
+    margin: 0 0 8px 0;
     white-space: nowrap;
   }
-  .site-footer__title i { color: #ff8800; font-size: 1.2rem; }
-  .site-footer__text { margin: 0; color: #333; line-height: 1.5; }
+  .site-footer__title i { color: #FFA000; font-size: 1.2rem; } /* Amber color for icons */
+  .site-footer__text { margin: 0; color: rgba(255, 255, 255, 0.9); line-height: 1.6; }
 
   /* bottom bar – full width, walang extra space */
   .site-footer__bar {
     text-align: center;
-    padding: 14px 0;
+    padding: 16px 0;
     color: #fff;
-    background: linear-gradient(90deg, #198754 60%, #ff8800 100%);
+    background: #1B5E20; /* Darker green for the copyright bar */
     font-size: 0.95rem; font-weight: 500;
   }
 

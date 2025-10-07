@@ -1,4 +1,26 @@
 <?php
+// Static website page routes
+Route::view('/about', 'website.about');
+Route::view('/contact', 'website.contact')->name('contact');
+Route::view('/customerfeedback', 'website.customerfeedback');
+Route::view('/news', 'website.news')->name('news');
+Route::view('/blogs', 'website.blogs');
+Route::view('/aggregates', 'website.aggregates');
+Route::view('/asphalt-bitumen', 'website.asphalt-bitumen');
+Route::view('/calibration', 'website.calibration');
+Route::view('/cement-mortar', 'website.cement-mortar');
+Route::view('/concrete-mortar', 'website.concrete-mortar');
+Route::view('/drilling-machine', 'website.drilling-machine');
+Route::view('/industrial-equipment', 'website.industrial-equipment');
+Route::view('/pavetest', 'website.pavetest');
+Route::view('/soil', 'website.soil');
+Route::view('/steel', 'website.steel');
+
+// Static homepage test route
+Route::get('/static', function () {
+    return view('website.index');
+});
+
 // AJAX product search for landing page
 Route::get('/landing-search', function (\Illuminate\Http\Request $request) {
     $q = $request->input('q');
@@ -58,11 +80,10 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 |--------------------------------------------------------------------------
 */
 
-// Home / Landing now redirects to /landing
-Route::redirect('/', '/landing');
-
-// Another landing page
-Route::view('/landing', 'landing')->name('landing');
+// Home page - main website homepage
+Route::get('/', function () {
+    return view('website.index');
+})->name('home');
 
 // Browse listing (simple page)
 Route::get('/browse', function () {
@@ -79,7 +100,7 @@ Route::get('/shop', function (Request $request) {
             $query->where(function ($sub) use ($q) {
                 $sub->where('name', 'like', "%{$q}%")
                     ->orWhere('description', 'like', "%{$q}%")
-                    ->orWhere('price', 'like', "%{$q}%");
+                    ->orWhere('unit_price', 'like', "%{$q}%");
             });
         })
         ->orderByDesc('created_at')

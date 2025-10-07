@@ -12,7 +12,7 @@ function productModal() {
         openModal(product) {
             this.modalProduct = {
                 ...product,
-                price: product.price
+                price: product.unit_price
             };
             this.show = true;
         },

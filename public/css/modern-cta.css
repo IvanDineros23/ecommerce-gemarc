@@ -1,0 +1,282 @@
+/* Modern Contact CTA Section Styling */
+.contact-cta-section.modern-cta {
+    padding: 120px 0;
+    background: linear-gradient(135deg, 
+        rgba(46, 125, 50, 0.1) 0%, 
+        rgba(76, 175, 80, 0.05) 50%, 
+        rgba(139, 195, 74, 0.1) 100%
+    );
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    position: relative;
+    overflow: hidden;
+}
+
+.contact-cta-section.modern-cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIgZmlsbD0icmdiYSg0NiwgMTI1LCA1MCwgMC4xKSIvPgo8L3N2Zz4K') repeat;
+    opacity: 0.3;
+    z-index: 1;
+}
+
+.contact-cta-section.modern-cta .container {
+    position: relative;
+    z-index: 2;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.contact-cta-content.modern-cta-content {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.cta-title {
+    font-size: 3.2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 40px;
+    line-height: 1.2;
+    position: relative;
+    display: inline-block;
+}
+
+.cta-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, #4caf50, #81c784);
+    border-radius: 2px;
+}
+
+.cta-button-wrapper {
+    margin-top: 30px;
+}
+
+/* Modern Contact Button Styling */
+.contact-cta-btn.modern-contact-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px 40px;
+    background: linear-gradient(135deg, #4caf50 0%, #66bb6a 50%, #81c784 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(76, 175, 80, 0.3);
+    border: 2px solid transparent;
+    min-width: 220px;
+    transform: translateY(0);
+    will-change: transform, box-shadow;
+}
+
+.contact-cta-btn.modern-contact-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #66bb6a 0%, #81c784 50%, #a5d6a7 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: inherit;
+}
+
+.contact-cta-btn.modern-contact-btn:hover::before {
+    opacity: 1;
+}
+
+.contact-cta-btn.modern-contact-btn:hover {
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 20px 40px rgba(76, 175, 80, 0.4);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-text {
+    position: relative;
+    z-index: 2;
+    transition: transform 0.3s ease;
+}
+
+.btn-icon {
+    position: relative;
+    z-index: 2;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+}
+
+.contact-cta-btn.modern-contact-btn:hover .btn-icon {
+    transform: translateX(5px) rotate(45deg);
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.contact-cta-btn.modern-contact-btn:hover .btn-text {
+    transform: translateX(-2px);
+}
+
+/* Shine effect */
+.btn-shine {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.6s ease;
+    z-index: 1;
+}
+
+.contact-cta-btn.modern-contact-btn:hover .btn-shine {
+    left: 100%;
+}
+
+/* Active state */
+.contact-cta-btn.modern-contact-btn:active {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 24px rgba(76, 175, 80, 0.35);
+}
+
+/* Focus state for accessibility */
+.contact-cta-btn.modern-contact-btn:focus {
+    outline: none;
+    box-shadow: 0 8px 32px rgba(76, 175, 80, 0.3), 0 0 0 4px rgba(76, 175, 80, 0.2);
+}
+
+/* Loading state animation */
+.contact-cta-btn.modern-contact-btn.loading {
+    pointer-events: none;
+}
+
+.contact-cta-btn.modern-contact-btn.loading .btn-text {
+    opacity: 0.7;
+}
+
+.contact-cta-btn.modern-contact-btn.loading .btn-icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .contact-cta-section.modern-cta {
+        padding: 80px 0;
+    }
+    
+    .cta-title {
+        font-size: 2.4rem;
+        margin-bottom: 30px;
+    }
+    
+    .contact-cta-btn.modern-contact-btn {
+        padding: 16px 32px;
+        font-size: 1.1rem;
+        min-width: 200px;
+    }
+    
+    .contact-cta-btn.modern-contact-btn:hover {
+        transform: translateY(-4px) scale(1.02);
+    }
+}
+
+@media (max-width: 480px) {
+    .contact-cta-section.modern-cta {
+        padding: 60px 0;
+    }
+    
+    .cta-title {
+        font-size: 2rem;
+        margin-bottom: 25px;
+    }
+    
+    .contact-cta-btn.modern-contact-btn {
+        padding: 14px 28px;
+        font-size: 1rem;
+        min-width: 180px;
+        gap: 10px;
+    }
+    
+    .btn-icon {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .cta-title {
+        color: #ecf0f1;
+    }
+    
+    .cta-title::after {
+        background: linear-gradient(90deg, #81c784, #a5d6a7);
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .contact-cta-section.modern-cta {
+        animation: none;
+    }
+    
+    .contact-cta-btn.modern-contact-btn {
+        transition: none;
+    }
+    
+    .contact-cta-btn.modern-contact-btn:hover {
+        transform: none;
+    }
+    
+    .btn-shine {
+        display: none;
+    }
+    
+    .btn-icon,
+    .btn-text {
+        transition: none;
+    }
+}
+
+/* High contrast support */
+@media (prefers-contrast: high) {
+    .contact-cta-btn.modern-contact-btn {
+        border: 3px solid #2e7d32;
+        background: #4caf50;
+    }
+    
+    .contact-cta-btn.modern-contact-btn:hover {
+        background: #2e7d32;
+        border-color: #1b5e20;
+    }
+}

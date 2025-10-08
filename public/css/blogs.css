@@ -1,0 +1,246 @@
+/* Blog Page Styles */
+.bg-navy-900 {
+    background-color: #0f172a;
+}
+
+/* Hero Section */
+.hero-section {
+    position: relative;
+    min-height: 400px;
+    background-position: center;
+    background-size: cover;
+}
+
+/* New hero background with blur & overlay */
+.page-hero.hero-with-bg {
+    position: relative;
+    min-height: 340px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1rem;
+    overflow: hidden;
+}
+
+.page-hero.hero-with-bg .hero-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(6px) brightness(0.55);
+    transform: scale(1.08); /* slight scale to hide blur edges */
+    z-index: 0;
+}
+
+.page-hero.hero-with-bg .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.55));
+    z-index: 1;
+    pointer-events: none;
+}
+
+.page-hero.hero-with-bg .hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: #fff;
+    max-width: 960px;
+}
+
+.page-hero.hero-with-bg .hero-content h1 {
+    font-size: clamp(2.25rem, 5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    text-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+.page-hero.hero-with-bg .hero-content p {
+    font-size: clamp(1rem, 1.3vw, 1.25rem);
+    font-weight: 400;
+    opacity: 0.95;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    margin: 0 auto;
+    max-width: 720px;
+}
+
+/* Increase specificity to override legacy .page-hero rules from global stylesheet */
+.page-hero.hero-blog {
+    background: none !important; /* remove old static background */
+    padding: 0; /* we already control padding inside hero-with-bg */
+}
+
+/* Fallback if hero-bg div fails to load image */
+.page-hero.hero-blog:not(.loaded) .hero-bg { background-color: #4b5563; }
+
+@media (min-width: 1024px) {
+    .page-hero.hero-with-bg { min-height: 420px; }
+}
+
+/* Search Section */
+.search-container {
+    position: relative;
+    z-index: 10;
+}
+
+.search-input {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    border: none;
+    border-radius: 9999px;
+    outline: none;
+    font-size: 1rem;
+    color: #1a202c;
+    background: white;
+}
+
+.search-button {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    padding: 0.75rem;
+    background: #16a34a;
+    color: white;
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.search-button:hover {
+    background: #15803d;
+}
+
+/* Blog Posts */
+.blog-post {
+    background: white;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.blog-post:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.featured-post {
+    background: #16a34a;
+    color: white;
+    border-radius: 0.75rem;
+    padding: 2rem;
+}
+
+.blog-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.25rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.badge-featured {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.badge-recent {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.badge-tech {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+/* Blog Meta */
+.blog-meta {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.blog-meta i {
+    margin-right: 0.5rem;
+}
+
+.blog-meta-divider {
+    margin: 0 0.75rem;
+}
+
+/* Read More Links */
+.read-more {
+    display: inline-flex;
+    align-items: center;
+    color: #16a34a;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.read-more:hover {
+    color: #15803d;
+}
+
+/* Responsive Grid */
+@media (min-width: 768px) {
+    .blog-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .blog-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* === Enhanced Blog Article Titles === */
+.blog-post .blog-content h3 {
+    font-size: 1.15rem;
+    font-weight: 750;
+    line-height: 1.3;
+    margin: 0 0 0.75rem;
+    letter-spacing: -.25px;
+    color: #0f172a;
+    transition: color .2s ease;
+}
+.blog-post .blog-content h3:hover { color: #065f46; }
+
+/* === Hero Background Enforcement & Fallback === */
+.page-hero.hero-with-bg.hero-blog .hero-bg { background-image: var(--hero-blog-bg); }
+.page-hero.hero-with-bg.hero-blog::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--hero-blog-bg);
+    background-size: cover;
+    background-position: center;
+    filter: blur(6px) brightness(0.55);
+    transform: scale(1.08);
+    z-index: 0;
+    opacity: 0; /* unused unless .no-bg applied */
+    pointer-events: none;
+}
+.page-hero.hero-with-bg.hero-blog.no-bg .hero-bg { display: none; }
+.page-hero.hero-with-bg.hero-blog.no-bg::after { opacity: 1; }

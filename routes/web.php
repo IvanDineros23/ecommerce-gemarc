@@ -16,6 +16,7 @@ Route::view('/pavetest', 'website.pavetest');
 Route::view('/soil', 'website.soil');
 Route::view('/steel', 'website.steel');
 
+
 // Static homepage test route
 Route::get('/static', function () {
     return view('website.index');

@@ -22,6 +22,7 @@
                     <div class="d-grid gap-2 mb-2">
                         <a href="{{ route('login') }}" class="btn btn-industrial">Sign in</a>
                         <a href="{{ route('register') }}" class="btn btn-success" style="background:#28a745; color:#fff; border:none;">Create account</a>
+                        <a href="{{ route('home') }}" class="btn btn-outline-secondary mt-2" style="border-color:#6c757d; color:#6c757d;">Go to Website</a>
                     </div>
                     <div class="text-muted small mt-4 text-center">&copy; {{ date('Y') }} Gemarc Enterprises Inc. All rights reserved.</div>
                 </div>

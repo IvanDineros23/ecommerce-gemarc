@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <a href="{{ route('orders.index') }}" class="block rounded-md px-5 py-2 text-[15px] font-normal text-gray-700 hover:bg-gray-100 transition">Orders</a>
                                 <a href="{{ route('saved.index') }}" class="block rounded-md px-5 py-2 text-[15px] font-normal text-gray-700 hover:bg-gray-100 transition">Saved Items</a>
                             @endif
-                            <a href="{{ route('settings') }}" class="block rounded-md px-5 py-2 text-[15px] font-normal text-gray-700 hover:bg-gray-100 transition">Settings</a>
+                            <a href="{{ route('profile.edit') }}" class="block rounded-md px-5 py-2 text-[15px] font-normal text-gray-700 hover:bg-gray-100 transition">Profile</a>
                             <div class="border-t border-gray-200 my-2"></div>
                             <!-- Authentication -->
                             <form method="POST" action="{{ route('logout') }}">

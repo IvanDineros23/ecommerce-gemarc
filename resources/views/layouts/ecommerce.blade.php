@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -19,8 +20,8 @@
     <style>
     /* Ecommerce Navbar Styles */
     .ecommerce-navbar {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        background: #ffffff;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         min-height: 70px;
     }
     .navbar-brand {
@@ -29,7 +30,7 @@
         gap: 0.5rem;
         font-weight: 700;
         font-size: 1.25rem;
-        color: #fff !important;
+        color: #222 !important;
         text-decoration: none;
     }
     .navbar-brand img {
@@ -37,7 +38,7 @@
         width: auto;
     }
     .navbar-nav .nav-link {
-        color: #e2e8f0 !important;
+        color: #333 !important;
         font-weight: 500;
         padding: 0.75rem 1rem !important;
         border-radius: 0.5rem;
@@ -45,53 +46,79 @@
         margin: 0 0.25rem;
     }
     .navbar-nav .nav-link:hover {
-        color: #fff !important;
-        background: rgba(255,255,255,0.1);
+        color: #16a34a !important;
+        background: rgba(22,163,74,0.05);
         transform: translateY(-1px);
     }
     .navbar-nav .nav-link.active {
-        color: #fff !important;
-        background: rgba(34,197,94,0.2);
-        border: 1px solid rgba(34,197,94,0.3);
+        color: #16a34a !important;
+        background: rgba(34,197,94,0.1);
+        border: 1px solid rgba(34,197,94,0.2);
     }
     .dropdown-menu {
-        background: #1e293b;
-        border: 1px solid rgba(255,255,255,0.1);
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.1);
         border-radius: 0.75rem;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     }
     .dropdown-item {
-        color: #e2e8f0;
+        color: #333;
         padding: 0.75rem 1.25rem;
         transition: all 0.3s ease;
     }
     .dropdown-item:hover {
-        background: rgba(34,197,94,0.2);
-        color: #fff;
+        background: rgba(34,197,94,0.1);
+        color: #16a34a;
     }
     .cart-badge {
         background: #ef4444;
         color: white;
         border-radius: 50%;
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
+        padding: 0.2rem 0.45rem;
+        font-size: 0.7rem;
         font-weight: 600;
         position: absolute;
-        top: -8px;
+        top: -6px;
         right: -8px;
-        min-width: 20px;
+        min-width: 18px;
         text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        border: 1.5px solid white;
+        animation: pulse 2s infinite;
+    }
+    
+    /* Different badge colors */
+    .notification-badge {
+        background: #f59e0b;
+    }
+    
+    .chat-badge {
+        background: #3b82f6;
+    }
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        50% {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(239,68,68,0.5);
+        }
+        100% {
+            transform: scale(1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
     }
     .nav-user-info {
         display: flex;
         align-items: center;
         gap: 0.75rem;
-        color: #e2e8f0;
+        color: #333;
         font-weight: 500;
     }
     .nav-user-avatar {
-        width: 35px;
-        height: 35px;
+        width: 38px;
+        height: 38px;
         background: linear-gradient(135deg, #22c55e, #16a34a);
         border-radius: 50%;
         display: flex;
@@ -100,6 +127,121 @@
         color: white;
         font-weight: 600;
         font-size: 0.875rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border: 2px solid #ffffff;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    /* Improved icon styling */
+    .navbar .nav-link i {
+        font-size: 1.1rem;
+        transition: transform 0.2s ease;
+    }
+    
+    .navbar .nav-link:hover i {
+        transform: translateY(-2px);
+    }
+    
+    /* Unread notification indicator */
+    .unread-notification {
+        background-color: rgba(34, 197, 94, 0.04);
+        position: relative;
+    }
+    
+    .unread-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #16a34a;
+        position: absolute;
+        right: 15px;
+        top: 15px;
+    }
+    
+    .notification-icon {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .notification-time {
+        color: #999;
+        font-size: 0.75rem;
+        display: block;
+        margin-top: 3px;
+    }
+    
+    /* Page Structure */
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+    
+    main {
+        flex: 1 0 auto;
+    }
+    
+    /* Footer Styles */
+    .site-footer {
+        background: #2E7D32; /* Dark green background */
+        padding: 0;
+        width: 100%;
+        border-top: none;
+        color: white;
+        flex-shrink: 0;
+        margin-top: auto;
+    }
+    .site-footer__wrap {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* 4 even columns grid */
+    .site-footer__grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0;
+        background-color: #2E7D32; /* Dark green */
+    }
+    .site-footer__item {
+        padding: 30px 20px;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .site-footer__item:last-child { border-right: 0; }
+
+    .site-footer__title {
+        display: flex; align-items: center; gap: 8px;
+        color: white; font-size: 1.05rem; font-weight: 600;
+        margin: 0 0 8px 0;
+        white-space: nowrap;
+    }
+    .site-footer__title i { color: #FFA000; font-size: 1.2rem; } /* Amber color for icons */
+    .site-footer__text { margin: 0; color: rgba(255, 255, 255, 0.9); line-height: 1.6; }
+
+    /* bottom bar */
+    .site-footer__bar {
+        text-align: center;
+        padding: 16px 0;
+        color: #fff;
+        background: #1B5E20; /* Darker green for the copyright bar */
+        font-size: 0.95rem; font-weight: 500;
+    }
+
+    /* responsive footer */
+    @media (max-width: 900px) {
+        .site-footer__grid { grid-template-columns: 1fr; }
+        .site-footer__item { border-right: 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .site-footer__item:last-child { border-bottom: 0; }
+        .site-footer__title { justify-content: center; }
+        .site-footer__text { text-align: center; }
     }
     </style>
 </head>
@@ -123,7 +265,6 @@
             <!-- Brand -->
             <a class="navbar-brand" href="{{ route('dashboard') }}">
                 <img src="{{ asset('images/gemarclogo.png') }}" alt="Gemarc">
-                <span>GEMARC Ecommerce</span>
             </a>
 
             <!-- Toggle Button -->
@@ -135,11 +276,6 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
-                            <i class="fas fa-home me-1"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('shop.index') ? 'active' : '' }}" href="{{ route('shop.index') }}">
                             <i class="fas fa-shopping-bag me-1"></i> Shop
                         </a>
@@ -148,9 +284,6 @@
                         <a class="nav-link {{ request()->routeIs('cart.*') ? 'active' : '' }}" href="{{ route('cart.index') }}">
                             <i class="fas fa-shopping-cart me-1"></i> 
                             Cart
-                            @if($cartCount > 0)
-                                <span class="cart-badge">{{ $cartCount }}</span>
-                            @endif
                         </a>
                     </li>
                     <li class="nav-item">
@@ -176,11 +309,67 @@
                             @endif
                         </a>
                     </li>
+                    
+                    <!-- Notifications Icon with Dropdown -->
+                    <li class="nav-item dropdown position-relative me-2">
+                        <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge cart-badge">3</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end p-0 overflow-hidden" style="width: 320px; max-height: 400px;">
+                            <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+                                <h6 class="m-0 fw-bold">Notifications</h6>
+                                <a href="#" class="text-decoration-none small">Mark all as read</a>
+                            </div>
+                            <div class="notifications-list">
+                                <!-- Unread Notification -->
+                                <a href="#" class="dropdown-item p-3 border-bottom d-flex align-items-center unread-notification">
+                                    <div class="notification-icon me-3 bg-success bg-opacity-10 text-success rounded-circle p-2">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="notification-content flex-grow-1">
+                                        <p class="mb-1 text-dark fw-semibold">Order #102938 confirmed</p>
+                                        <p class="small text-muted mb-0">Your order has been processed and shipped.</p>
+                                        <span class="notification-time small">2 hours ago</span>
+                                    </div>
+                                    <div class="unread-indicator"></div>
+                                </a>
+                                <!-- Normal Notification -->
+                                <a href="#" class="dropdown-item p-3 border-bottom d-flex align-items-center unread-notification">
+                                    <div class="notification-icon me-3 bg-primary bg-opacity-10 text-primary rounded-circle p-2">
+                                        <i class="fas fa-percent"></i>
+                                    </div>
+                                    <div class="notification-content flex-grow-1">
+                                        <p class="mb-1 text-dark fw-semibold">New discount available!</p>
+                                        <p class="small text-muted mb-0">Use code GEMARC15 for 15% off your next order.</p>
+                                        <span class="notification-time small">Yesterday</span>
+                                    </div>
+                                    <div class="unread-indicator"></div>
+                                </a>
+                                <!-- Normal Notification -->
+                                <a href="#" class="dropdown-item p-3 border-bottom d-flex align-items-center unread-notification">
+                                    <div class="notification-icon me-3 bg-warning bg-opacity-10 text-warning rounded-circle p-2">
+                                        <i class="fas fa-truck"></i>
+                                    </div>
+                                    <div class="notification-content flex-grow-1">
+                                        <p class="mb-1 text-dark fw-semibold">Package delivered!</p>
+                                        <p class="small text-muted mb-0">Your order #98765 was delivered successfully.</p>
+                                        <span class="notification-time small">Oct 7, 2025</span>
+                                    </div>
+                                    <div class="unread-indicator"></div>
+                                </a>
+                            </div>
+                            <div class="text-center p-2 border-top">
+                                <a href="#" class="text-decoration-none small">View all notifications</a>
+                            </div>
+                        </div>
+                    </li>
 
                     <!-- Chat Icon -->
-                    <li class="nav-item me-3">
+                    <li class="nav-item position-relative me-3">
                         <a class="nav-link" href="{{ route('chat.page') }}" title="Chat">
                             <i class="fas fa-comment-dots"></i>
+                            <span class="chat-badge cart-badge">2</span>
                         </a>
                     </li>
                     
@@ -195,9 +384,6 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{{ route('profile.edit') }}">
                                 <i class="fas fa-user me-2"></i> Profile
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ route('settings') }}">
-                                <i class="fas fa-cog me-2"></i> Settings
                             </a></li>
                             <li><a class="dropdown-item" href="{{ route('saved.index') }}">
                                 <i class="fas fa-heart me-2"></i> Saved Items
@@ -219,9 +405,57 @@
     </nav>
 
     <!-- Main Content -->
-    <main>
+    <main class="flex-grow-1">
         @yield('content')
     </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="site-footer__wrap">
+            <div class="site-footer__grid">
+                <!-- Office Location -->
+                <div class="site-footer__item">
+                    <h4 class="site-footer__title"><i class="fas fa-map-marker-alt"></i> Office Address</h4>
+                    <p class="site-footer__text">
+                        No. 15 Chile St. Ph1 Greenheights Subdivision,<br>
+                        Concepcion 1, Marikina City,<br>
+                        Philippines 1807
+                    </p>
+                </div>
+                
+                <!-- Contact Information -->
+                <div class="site-footer__item">
+                    <h4 class="site-footer__title"><i class="fas fa-phone-alt"></i> Telephone Numbers</h4>
+                    <p class="site-footer__text">
+                        (632)8-997-7959 &nbsp;|&nbsp; (632)8-584-5572
+                    </p>
+                </div>
+                
+                <!-- Mobile Numbers -->
+                <div class="site-footer__item">
+                    <h4 class="site-footer__title"><i class="fas fa-mobile-alt"></i> Mobile Numbers</h4>
+                    <p class="site-footer__text">
+                        +63 909 087 9416<br>
+                        +63 928 395 3532 &nbsp;|&nbsp; +63 918 905 8316
+                    </p>
+                </div>
+                
+                <!-- Email Contacts -->
+                <div class="site-footer__item">
+                    <h4 class="site-footer__title"><i class="fas fa-envelope"></i> Email Address</h4>
+                    <p class="site-footer__text">
+                        sales@gemarcph.com<br>
+                        technical@gemarcph.com
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Copyright Bar -->
+        <div class="site-footer__bar">
+            &copy; {{ date('Y') }} Gemarc Enterprises Incorporated. All rights reserved.
+        </div>
+    </footer>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

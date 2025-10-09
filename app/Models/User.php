@@ -37,6 +37,7 @@ class User extends Authenticatable
         'password',
         'payment_details',
         'delivery_option',
+        'profile_image',
     ];
 
     protected $casts = [

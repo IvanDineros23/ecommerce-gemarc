@@ -1,41 +1,42 @@
-@extends('layouts.app')
+@extends('layouts.ecommerce')
+@section('title', 'Request a Quote | Gemarc Enterprises Inc.')
 @section('content')
-<div class="max-w-4xl mx-auto py-10">
+<div class="container py-4">
+    <h2 class="text-center text-success fw-bold mb-4">Request a Quote</h2>
+    
     @if(session('success'))
-        <div id="successModal" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40">
-            <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
-                <div class="text-green-600 text-3xl mb-2">✔️</div>
-                <div class="text-lg font-semibold mb-2">{{ session('success') }}</div>
-                <button onclick="document.getElementById('successModal').style.display='none'" class="mt-4 px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700">OK</button>
-            </div>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Success!</strong> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        <script>setTimeout(()=>{document.getElementById('successModal').style.display='none'}, 3000);</script>
     @endif
-    <h1 class="text-2xl font-bold text-green-800 mb-6">Request a Quote</h1>
-    <form method="GET" action="" class="mb-4" onsubmit="return false;">
-        <div class="flex gap-2">
-            <input type="text" id="product-search" name="search" value="{{ request('search') }}" placeholder="Search products..." class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-200" autocomplete="off" />
-            <button type="button" id="clear-search" class="bg-gray-200 px-3 rounded text-gray-700 font-semibold hover:bg-gray-300">Clear</button>
-        </div>
-    </form>
+    
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <form class="mb-3">
+                <div class="input-group">
+                    <input type="text" id="product-search" class="form-control" placeholder="Search products..." autocomplete="off">
+                    <button class="btn btn-outline-secondary" type="button" id="clear-search">Clear</button>
+                </div>
+            </form>
     <form method="POST" action="{{ route('quotes.store') }}">
         @csrf
-        <div class="mb-6 overflow-x-auto">
-            <table class="min-w-full bg-white border rounded shadow" id="products-table">
-                <thead>
-                    <tr class="bg-green-100 text-green-800">
-                        <th class="px-4 py-2 text-left">Image</th>
-                        <th class="px-4 py-2 text-left">Product</th>
-                        <th class="px-4 py-2 text-left">Description</th>
-                        <th class="px-4 py-2 text-right">Price</th>
-                        <th class="px-4 py-2 text-center">Quantity</th>
-                        <th class="px-4 py-2 text-center">Add</th>
+        <div class="table-responsive">
+            <table class="table table-hover" id="products-table">
+                <thead style="background-color: #e8f5e9;">
+                    <tr>
+                        <th>Image</th>
+                        <th>Product</th>
+                        <th>Description</th>
+                        <th class="text-end">Price</th>
+                        <th class="text-center">Quantity</th>
+                        <th class="text-center">Add</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($products as $product)
                     <tr class="product-row">
-                        <td class="px-4 py-2 text-center">
+                        <td class="text-center">
                             @php
                                 $img = null;
                                 if (isset($product->images) && count($product->images)) {
@@ -45,31 +46,40 @@
                                 }
                             @endphp
                             @if($img)
-                                <img src="{{ asset('storage/' . $img) }}" alt="{{ $product->name }}" class="w-16 h-16 object-contain rounded border" />
+                                <img src="{{ asset('storage/' . $img) }}" alt="{{ $product->name }}" class="img-fluid rounded" style="width: 60px; height: 60px; object-fit: contain;" />
                             @else
-                                <div class="w-16 h-16 flex items-center justify-center bg-gray-100 text-gray-400 border rounded">No Image</div>
+                                <div class="bg-light text-secondary d-flex align-items-center justify-content-center rounded" style="width: 60px; height: 60px;">No Image</div>
                             @endif
                         </td>
-                        <td class="px-4 py-2 product-name">{{ $product->name }}</td>
-                        <td class="px-4 py-2 text-sm text-gray-600 product-desc">{{ $product->description }}</td>
-                        <td class="px-4 py-2 text-right">₱{{ number_format($product->unit_price, 2) }}</td>
-                        <td class="px-4 py-2 text-center">
-                            <input type="number" name="quantities[{{ $product->id }}]" min="0" max="9999" value="0" class="w-20 border rounded px-2 py-1 text-center">
+                        <td class="product-name fw-medium">{{ $product->name }}</td>
+                        <td class="product-desc text-secondary">{{ $product->description }}</td>
+                        <td class="text-end fw-medium">₱{{ number_format($product->unit_price, 2) }}</td>
+                        <td class="text-center">
+                            <input type="number" name="quantities[{{ $product->id }}]" min="0" max="9999" value="0" class="form-control" style="width: 70px; margin: 0 auto;">
                         </td>
-                        <td class="px-4 py-2 text-center">
-                            <input type="checkbox" name="products[]" value="{{ $product->id }}">
+                        <td class="text-center">
+                            <input type="checkbox" class="form-check-input" name="products[]" value="{{ $product->id }}">
                         </td>
                     </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
-        <div class="mb-4">
-            <label class="block text-gray-700 mb-1">Additional Notes</label>
-            <textarea name="notes" class="w-full border border-gray-300 rounded px-3 py-2" rows="3" placeholder="Any special instructions or notes..."></textarea>
+            </div>
+            
+            <div class="mb-4 mt-4">
+                <label for="notes" class="form-label fw-medium">Additional Notes</label>
+                <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Any special instructions or requirements..."></textarea>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                <button type="submit" class="btn btn-success px-4 py-2">
+                    Submit Quote Request
+                </button>
+            </div>
+        </form>
         </div>
-        <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 font-semibold">Submit Quote Request</button>
-    </form>
+    </div>
 </div>
 
 @push('scripts')
@@ -78,25 +88,54 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('product-search');
     const clearBtn = document.getElementById('clear-search');
     const rows = document.querySelectorAll('.product-row');
+    
     function filterRows() {
         const val = searchInput.value.toLowerCase();
+        let found = 0;
+        
         rows.forEach(row => {
             const name = row.querySelector('.product-name').textContent.toLowerCase();
             const desc = row.querySelector('.product-desc').textContent.toLowerCase();
             if (name.includes(val) || desc.includes(val)) {
                 row.style.display = '';
+                found++;
             } else {
                 row.style.display = 'none';
             }
         });
+        
+        // Show no results message
+        let noResults = document.getElementById('no-results');
+        if (found === 0 && val.length > 0) {
+            if (!noResults) {
+                noResults = document.createElement('div');
+                noResults.id = 'no-results';
+                noResults.className = 'alert alert-info text-center my-3';
+                noResults.textContent = 'No products found matching your search.';
+                document.getElementById('products-table').parentNode.appendChild(noResults);
+            }
+            noResults.style.display = '';
+        } else if (noResults) {
+            noResults.style.display = 'none';
+        }
     }
+    
     searchInput.addEventListener('input', filterRows);
     clearBtn.addEventListener('click', function() {
         searchInput.value = '';
         filterRows();
         searchInput.focus();
     });
-});
+    
+    // Add hover effect to rows
+    rows.forEach(row => {
+        row.addEventListener('mouseover', function() {
+            this.style.backgroundColor = '#f8f9fa';
+        });
+        row.addEventListener('mouseout', function() {
+            this.style.backgroundColor = '';
+        });
+    });
 </script>
 @endpush
 @endsection

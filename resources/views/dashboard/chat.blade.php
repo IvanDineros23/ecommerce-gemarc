@@ -1,28 +1,37 @@
-@extends('layouts.app')
+@extends('layouts.ecommerce')
 
+@section('title', 'Chat with Employee | Gemarc Enterprises Inc.')
 @section('content')
-<div class="py-12 max-w-3xl mx-auto">
-    <h1 class="text-2xl font-bold text-green-800 mb-4 flex items-center gap-2">
-        <svg class="w-7 h-7 text-green-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4-4.03 7-9 7-1.18 0-2.31-.13-3.36-.38-.37-.09-.77-.08-1.12.07l-2.13.85a1 1 0 01-1.32-1.32l.85-2.13c.15-.35.16-.75.07-1.12A7.96 7.96 0 013 12c0-4 4.03-7 9-7s9 3 9 7z" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Chat with Employee
-    </h1>
-    <div class="bg-white rounded-xl shadow p-6">
-        <div class="relative">
-            <div id="chat-messages" class="h-80 overflow-y-auto bg-gray-50 rounded p-4 mb-4 text-base border border-gray-200"></div>
-            <div id="chat-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 text-lg px-4 text-center pointer-events-none transition-opacity duration-500" style="background:rgba(255,255,255,0.85); z-index:2;">
-                <div class="font-semibold text-green-700 mb-2 text-xl">Welcome to Gemarc Enterprises Inc.</div>
-                <div>What would you like to inquire about?<br>Want to get a quote quickly?</div>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <h2 class="text-center text-success fw-bold mb-4">
+                <i class="fas fa-comments me-2"></i> Chat with Employee
+            </h2>
+            
+            <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+                <div class="card-body p-0">
+                    <div class="position-relative">
+                        <div id="chat-messages" class="p-4 mb-0" style="height: 400px; overflow-y: auto; background-color: #f8f9fa;"></div>
+                        <div id="chat-placeholder" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center text-muted fs-5 px-4 text-center" style="background:rgba(255,255,255,0.9); z-index:2; transition: opacity 0.5s;">
+                            <div class="fw-bold text-success mb-2 fs-4">Welcome to Gemarc Enterprises Inc.</div>
+                            <div>What would you like to inquire about?<br>Want to get a quote quickly?</div>
+                        </div>
+                    </div>
+                    
+                    <div class="border-top p-3">
+                        <form id="chat-form" class="d-flex gap-2 mb-2">
+                            <input type="text" id="chat-input" class="form-control" placeholder="Type your message..." autocomplete="off">
+                            <button type="submit" class="btn btn-success px-4">Send</button>
+                        </form>
+                        <button id="clear-chat" class="btn btn-warning">Clear Chat</button>
+                        <div id="chat-status" class="text-muted small mt-2"></div>
+                    </div>
+                </div>
             </div>
         </div>
-        <form id="chat-form" class="flex gap-2 mb-2">
-            <input type="text" id="chat-input" class="border border-green-300 rounded px-3 py-2 w-full focus:outline-none" placeholder="Type your message...">
-            <button type="submit" class="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800 font-semibold">Send</button>
-        </form>
-        <button id="clear-chat" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded font-semibold mb-2">Clear Chat</button>
-        <div id="chat-status" class="text-xs text-gray-400 mt-1"></div>
     </div>
+</div>
     <script>
     // Placeholder fade logic
     function updateChatPlaceholder() {
@@ -57,7 +66,23 @@
         })
             .then(r => r.json())
             .then(msgs => {
-                let html = msgs.map(m => `<div><b>${m.sender_id == {{ auth()->id() }} ? 'You' : 'Employee'}:</b> ${m.message}</div>`).join('');
+                let html = '';
+                msgs.forEach(m => {
+                    const isUser = m.sender_id == {{ auth()->id() }};
+                    const alignClass = isUser ? 'text-end' : '';
+                    const bubbleClass = isUser ? 'bg-primary text-white' : 'bg-light';
+                    const msgTime = new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    
+                    html += `
+                        <div class="mb-3 ${alignClass}">
+                            <div class="d-inline-block ${bubbleClass} rounded-3 px-3 py-2" style="max-width: 80%;">
+                                ${m.message}
+                                <div class="text-${isUser ? 'light' : 'muted'} small mt-1">${msgTime}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
                 document.getElementById('chat-messages').innerHTML = html;
                 let box = document.getElementById('chat-messages');
                 box.scrollTop = box.scrollHeight;
@@ -66,10 +91,30 @@
     }
     fetchChat();
     setInterval(fetchChat, 3000);
+    
+    // Show typing indicator
+    function showTypingIndicator() {
+        const status = document.getElementById('chat-status');
+        status.textContent = 'Employee is typing...';
+        setTimeout(() => { status.textContent = ''; }, 2000);
+    }
+    
+    // Occasionally show typing for demo purposes
+    setInterval(() => {
+        if (Math.random() > 0.7) showTypingIndicator();
+    }, 10000);
+    
     document.getElementById('chat-form').onsubmit = function(e) {
         e.preventDefault();
         let msg = document.getElementById('chat-input').value;
         if (!msg.trim()) return;
+        
+        // Disable input while sending
+        const input = document.getElementById('chat-input');
+        const sendBtn = this.querySelector('button[type="submit"]');
+        input.disabled = true;
+        sendBtn.disabled = true;
+        
         fetch("{{ url('/chat/send') }}", {
             method: 'POST',
             headers: {
@@ -78,12 +123,23 @@
             },
             body: JSON.stringify({ message: msg, to_user_id: EMPLOYEE_ID })
         }).then(r => r.json()).then(() => {
-            document.getElementById('chat-input').value = '';
+            input.value = '';
+            input.disabled = false;
+            sendBtn.disabled = false;
+            input.focus();
             fetchChat();
+        }).catch(err => {
+            console.error(err);
+            input.disabled = false;
+            sendBtn.disabled = false;
         });
     };
+    
     document.getElementById('clear-chat').onclick = function() {
         if(confirm('Clear all chat messages?')) {
+            this.disabled = true;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Clearing...';
+            
             fetch("{{ url('/chat/clear') }}", {
                 method: 'POST',
                 headers: {
@@ -92,10 +148,48 @@
                 },
                 body: JSON.stringify({ to_user_id: EMPLOYEE_ID })
             }).then(r => r.json()).then(() => {
+                this.disabled = false;
+                this.innerHTML = 'Clear Chat';
                 fetchChat();
+            }).catch(err => {
+                console.error(err);
+                this.disabled = false;
+                this.innerHTML = 'Clear Chat';
             });
         }
     };
     </script>
 </div>
+
+@push('styles')
+<style>
+    #chat-messages::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    #chat-messages::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    
+    #chat-messages::-webkit-scrollbar-thumb {
+        background: #28a745;
+        border-radius: 10px;
+    }
+    
+    #chat-messages::-webkit-scrollbar-thumb:hover {
+        background: #218838;
+    }
+    
+    .chat-bubble-in {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+@endpush
+
 @endsection

@@ -57,7 +57,8 @@ class AuthenticatedSessionController extends Controller
             }
         }
         // fallback
-        return redirect('/');
+    // After logout, send users to the ecommerce landing instead of the website homepage
+    return redirect()->route('auth.welcome');
     }
 
     /**
@@ -88,6 +89,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        // After logout, send users to the ecommerce landing instead of the website homepage
+        return redirect()->route('auth.welcome');
     }
 }

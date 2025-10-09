@@ -52,21 +52,21 @@
 .material-testing-highlights {position:relative;padding:4rem 0 6rem;min-height:90vh;color:#fff;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,'Noto Sans',sans-serif;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.08),transparent 60%),radial-gradient(circle at 80% 70%,rgba(255,255,255,.06),transparent 55%),linear-gradient(135deg,#1e293b,#0f172a);} /* fallback gradient */
 .material-testing-highlights .highlights-background {position:absolute;inset:0;background:linear-gradient(rgba(15,23,42,.78),rgba(15,23,42,.78)),url('{{ asset('images/360_F_1589025175_1DxdWO4V6n1gbYRWoVjD0eef0QEi9yq4.jpg') }}') center/cover no-repeat;z-index:0;opacity:.95;}
 .material-testing-highlights .container {position:relative;z-index:2;max-width:1280px;margin:0 auto;padding:0 2rem;}
-.products-search {max-width:760px;margin:0 auto 2.5rem;display:flex;gap:.5rem;background:rgba(255,255,255,.92);border-radius:50px;padding:.75rem 1.25rem;box-shadow:0 10px 40px -10px rgba(0,0,0,.35);backdrop-filter:blur(6px);}
+.products-search {max-width:660px;margin:0 auto 2.5rem;display:flex;gap:.5rem;background:rgba(255,255,255,.92);border-radius:50px;padding:.75rem 1.25rem;box-shadow:0 10px 40px -10px rgba(0,0,0,.35);backdrop-filter:blur(6px);}
 .products-search .search-input{flex:1;border:none;font-size:1rem;padding:.75rem 1rem;background:transparent;outline:none;color:#111;}
 .products-search .search-btn{width:56px;height:56px;border:none;border-radius:50%;background:#15803d;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.15rem;cursor:pointer;transition:.35s;background-image:linear-gradient(135deg,#16a34a,#15803d);} 
 .products-search .search-btn:hover{filter:brightness(1.1);transform:translateY(-2px);} 
-.highlights-container{position:relative;overflow:hidden;}
-/* Fade style slider (simpler & reliable) */
-.highlights-carousel{position:relative;width:100%;min-height:460px;}
-.highlights-track{position:relative;width:100%;height:100%;}
-.highlights-slide{position:absolute;inset:0;opacity:0;pointer-events:none;display:flex;transform:translateX(60px) scale(.98);transition:opacity .9s ease,transform 1s cubic-bezier(.77,0,.18,1),filter 1s;filter:blur(2px);} 
-.highlights-slide.preparing{opacity:0;transform:translateX(60px) scale(.98);}
-.highlights-slide.leaving{opacity:0;transform:translateX(-60px) scale(.98);filter:blur(4px);} 
-.highlights-slide.active{opacity:1;pointer-events:auto;transform:translateX(0) scale(1);filter:blur(0);} 
-.no-js .highlights-slide{display:none;}
-.no-js .highlights-slide:first-child{display:flex;opacity:1;}
-.highlights-slide .highlights-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:3rem;align-items:center;min-height:430px;width:100%;}
+.highlights-container{position:relative;overflow:visible !important;}
+/* Fade style slider (isolated hero variant) */
+.hero-carousel{position:relative;width:100%;min-height:440px;}
+.hero-track{position:relative;width:100%;height:100%;}
+.hero-slide{position:absolute;inset:0;display:none;transform:translateX(60px) scale(.98);transition:opacity .9s ease,transform 1s cubic-bezier(.77,0,.18,1),filter 1s;filter:blur(2px);} 
+.hero-slide.preparing{display:none;transform:translateX(60px) scale(.98);}
+.hero-slide.leaving{display:none;transform:translateX(-60px) scale(.98);filter:blur(4px);} 
+.hero-slide.active{display:flex;transform:translateX(0) scale(1);filter:blur(0);pointer-events:auto;opacity:1;} 
+.no-js .hero-slide{display:none;}
+.no-js .hero-slide:first-child{display:flex;opacity:1;}
+.hero-slide .hero-highlights-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:3rem;align-items:center;min-height:430px;width:100%;}
 .highlights-text .highlights-title{font-size:clamp(2.5rem,6vw,4.5rem);line-height:1.05;font-weight:800;letter-spacing:.5px;margin:0 0 1.25rem;}
 .highlights-text .highlights-description{font-size:1.1rem;line-height:1.6;max-width:40ch;color:#f1f5f9;margin:0 0 2rem;font-weight:400;}
 .highlights-actions{display:flex;gap:1rem;flex-wrap:wrap;}
@@ -88,9 +88,18 @@
 .highlights-navigation .nav-dot{width:14px;height:14px;background:rgba(255,255,255,.3);border:none;border-radius:50%;cursor:pointer;transition:.4s;position:relative;}
 .highlights-navigation .nav-dot.active{background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.25);} 
 .highlights-navigation .nav-dot:hover{background:rgba(255,255,255,.55);} 
-@media (max-width:1024px){.highlights-slide .highlights-content{gap:2.5rem;} .machine-item{max-width:44%;}}
-@media (max-width:820px){.highlights-slide .highlights-content{grid-template-columns:1fr;}.machine-item{max-width:44%;}}
+@media (max-width:1024px){.hero-slide .hero-highlights-content{gap:2.5rem;} .machine-item{max-width:44%;}}
+@media (max-width:820px){.hero-slide .hero-highlights-content{grid-template-columns:1fr;}.machine-item{max-width:44%;}}
 @media (max-width:640px){.highlights-actions{flex-direction:column;}.machine-item{max-width:46%;min-width:160px;width:48%;aspect-ratio:1/1.1;padding:.85rem;border-radius:1.25rem;} .highlights-btn{flex:1;}}
+/* --- Namespaced hero layout to avoid collision with global .highlights-content in external CSS --- */
+.material-testing-highlights .hero-highlights-content{display:flex;flex-direction:column;gap:3rem;align-items:stretch;}
+@media (min-width:900px){
+    .material-testing-highlights .hero-highlights-content{flex-direction:row;}
+    .material-testing-highlights .hero-highlights-content > .highlights-text,
+    .material-testing-highlights .hero-highlights-content > .highlights-images{flex:1 1 0;}
+}
+/* Force machines to stay horizontal */
+.material-testing-highlights .compression-machines-showcase{flex-wrap:nowrap;}
 </style>
 @endpush
 @push('scripts')
@@ -123,20 +132,25 @@ function nextHighlight(){ showHighlight(currentHighlight+1); }
 function startHighlightAutoplay(){ stopHighlightAutoplay(); highlightTimer=setInterval(nextHighlight,8000); }
 function stopHighlightAutoplay(){ if(highlightTimer) clearInterval(highlightTimer); }
 function restartHighlightAutoplay(){ startHighlightAutoplay(); }
+let highlightsInitialized=false;
 document.addEventListener('DOMContentLoaded',()=>{
-    document.querySelector('.material-testing-highlights')?.classList.remove('no-js');
-    highlightSlides=[...document.querySelectorAll('.highlights-slide')];
+    if(highlightsInitialized) return; // guard against double init
+    const hero=document.querySelector('.material-testing-highlights');
+    if(!hero) return;
+    hero.classList.remove('no-js');
+    highlightSlides=[...hero.querySelectorAll('.hero-slide')];
     highlightDots=[...document.querySelectorAll('.highlights-navigation .nav-dot')];
-    if(highlightSlides.length){ highlightSlides[0].classList.add('active'); highlightDots[0]?.classList.add('active'); }
-    startHighlightAutoplay();
-    const container=document.querySelector('.material-testing-highlights');
-    if(container){
-        container.addEventListener('pointerenter',stopHighlightAutoplay);
-        container.addEventListener('pointerleave',startHighlightAutoplay);
+    if(highlightSlides.length){
+        highlightSlides.forEach((s,i)=>{ if(i===0){ s.classList.add('active'); } else { s.classList.remove('active','leaving','preparing'); }});
+        highlightDots[0]?.classList.add('active');
     }
-    document.querySelectorAll('.highlights-slide img').forEach(img=>{
+    startHighlightAutoplay();
+    hero.addEventListener('pointerenter',stopHighlightAutoplay);
+    hero.addEventListener('pointerleave',startHighlightAutoplay);
+    hero.querySelectorAll('.hero-slide img').forEach(img=>{
         img.addEventListener('error',()=>{ if(!img.dataset.fallback){ img.dataset.fallback='1'; img.src='{{ asset('images/gemarclogo.png') }}'; }});
     });
+    highlightsInitialized=true;
 });
 </script>
 @endpush
@@ -144,7 +158,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 <div class="min-h-screen flex flex-col pt-0">
     <main class="flex-grow">
         <!-- Legacy Material Testing Highlights Section Injected -->
-        <section class="material-testing-highlights" data-aos="fade-up">
+    <section class="material-testing-highlights no-js" data-aos="fade-up">
             <div class="highlights-background"></div>
             <div class="container">
                 <div class="products-search">
@@ -152,10 +166,10 @@ document.addEventListener('DOMContentLoaded',()=>{
                     <button class="search-btn" type="button"><i class="fas fa-search"></i></button>
                 </div>
                 <div class="highlights-container">
-                    <div class="highlights-carousel">
-                        <div class="highlights-track">
-                        <div class="highlights-slide" data-slide="0">
-                            <div class="highlights-content">
+                    <div class="hero-carousel">
+                        <div class="hero-track">
+                        <div class="hero-slide active" data-slide="0">
+                            <div class="hero-highlights-content">
                                 <div class="highlights-text">
                                     <h1 class="highlights-title"><span class="text-white">TRIAXIAL</span><br>SYSTEMS</h1>
                                     <p class="highlights-description">Advanced triaxial testing systems for geotechnical engineering and soil mechanics. Our equipment provides precise measurement of soil strength parameters for foundation design, slope stability, and soil behavior analysis.</p>
@@ -172,8 +186,8 @@ document.addEventListener('DOMContentLoaded',()=>{
                                 </div>
                             </div>
                         </div>
-                        <div class="highlights-slide" data-slide="1">
-                            <div class="highlights-content">
+                        <div class="hero-slide" data-slide="1">
+                            <div class="hero-highlights-content">
                                 <div class="highlights-text">
                                     <h1 class="highlights-title"><span class="text-white">COMPRESSION</span><br>TESTING</h1>
                                     <p class="highlights-description">Professional compression testing equipment for construction materials including concrete, cement, mortar, and other building materials. Our machines deliver precise load measurement and accurate strength analysis for quality control and compliance testing.</p>
@@ -190,8 +204,8 @@ document.addEventListener('DOMContentLoaded',()=>{
                                 </div>
                             </div>
                         </div>
-                        <div class="highlights-slide" data-slide="2">
-                            <div class="highlights-content">
+                        <div class="hero-slide" data-slide="2">
+                            <div class="hero-highlights-content">
                                 <div class="highlights-text">
                                     <h1 class="highlights-title"><span class="text-white">CALIBRATION &</span><br>MAINTENANCE</h1>
                                     <p class="highlights-description">Complete calibration and maintenance services for all testing equipment. Our certified technicians ensure your instruments maintain accuracy and compliance with international standards.</p>
@@ -208,8 +222,8 @@ document.addEventListener('DOMContentLoaded',()=>{
                                 </div>
                             </div>
                         </div>
-                        <div class="highlights-slide" data-slide="3">
-                            <div class="highlights-content">
+                        <div class="hero-slide" data-slide="3">
+                            <div class="hero-highlights-content">
                                 <div class="highlights-text">
                                     <h1 class="highlights-title"><span class="text-white">SUPERPAVE</span><br>GYRATORY COMPACTORS</h1>
                                     <p class="highlights-description">Advanced Superpave Gyratory Compactors for asphalt mix design and quality control. Our equipment ensures precise compaction, angle measurement, and comprehensive data analysis for optimal pavement performance.</p>
@@ -226,8 +240,8 @@ document.addEventListener('DOMContentLoaded',()=>{
                                 </div>
                             </div>
                         </div>
-                        <div class="highlights-slide" data-slide="4">
-                            <div class="highlights-content">
+                        <div class="hero-slide" data-slide="4">
+                            <div class="hero-highlights-content">
                                 <div class="highlights-text">
                                     <h1 class="highlights-title"><span class="text-white">DRILLING</span><br>EQUIPMENT</h1>
                                     <p class="highlights-description">Professional drilling equipment for soil investigation, core sampling, and geotechnical exploration. Our robust and reliable drilling systems offer optimal performance for both field and laboratory applications.</p>
@@ -310,7 +324,7 @@ document.addEventListener('DOMContentLoaded',()=>{
                                 @if($p['price'] > 0)
                                     <div class="text-lg font-bold text-green-600 mb-3">₱{{ number_format($p['price'], 2) }}</div>
                                 @endif
-                                <a href="{{ route('shop.index') }}" class="mt-auto w-full px-5 py-3 rounded-lg bg-green-600 hover:bg-green-700 text-white font-medium transition duration-300 shadow hover:shadow-lg">
+                                <a href="{{ route('auth.welcome') }}" class="mt-auto w-full px-5 py-3 rounded-lg bg-green-600 hover:bg-green-700 text-white font-medium transition duration-300 shadow hover:shadow-lg">
                                     <i class="fas fa-shopping-cart mr-2"></i>Shop Now
                                 </a>
                             </article>
@@ -477,7 +491,7 @@ document.addEventListener('DOMContentLoaded',()=>{
                     <p class="text-xl text-gray-600 max-w-2xl mx-auto">Your trusted partner for exceptional service and premium construction solutions</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                    <a href="{{ route('shop.index') }}" class="feature-card group rounded-3xl shadow-lg p-10 flex flex-col items-center text-center">
+                    <a href="{{ route('browse') }}" class="feature-card group rounded-3xl shadow-lg p-10 flex flex-col items-center text-center">
                         <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl p-6 mb-6 group-hover:scale-110 transition-transform duration-300"><i class="fas fa-shopping-cart text-3xl"></i></div>
                         <h3 class="text-2xl font-bold mb-4 text-gray-800">Browse Products</h3>
                         <p class="text-gray-600 leading-relaxed">Explore our comprehensive selection of premium industrial and commercial construction products.</p>

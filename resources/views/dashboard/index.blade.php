@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.ecommerce')
 
 @section('content')
 @if(session('checkout_success'))

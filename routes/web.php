@@ -88,7 +88,11 @@ Route::get('/', function () {
 
 // Browse listing (simple page)
 Route::get('/browse', function () {
-    $products = Product::where('is_active', 1)->orderByDesc('created_at')->get();
+    // Public lightweight browse: show only active and in-stock products
+    $products = Product::where('is_active', 1)
+        ->where('stock', '>', 0)
+        ->orderByDesc('created_at')
+        ->get();
     return view('browse', compact('products'));
 })->name('browse');
 

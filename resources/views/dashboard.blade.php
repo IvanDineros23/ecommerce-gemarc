@@ -1,5 +1,5 @@
 
-@extends('layouts.app')
+@extends('layouts.ecommerce')
 
 @section('content')
 	@include('dashboard.index')

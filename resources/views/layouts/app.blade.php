@@ -58,6 +58,7 @@
             }
         </style>
         {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
+        @stack('styles')
     </head>
     <body class="font-sans antialiased">
         <!-- Header -->
@@ -82,7 +83,7 @@
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle"><i class="fas fa-industry"></i> Products <i class="fas fa-chevron-down"></i></a>
                             <ul class="dropdown-menu">
-                                <li><a href="{{ route('shop.index') }}">Browse Products</a></li>
+                                <li><a href="{{ route('browse') }}">Browse Products</a></li>
                                 <li><a href="/aggregates">Aggregates</a></li>
                                 <li><a href="/asphalt-bitumen">Asphalt & Bitumen</a></li>
                                 <li><a href="/cement-mortar">Cement & Mortar</a></li>
@@ -127,7 +128,7 @@
                             <li>
                                 <button class="mobile-menu-main">Products</button>
                                 <ul class="mobile-menu-sub">
-                                    <li><a href="{{ route('shop.index') }}">Browse Products</a></li>
+                                    <li><a href="{{ route('browse') }}">Browse Products</a></li>
                                     <li><a href="/aggregates">Aggregates</a></li>
                                     <li><a href="/asphalt-bitumen">Asphalt & Bitumen</a></li>
                                     <li><a href="/cement-mortar">Cement & Mortar</a></li>
@@ -158,7 +159,7 @@
                         
                         <!-- Quick Actions (mobile only) -->
                         <div class="mobile-actions">
-                            <a href="/contact" class="action-btn quote-btn">
+                            <a href="{{ route('auth.welcome') }}" class="action-btn quote-btn">
                                 <i class="fas fa-calculator"></i> Get Quote
                             </a>
                             <a href="tel:+639090879416" class="action-btn call-btn">
@@ -169,7 +170,7 @@
                     
                     <!-- Action Buttons -->
                     <div class="nav-actions">
-                        <a href="/contact" class="action-btn quote-btn">
+                        <a href="{{ route('auth.welcome') }}" class="action-btn quote-btn">
                             <i class="fas fa-file-invoice"></i>Get Quote
                         </a>
                         <a href="tel:+639090879416" class="action-btn call-btn">

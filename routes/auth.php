@@ -57,8 +57,8 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
 
-    // Handle GET /logout gracefully (redirect to landing page)
+    // Handle GET /logout gracefully (redirect to ecommerce landing)
     Route::get('logout', function() {
-        return redirect('/');
+        return redirect()->route('auth.welcome');
     });
 });

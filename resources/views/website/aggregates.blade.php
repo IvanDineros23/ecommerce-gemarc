@@ -121,17 +121,33 @@
         font-size:1.1rem;color:#333;font-weight:600;
         margin-bottom:1rem;text-align:center;
     }
+    /* Inquiry form styles inside modal */
+    #inquiryForm form{background:#f7faf8;border:1px solid #e6efe8;border-radius:14px;padding:16px 18px;box-shadow:0 8px 20px rgba(0,0,0,.04)}
+    #inquiryForm .form-label{display:block;font-weight:700;color:#2f3b2f;margin-bottom:.35rem}
+    #inquiryForm .form-control{width:100%;padding:12px 14px;border:1px solid #e3e6e3;border-radius:10px;background:#fff;color:#333;transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}
+    #inquiryForm .form-control:focus{outline:0;border-color:#43a047;box-shadow:0 0 0 3px rgba(67,160,71,.18)}
+    #inquiryForm textarea.form-control{min-height:110px;resize:vertical}
+    #inquiryForm .mb-3{margin-bottom:1rem}
+    #inquiryForm .btn-success.w-100{background:linear-gradient(135deg,#2e7d32,#1b5e20);border:0;border-radius:12px;font-weight:800;letter-spacing:.2px;padding:.85rem 1rem;box-shadow:0 10px 20px rgba(46,125,50,.25);transition:transform .15s ease,box-shadow .15s ease;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.15)}
+    #inquiryForm .btn-success.w-100:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(46,125,50,.32);color:#fff}
+    #inquiryForm .btn-success.w-100:active{transform:none;box-shadow:0 8px 16px rgba(46,125,50,.22)}
+    /* Modern primary action button inside modal */
     .modal-contact-btn {
-        display:flex;align-items:center;justify-content:center;gap:0.5rem;
-        padding:0.75rem 2rem;border:none;border-radius:6px;
-        font-weight:600;cursor:pointer;transition:all 0.2s ease;
+        display:flex;align-items:center;justify-content:center;gap:0.6rem;
+        padding:0.9rem 1.75rem;border:0;border-radius:12px;
+        font-weight:700;letter-spacing:.2px;cursor:pointer;
+        transition:transform .15s ease,box-shadow .15s ease,background .2s ease,filter .2s ease;
+        outline:0;
     }
-    .modal-email-btn {
-        background:#2e7d32;color:white;
+    .modal-email-btn{
+        background:linear-gradient(135deg,#2e7d32 0%,#1b5e20 100%);color:#fff;
+        box-shadow:0 10px 20px rgba(46,125,50,.25),inset 0 1px 0 rgba(255,255,255,.15);
     }
-    .modal-email-btn:hover {
-        background:#1b5e20;
-    }
+    .modal-email-btn:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(46,125,50,.28);filter:saturate(1.1)}
+    .modal-email-btn:active{transform:translateY(0);box-shadow:0 8px 16px rgba(46,125,50,.22)}
+    .modal-email-btn:focus-visible{box-shadow:0 0 0 3px rgba(46,125,50,.35),0 10px 20px rgba(46,125,50,.25)}
+    .modal-email-btn i{font-size:1rem;transition:transform .2s ease,opacity .2s ease}
+    .modal-email-btn:hover i{transform:translateX(2px)}
     @media (max-width: 768px) {
         .modal-product-info {grid-template-columns:1fr;}
         .modal-specs-grid {grid-template-columns:1fr;}

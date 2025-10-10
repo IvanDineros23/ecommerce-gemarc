@@ -16,6 +16,9 @@ Route::view('/pavetest', 'website.pavetest');
 Route::view('/soil', 'website.soil');
 Route::view('/steel', 'website.steel');
 
+// Public inquiry submission (for product/category pages)
+Route::post('/inquiry/submit', [\App\Http\Controllers\InquiryController::class, 'submit'])->name('inquiry.submit');
+
 
 // Static homepage test route
 Route::get('/static', function () {

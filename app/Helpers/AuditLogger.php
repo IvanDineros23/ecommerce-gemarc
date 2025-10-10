@@ -30,14 +30,18 @@ class AuditLogger
      */
     public static function log($action, $entity = null, $entityId = null, $before = null, $after = null, $details = null)
     {
-        AuditLog::create([
-            'actor_user_id' => Auth::id(),
-            'action'        => $action,
-            'entity'        => $entity,
-            'entity_id'     => $entityId,
-            'before_json'   => $before ? json_encode($before) : null,
-            'after_json'    => $after ? json_encode($after) : null,
-            'details'       => $details,
-        ]);
+        try {
+            AuditLog::create([
+                'actor_user_id' => Auth::id(),
+                'action'        => $action,
+                'entity'        => $entity,
+                'entity_id'     => $entityId,
+                'before_json'   => $before ? json_encode($before) : null,
+                'after_json'    => $after ? json_encode($after) : null,
+                'details'       => $details,
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('AuditLogger error: ' . $e->getMessage());
+        }
     }
 }

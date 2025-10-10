@@ -9,6 +9,17 @@ class AuditLog extends Model
     protected $fillable = [
         'actor_user_id', 'action', 'entity', 'entity_id', 'before_json', 'after_json', 'details',
     ];
+    
+    // Fix for potential database column name mismatch
+    public function setBeforeDataAttribute($value)
+    {
+        $this->attributes['before_json'] = $value;
+    }
+    
+    public function setAfterDataAttribute($value)
+    {
+        $this->attributes['after_json'] = $value;
+    }
 
     public function actor()
     {

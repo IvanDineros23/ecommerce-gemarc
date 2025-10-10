@@ -344,6 +344,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-</body>
 @stack('scripts')
+</body>
 </html>

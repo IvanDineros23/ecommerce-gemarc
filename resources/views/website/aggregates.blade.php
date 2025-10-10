@@ -1,136 +1,158 @@
 ﻿@extends('layouts.app')
-@section('content')
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="logo">
-                <a href="index.html" class="logo-link">
-                    <img src="{{ asset('website/images/gemarclogo.png') }}" alt="Gemarc Enterprises" class="logo-img">
-// ...existing code...
-@endsection
-                </a>
-            </div>
-            <nav class="nav">
-                <ul class="nav-list desktop-nav">
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle"><i class="fas fa-newspaper"></i> News <i class="fas fa-chevron-down"></i></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="news.html">News</a></li>
-                            <li><a href="blogs.html">Blogs</a></li>
-                        </ul>
-                    </li>
-                    
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle"><i class="fas fa-industry"></i> Products <i class="fas fa-chevron-down"></i></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="aggregates.html" class="active">Aggregates</a></li>
-                            <li><a href="asphalt-bitumen.html">Asphalt & Bitumen</a></li>
-                            <li><a href="cement-mortar.html">Cement & Mortar</a></li>
-                            <li><a href="concrete-mortar.html">Concrete & Mortar</a></li>
-                            <li><a href="drilling-machine.html">Drilling Machine</a></li>
-                            <li><a href="industrial-equipment.html">Industrial Equipment</a></li>
-                            <li><a href="soil.html">Soil Testing</a></li>
-                            <li><a href="steel.html">Steel Testing</a></li>
-                            <li><a href="pavetest.html">Pavetest Equipment</a></li>
-                        </ul>
-                    </li>
-                    
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle"><i class="fas fa-wrench"></i> Services <i class="fas fa-chevron-down"></i></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="calibration.html">Calibration Services</a></li>
-                            <li><a href="services.html">Repair Services</a></li>
-                        </ul>
-                    </li>
-                    
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle"><i class="fas fa-users"></i> About <i class="fas fa-chevron-down"></i></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="about.html">Company</a></li>
-                            <li><a href="contact.html">Contact</a></li>
-                        <li><a href="customerfeedback.html">Customer Feedback</a></li>
-</ul>
-                    </li>
-                </ul>
-                <!-- Mobile Menu Overlay -->
-                <div class="mobile-menu-overlay" id="mobileMenu"><button class="mobile-menu-close" id="closeMenu">&times;</button>
-                  <ul class="mobile-menu-list">
-                    <li>
-                      <button class="mobile-menu-main">News</button>
-                      <ul class="mobile-menu-sub">
-                        <li><a href="news.html">News</a></li>
-                        <li><a href="blogs.html">Blogs</a></li>
-                      </ul>
-                    </li>
-                    <li>
-                      <button class="mobile-menu-main">Products</button>
-                      <ul class="mobile-menu-sub">
-                        <li><a href="aggregates.html" class="active">Aggregates</a></li>
-                        <li><a href="asphalt-bitumen.html">Asphalt & Bitumen</a></li>
-                        <li><a href="cement-mortar.html">Cement & Mortar</a></li>
-                        <li><a href="concrete-mortar.html">Concrete & Mortar</a></li>
-                        <li><a href="drilling-machine.html">Drilling Machine</a></li>
-                        <li><a href="industrial-equipment.html">Industrial Equipment</a></li>
-                        <li><a href="soil.html">Soil Testing</a></li>
-                        <li><a href="steel.html">Steel Testing</a></li>
-                        <li><a href="pavetest.html">Pavetest Equipment</a></li>
-                      </ul>
-                    </li>
-                    <li>
-                      <button class="mobile-menu-main">Services</button>
-                      <ul class="mobile-menu-sub">
-                        <li><a href="calibration.html">Calibration Services</a></li>
-                        <li><a href="services.html">Repair Services</a></li>
-                      </ul>
-                    </li>
-                    <li>
-                      <button class="mobile-menu-main">About</button>
-                      <ul class="mobile-menu-sub">
-                        <li><a href="about.html">Company</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                      <li><a href="customerfeedback.html">Customer Feedback</a></li>
-</ul>
-                    </li>
-                  </ul>
-<!-- Quick Actions (mobile only) -->
-<div class="mobile-actions">
-  <a href="contact.html" class="action-btn quote-btn">
-    <i class="fas fa-calculator"></i> Get Quote
-  </a>
-  <a href="tel:+639090879416" class="action-btn call-btn">
-    <i class="fas fa-phone"></i> Call Now
-  </a>
-</div>
-</div>
-                
-                <!-- Quick Actions -->
-                <div class="nav-actions">
-                    <a href="contact.html" class="action-btn quote-btn">
-                        <i class="fas fa-calculator"></i> Get Quote
-                    </a>
-                    <a href="tel:+639090879416" class="action-btn call-btn">
-                        <i class="fas fa-phone"></i> Call Now
-                    </a>
-                </div>
-                
-                <div class="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </nav>
-        </div>
-    </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
+@section('title', 'Aggregates Testing Equipment | Gemarc Enterprises Incorporated')
+
+@push('styles')
+<link href="{{ asset('css/blogs.css') }}?v={{ filemtime(public_path('css/blogs.css')) }}" rel="stylesheet">
+<style>
+    /* Hero background override for Aggregates */
+    .page-hero.hero-with-bg.hero-aggregates{background:none!important;overflow:hidden}
+    .page-hero.hero-with-bg.hero-aggregates .hero-bg{
+        background-image:url('{{ asset('images/highlights/360_F_1589025175_1DxdWO4V6n1gbYRWoVjD0eef0QEi9yq4.jpg') }}') !important;
+        background-position:center;background-size:cover;background-repeat:no-repeat;
+        filter:blur(5px);transform:scale(1.08); /* compensate blur crop */
+    }
+    .page-hero.hero-with-bg.hero-aggregates .hero-overlay{
+        background:rgba(0,0,0,.45);backdrop-filter:blur(1.5px);
+    }
+    /* Product cards with shadow on hover */
+    .blogs-section .blog-post{box-shadow:0 4px 12px rgba(0,0,0,0.05);transition:all 0.3s ease;}
+    .blogs-section .blog-post:hover{transform:translateY(-5px);box-shadow:0 10px 20px rgba(0,0,0,0.1);}
+    /* Product title styling */
+    .blogs-section .blog-post .blog-content h3{font-weight:700!important;font-size:1.15rem!important;letter-spacing:-.3px!important;}
+    /* If still gray, apply fallback background directly */
+    .page-hero.hero-with-bg.hero-aggregates.no-image{background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),url('{{ asset('website/images/aggregates-banner.jpg') }}') center/cover no-repeat!important;}
+    /* Ensure stacking context correct */
+    .page-hero.hero-with-bg.hero-aggregates .hero-bg, .page-hero.hero-with-bg.hero-aggregates::after{will-change:transform;}
+    /* Product cards styling */
+    .blog-image {position:relative;height:220px;overflow:hidden;}
+    .blog-image img {width:100%;height:100%;object-fit:cover;transition:all 0.5s ease;}
+    .blog-post:hover .blog-image img {transform:scale(1.05);}
+    .product-code-badge {position:absolute;top:10px;right:10px;background:rgba(46,125,50,0.85);color:white;padding:4px 8px;border-radius:4px;font-size:0.85rem;font-weight:600;}
+    .blog-meta {display:flex;flex-wrap:wrap;align-items:center;margin-bottom:0.5rem;}
+    .blog-category {display:inline-block;padding:3px 10px;background:#e8f5e9;color:#2e7d32;border-radius:4px;font-size:0.8rem;font-weight:500;}
+    .blog-standard {margin-left:auto;font-size:0.8rem;color:#666;}
+    .blog-actions {display:flex;margin-top:1rem;gap:0.5rem;}
+    .blog-actions .btn {flex:1;padding:8px 12px;font-size:0.9rem;border-radius:6px;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.2s ease;}
+    .blog-actions .btn-pdf {background:#f5f5f5;color:#333;}
+    .blog-actions .btn-pdf:hover {background:#e0e0e0;}
+    .blog-actions .btn-details {background:#2e7d32;color:white;}
+    .blog-actions .btn-details:hover {background:#1b5e20;}
+    /* Brand section styling */
+    .brand-header {margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #e0e0e0;}
+    /* Standardize brand logos */
+    .brand-logo{height:64px;max-height:64px;width:auto;object-fit:contain;}
+    /* Hide brand title text if present (legacy markup safety) */
+    .brand-title{display:none!important}
+    
+    /* Modern CTA Styles */
+    .more-products-cta{margin:3rem 0}
+    .cta-card{
+        background:linear-gradient(135deg,#1b5e20,#43a047);
+        color:#fff;border-radius:14px;padding:24px 28px;
+        display:flex;align-items:center;justify-content:space-between;
+        box-shadow:0 10px 30px rgba(27,94,32,.25);
+    }
+    .cta-text h3{margin:0 0 6px;font-size:1.4rem;font-weight:800;letter-spacing:-.2px}
+    .cta-text p{margin:0;opacity:.9}
+    .cta-actions .cta-btn{
+        display:inline-flex;align-items:center;gap:10px;
+        background:#ffffff;color:#1b5e20;padding:12px 18px;border-radius:10px;
+        font-weight:700;text-decoration:none;transition:transform .15s ease,box-shadow .15s ease;
+        box-shadow:0 6px 18px rgba(0,0,0,.15)
+    }
+    .cta-actions .cta-btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.2)}
+    @media (max-width:768px){.cta-card{flex-direction:column;align-items:flex-start;gap:14px}}
+    /* Enhanced modal styling */
+    .modal-overlay {
+        position:fixed;top:0;left:0;right:0;bottom:0;
+        background:rgba(0,0,0,0.7);backdrop-filter:blur(5px);
+        display:flex;align-items:center;justify-content:center;
+        z-index:9999;opacity:0;visibility:hidden;transition:all 0.3s ease;
+    }
+    .modal-overlay.active {opacity:1;visibility:visible;}
+    .modal-content {
+        background:#fff;border-radius:12px;width:90%;max-width:900px;
+        max-height:90vh;overflow:hidden;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);
+        transform:scale(0.95);opacity:0;transition:all 0.3s ease;
+    }
+    .modal-overlay.active .modal-content {transform:scale(1);opacity:1;}
+    .modal-header {
+        display:flex;align-items:center;justify-content:space-between;
+        padding:1rem 1.5rem;border-bottom:1px solid #e0e0e0;
+    }
+    .modal-title {margin:0;font-size:1.5rem;color:#2e7d32;font-weight:700;}
+    .modal-close {
+        background:none;border:none;font-size:1.75rem;color:#666;
+        cursor:pointer;transition:color 0.2s ease;
+    }
+    .modal-close:hover {color:#d32f2f;}
+    .modal-body {padding:1.5rem;overflow-y:auto;max-height:calc(90vh - 70px);}
+    .modal-product-info {display:grid;grid-template-columns:1fr 1.5fr;gap:2rem;}
+    .modal-product-image {
+        background:#f5f5f5;border-radius:8px;padding:1rem;
+        display:flex;align-items:center;justify-content:center;
+    }
+    .modal-product-img {max-width:100%;max-height:300px;object-fit:contain;}
+    .modal-product-code {font-size:0.9rem;color:#666;margin-bottom:0.5rem;}
+    .modal-product-name {font-size:1.5rem;color:#1b5e20;font-weight:700;margin:0.5rem 0 1rem;}
+    .modal-product-standard, .modal-product-description {margin-bottom:1rem;}
+    .modal-specs-section {margin-top:2rem;}
+    .modal-specs-title {
+        font-size:1.25rem;color:#2e7d32;font-weight:600;
+        padding-bottom:0.5rem;border-bottom:1px solid #e0e0e0;
+        margin-bottom:1rem;
+    }
+    .modal-specs-grid {
+        display:grid;grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));
+        gap:1rem;
+    }
+    .modal-spec-item {
+        background:#f9f9f9;border-radius:6px;padding:0.75rem 1rem;
+    }
+    .modal-spec-label {font-weight:600;margin-bottom:0.25rem;}
+    .modal-spec-value {color:#555;}
+    .modal-contact-section {
+        margin-top:2rem;padding-top:1rem;
+        border-top:1px solid #e0e0e0;
+        display:flex;flex-direction:column;align-items:center;
+    }
+    .modal-contact-title {
+        font-size:1.1rem;color:#333;font-weight:600;
+        margin-bottom:1rem;text-align:center;
+    }
+    .modal-contact-btn {
+        display:flex;align-items:center;justify-content:center;gap:0.5rem;
+        padding:0.75rem 2rem;border:none;border-radius:6px;
+        font-weight:600;cursor:pointer;transition:all 0.2s ease;
+    }
+    .modal-email-btn {
+        background:#2e7d32;color:white;
+    }
+    .modal-email-btn:hover {
+        background:#1b5e20;
+    }
+    @media (max-width: 768px) {
+        .modal-product-info {grid-template-columns:1fr;}
+        .modal-specs-grid {grid-template-columns:1fr;}
+    }
+</style>
+@endpush
+
+@section('content')
+
+    <!-- Aggregates Hero -->
+    <section class="page-hero hero-with-bg hero-aggregates">
+        <div class="hero-bg"></div>
+        <div class="hero-overlay"></div>
         <div class="hero-content">
             <h1>Aggregates Testing Equipment</h1>
+            <p>Precision tools for testing and quality assurance of construction aggregates</p>
         </div>
     </section>
 
-    <!-- Main Content -->
-    <section class="page-content">
+    <!-- Products Section -->
+    <section class="blogs-section">
         <div class="container">
             <!-- Search Bar -->
             <div class="products-search">
@@ -138,289 +160,336 @@
                 <button class="search-btn" type="button"><i class="fas fa-search"></i></button>
             </div>
             
-            <div class="content-wrapper">
-                <p>We provide comprehensive aggregates testing equipment and services to ensure the quality and performance of construction materials. Our range includes equipment for testing various properties of aggregates used in construction and infrastructure projects.</p>
+            <p class="mb-4">We provide comprehensive aggregates testing equipment and services to ensure the quality and performance of construction materials. Our range includes equipment for testing various properties of aggregates used in construction and infrastructure projects.</p>
                 
                 <!-- Matest Products Section -->
-                <div class="brand-section matest-section">
-                    <div class="brand-header">
-                        <div class="brand-logo">
-                            <img src="images/partnership/logo-matest.png" alt="Matest" class="brand-logo-img">
-                        </div>
+                <div class="brand-section mt-5 mb-4">
+                    <div class="brand-header d-flex align-items-center">
+                        <img src="{{ asset('images/highlights/partnership/logo-matest.png') }}" alt="Matest" class="brand-logo me-3">
                     </div>
                     
-                    <div class="products-grid">
-                        <div class="product-card">
-                            <div class="product-image">
-                                <img src="images/A024N.jpg" alt="A024N Ceramic Muffle Furnace" class="product-img">
+                    <div class="blogs-grid">
+                        <!-- Product 1: A024N -->
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/A024N.jpg') }}" alt="A024N Ceramic Muffle Furnace" class="product-img">
+                                <span class="product-code-badge">A024N</span>
                             </div>
-                            <div class="product-info">
-                                <h4 class="product-code">A024N</h4>
-                                <h3 class="product-name">Ceramic Muffle Furnace</h3>
-                                <p class="product-standard"><strong>Standard:</strong> EN 196-2, EN 196-21, EN 459-2</p>
-                                <p class="product-description">Used to determine the loss on ignition of cement and lime; chloride, carbon dioxide, alkali content of cement.</p>
-                                <a href="downloadable content/A024N.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                                <button class="expand-btn" onclick="openA024NModal()">
-                                    <i class="fas fa-eye"></i> View Details
-                                </button>
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Furnace</span>
+                                    <span class="blog-standard">EN 196-2, EN 196-21, EN 459-2</span>
+                                </div>
+                                <h3 class="blog-title">Ceramic Muffle Furnace</h3>
+                                <p>Used to determine the loss on ignition of cement and lime; chloride, carbon dioxide, alkali content of cement.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/A024N.pdf') }}" class="btn btn-pdf" target="_blank">
+                                        <i class="fas fa-file-pdf"></i> PDF Specs
+                                    </a>
+                                    <button class="btn btn-details" onclick="openA024NModal()">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        </article>
                         
-                        <div class="product-card">
-                            <div class="product-image">
-                                <img src="images/A075N.jpg" alt="A075N Los Angeles Machine" class="product-img">
+                        <!-- Product 2: A075N -->
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/A075N.jpg') }}" alt="A075N Los Angeles Machine" class="product-img">
+                                <span class="product-code-badge">A075N</span>
                             </div>
-                            <div class="product-info">
-                                <h4 class="product-code">A075N</h4>
-                                <h3 class="product-name">LOS ANGELES ABRASION MACHINE</h3>
-                                <p class="product-standard"><strong>Standard:</strong> ASTM C131, EN 12697-17, EN 12697-43, NF P18-573, AASHTO T96, CNR N. 34</p>
-                                <p class="product-description">Used to determine the resistance of aggregates to abrasion.</p>
-                                <a href="downloadable content/A075N.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                                <button class="expand-btn" onclick="openProductModal({
-                                    code: 'A075N',
-                                    name: 'LOS ANGELES ABRASION MACHINE',
-                                    standard: 'ASTM C131, EN 12697-17, EN 12697-43, NF P18-573, AASHTO T96, CNR N. 34',
-                                    description: 'Used to determine the resistance of aggregates to abrasion.',
-                                    image: 'images/A075N.jpg',
-                                    manufacturer: 'MATEST',
-                                    manufacturerUrl: 'https://www.matest.com/',
-                                    specs: [
-                                        {label: 'Cylinder Dimensions', value: '711 mm (ID) x 508 mm (Length)'},
-                                        {label: 'Rotation Speed', value: '31-33 rpm'},
-                                        {label: 'Material', value: 'Heavy steel construction'},
-                                        {label: 'Drive', value: 'Gear motor with speed reducer'},
-                                        {label: 'Counter', value: 'Automatic digital counter, presettable'},
-                                        {label: 'Filling Opening', value: 'Counterbalanced, push-button positioning'},
-                                        {label: 'Control Panel', value: 'Wall fixed or bench placed'},
-                                        {label: 'Power Supply', value: '230V 50Hz 1ph 750W'},
-                                        {label: 'Dimensions', value: '1000x800x1000 mm'},
-                                        {label: 'Weight', value: '370 kg approx.'}
-                                    ]
-                                })">
-                                    <i class="fas fa-eye"></i> View Details
-                                </button>
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Abrasion</span>
+                                    <span class="blog-standard">ASTM C131, EN 12697</span>
+                                </div>
+                                <h3 class="blog-title">Los Angeles Abrasion Machine</h3>
+                                <p>Used to determine the resistance of aggregates to abrasion and impact wear through rotation in a steel drum with a steel charge.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/A075N.pdf') }}" class="btn btn-pdf" target="_blank">
+                                        <i class="fas fa-file-pdf"></i> PDF Specs
+                                    </a>
+                                    <button class="btn btn-details" onclick="openA075NModal()">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        </article>
                         
-                        <div class="product-card">
-                            <div class="product-image">
-                                <img src="images/A125N.jpg" alt="A125N Digital Point Load Tester" class="product-img">
+                        <!-- Product 3: A125N -->
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/A125N.jpg') }}" alt="A125N Digital Point Load Tester" class="product-img">
+                                <span class="product-code-badge">A125N</span>
                             </div>
-                            <div class="product-info">
-                                <h4 class="product-code">A125N</h4>
-                                <h3 class="product-name">Digital Point Load Tester 56 KN (ROCK STRENGTH INDEX)</h3>
-                                <p class="product-standard"><strong>Standard:</strong> ASTM D5731, ISRM</p>
-                                <p class="product-description">Used to determine the strength values of a rock specimen both in the field and in the laboratory.</p>
-                                <a href="downloadable content/A125N.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                                <button class="expand-btn" onclick="openA125NModal()">
-                                    <i class="fas fa-eye"></i> View Details
-                                </button>
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Rock Testing</span>
+                                    <span class="blog-standard">ASTM D5731, ISRM</span>
+                                </div>
+                                <h3 class="blog-title">Digital Point Load Tester (Rock Strength Index)</h3>
+                                <p>Used to determine the strength values of a rock specimen both in the field and in the laboratory.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/A125N.pdf') }}" class="btn btn-pdf" target="_blank">
+                                        <i class="fas fa-file-pdf"></i> PDF Specs
+                                    </a>
+                                    <button class="btn btn-details" onclick="openA125NModal()">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        </article>
                     </div>
                 </div>
                 
                 <!-- NL Scientific Products Section -->
-                <div class="brand-section nl-section">
-                    <div class="brand-header">
-                        <div class="brand-logo">
-                            <img src="images/partnership/NL-Scientific_logo.png" alt="NL Scientific" class="brand-logo-img">
-                        </div>
+                <div class="brand-section mt-5 mb-4">
+                    <div class="brand-header d-flex align-items-center">
+                        <img src="{{ asset('images/highlights/partnership/NL-Scientific_logo.png') }}" alt="NL Scientific" class="brand-logo me-3">
                     </div>
-                    <div class="products-grid">
-                       <div class="product-card">
-    <div class="product-image">
-        <img src="images/nl1002x002-01.jpg" alt="NL 1002 X / 002 Aggregate Impact Value Apparatus (AIV)" class="product-img">
-    </div>
-    <div class="product-info">
-        <h4 class="product-code">NL 1002 X / 002</h4>
-        <h3 class="product-name">Aggregate Impact Value Apparatus (AIV)</h3>
-        <p class="product-standard"><strong>Standard:</strong> BS 812, NF P18-574</p>
-        <p class="product-description">
-            Used to determine the aggregate impact value by measuring the resistance of an aggregate to sudden impact or shock loading,
-            which may vary from its resistance to gradually applied compressive loads on construction materials such as crushed stones and gravel.
-            It is determined by subjecting a sample of aggregate to a standard amount of impact, usually in a testing machine,
-            and then measuring the percentage of fines produced.
-        </p>
-        <a href="downloadable content/NL 1002 X _ 002.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-        <button class="expand-btn" onclick="openNL1002X002Modal()">
-            <i class="fas fa-eye"></i> View Details
-        </button>
-    </div>
-</div>
-                        <div class="product-card">
-                            <div class="product-image">
-                                <img src="images/NL-1015-X-011.jpg" alt="NL 1015 X / 011 ECO-SMARTZ Multi Amplitude Triple Motion Sieves Shaker" class="product-img">
+                    
+                    <div class="blogs-grid">
+                        <!-- Product 1: NL 1002 X / 002 -->
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/nl1002x002-01.jpg') }}" alt="NL 1002 X / 002 Aggregate Impact Value Apparatus (AIV)" class="product-img">
+                                <span class="product-code-badge">NL 1002 X/002</span>
                             </div>
-                            <div class="product-info">
-                                <h4 class="product-code">NL 1015 X / 011</h4>
-                                <h3 class="product-name">Sieve Shaker, Triple Motion (From 200 up to 450 mm Dia.)</h3>
-                                <p class="product-standard"><strong>Standard:</strong> EN 932-5, ISO 3310-1, ASTM C136</p>
-                                <p class="product-description">Triple motion functionality incorporating vertical, horizontal, and rotational motions for thorough and efficient sieving. Features variable speed control, digital timer, and can accommodate sieves from 200mm to 450mm diameter.</p>
-                                <a href="downloadable content/NL 1015 X _ 011.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                                <button class="expand-btn" onclick="openNL1015X011Modal()">
-                                    <i class="fas fa-eye"></i> View Details
-                                </button>
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Impact Testing</span>
+                                    <span class="blog-standard">BS 812, NF P18-574</span>
+                                </div>
+                                <h3 class="blog-title">Aggregate Impact Value Apparatus (AIV)</h3>
+                                <p>Measures the resistance of an aggregate to sudden impact or shock loading, which may vary from its resistance to gradually applied compressive loads.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/NL 1002 X _ 002.pdf') }}" class="btn btn-pdf" target="_blank">
+                                        <i class="fas fa-file-pdf"></i> PDF Specs
+                                    </a>
+                                    <button class="btn btn-details" onclick="openNL1002X002Modal()">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="product-card">
-                            <div class="product-image">
-                                <img src="images/NL-1003-X.jpg" alt="NL 1003 X Bulk Density Measurement" class="product-img">
+                        </article>
+                        
+                        <!-- Product 2: NL 1015 X / 011 -->
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/NL-1015-X-011.jpg') }}" alt="NL 1015 X / 011 ECO-SMARTZ Multi Amplitude Triple Motion Sieves Shaker" class="product-img">
+                                <span class="product-code-badge">NL 1015 X/011</span>
                             </div>
-                            <div class="product-info">
-                                <h4 class="product-code">NL 1003 X</h4>
-                                <h3 class="product-name">Bulk Density Measure</h3>
-                                <p class="product-standard"><strong>Standard:</strong> ASTM C29, BS EN 1097-3</p>
-                                <p class="product-description">Steel constructed with handles for capacity 1 litre and above. Used to determine the loose bulk density and void of aggregate. Available in multiple capacities for different testing requirements.</p>
-                                <a href="downloadable content/NL 1003 X.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                                <button class="expand-btn" onclick="openNL1003XModal()">
-                                    <i class="fas fa-eye"></i> View Details
-                                </button>
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Sieve Analysis</span>
+                                    <span class="blog-standard">EN 932-5, ISO 3310-1</span>
+                                </div>
+                                <h3 class="blog-title">Triple Motion Sieve Shaker</h3>
+                                <p>Features triple motion functionality incorporating vertical, horizontal, and rotational motions for thorough and efficient sieving of aggregate materials.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/NL 1015 X _ 011.pdf') }}" class="btn btn-pdf" target="_blank">
+                                        <i class="fas fa-file-pdf"></i> PDF Specs
+                                    </a>
+                                    <button class="btn btn-details" onclick="openNL1015X011Modal()">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        </article>
+                        
+                        <!-- Product 3: NL 1003 X -->
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/NL-1003-X.jpg') }}" alt="NL 1003 X Bulk Density Measurement" class="product-img">
+                                <span class="product-code-badge">NL 1003 X</span>
+                            </div>
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Density Testing</span>
+                                    <span class="blog-standard">ASTM C29, BS EN 1097-3</span>
+                                </div>
+                                <h3 class="blog-title">Bulk Density Measure</h3>
+                                <p>Steel constructed with handles for capacity 1 litre and above. Used to determine the loose bulk density and void content of aggregates.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/NL 1003 X.pdf') }}" class="btn btn-pdf" target="_blank">
+                                        <i class="fas fa-file-pdf"></i> PDF Specs
+                                    </a>
+                                    <button class="btn btn-details" onclick="openNL1003XModal()">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </button>
+                                </div>
+                            </div>
+                        </article>
                     </div>
                 </div>
                 
                 <!-- LabTech BioMedic Products Section -->
-
-                <div class="brand-section labtech-section">
-                    <div class="brand-header">
-                        <div class="brand-logo">
-                            <img src="images/partnership/labtech_logo.jpg" alt="LabTech BioMedic" class="brand-logo-img">
-                        </div>
+                <div class="brand-section mt-5 mb-4">
+                    <div class="brand-header d-flex align-items-center">
+                        <img src="{{ asset('images/highlights/partnership/labtech_logo.jpg') }}" alt="LabTech BioMedic" class="brand-logo me-3">
                     </div>
-                    <div class="products-grid">
-                        <div class="product-card">
-                            <div class="product-image">
-                                <img src="images/LDO-060E.jpg" alt="LDO-060E Universal Drying Oven" class="product-img">
+                    
+                    <div class="blogs-grid">
+                        <!-- Product 1: LDO-060E -->
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/LDO-060E.jpg') }}" alt="LDO-060E Universal Drying Oven" class="product-img">
+                                <span class="product-code-badge">LDO-060E</span>
                             </div>
-                            <div class="product-info">
-                                <h4 class="product-code">LDO-060E</h4>
-                                <h3 class="product-name">Natural Convection Oven</h3>
-                                <p class="product-standard"><strong>Features:</strong> Advanced Temperature Control & Natural Convection</p>
-                                <p class="product-description">Stainless Steel chamber for excellent corrosion resistance and easy cleaning. Insulation and sealing structure with silicone packing enable excellent temp. uniformity. Natural convection of heated air w/o a separate fan. Temp. auto - tuning function available.</p>
-                                <a href="downloadable content/LDO-060E.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                                <button class="expand-btn" onclick="openLDO060EModal()">
-                                    <i class="fas fa-eye"></i> View Details
-                                </button>
-                            </div>
-                        </div>
-                        <div class="product-card">
-                            <div class="product-image">
-                                <img src="images/LBD-2045-D.jpg" alt="LBD-2045D Hotplate & Stirrer" class="product-img">
-                            </div>
-                            <div class="product-info">
-                                <h4 class="product-code">LBD-2045D</h4>
-                                <h3 class="product-name">Hotplate & Stirrer</h3>
-                                <p class="product-standard"><strong>Features:</strong> High Density Ceramic Coating & Temperature Control</p>
-                                <p class="product-description">High density ceramic coated stainless steel top plate for excellent chemical resistance. High class powder coated aluminium casting body for excellent heat and corrosion resistance. A heater that is durable and excellent in heat transfer is equipped.</p>
-                                <a href="downloadable content/LBD-2045D.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                                <button class="expand-btn" onclick="openProductModal({
-                                    code: 'LBD-2045D',
-                                    name: 'Hotplate & Stirrer',
-                                    standard: 'High Density Ceramic Coating & Temperature Control',
-                                    description: 'High density ceramic coated stainless steel top plate for excellent chemical resistance. High class powder coated aluminium casting body for excellent heat and corrosion resistance. A heater that is durable and excellent in heat transfer is equipped.',
-                                    image: 'images/LBD-2045-D.jpg',
-                                    manufacturer: 'LabTech BioMedic',
-                                    manufacturerUrl: 'https://www.labtech.co.kr/',
-                                    specs: [
-                                        {label: 'Top Plate', value: 'High density ceramic coated stainless steel for excellent chemical resistance'},
-                                        {label: 'Body', value: 'High class powder coated aluminium casting body for excellent heat and corrosion resistance'},
-                                        {label: 'Heater', value: 'Durable heater with excellent heat transfer'},
-                                        {label: 'Application', value: 'Laboratory heating and stirring applications'},
-                                        {label: 'Features', value: 'Temperature control and stirring capabilities'}
-                                    ]
-                                })">
-                                    <i class="fas fa-eye"></i> View Details
-                                </button>
-                            </div>
-                        </div>
-                        <div class="product-card">
-                            <div class="product-image">
-                                <img src="images/LWB-111D.jpg" alt="LWB-111D Digital Water Bath" class="product-img">
-                            </div>
-                            <div class="product-info">
-                                <h4 class="product-code">LWB-111D</h4>
-                                <h3 class="product-name">Digital Water Bath</h3>
-                                <p class="product-standard"><strong>Features:</strong> Stainless Steel Construction & Auto Tuning</p>
-                                <p class="product-description">Durable to use in many fields for general purpose. Seamless stainless-steel bath for excellent corrosion resistance and easy cleaning. Heater cover is provided to protect the heater and sensor from unexpected damage. Temp. auto tuning function available</p>
-                                <a href="downloadable content/LWB-111D.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                                <button class="expand-btn" onclick="openProductModal({
-                                    code: 'LWB-111D',
-                                    name: 'Digital Water Bath',
-                                    standard: 'Stainless Steel Construction & Auto Tuning',
-                                    description: 'Durable to use in many fields for general purpose. Seamless stainless-steel bath for excellent corrosion resistance and easy cleaning. Heater cover is provided to protect the heater and sensor from unexpected damage. Temp. auto tuning function available',
-                                    image: 'images/LWB-111D.jpg',
-                                    manufacturer: 'LabTech BioMedic',
-                                    manufacturerUrl: 'https://www.labtech.co.kr/',
-                                    specs: [
-                                        {label: 'General Purpose', value: 'Durable to use in many fields for general purpose'},
-                                        {label: 'Bath Construction', value: 'Seamless stainless steel bath for excellent corrosion resistance and easy cleaning'},
-                                        {label: 'Design', value: 'Compact design to be able to use in various places'},
-                                        {label: 'Protection', value: 'Heater cover is provided to protect the heater and sensor from unexpected damage'},
-                                        {label: 'Standard Accessory', value: 'Stainless steel flat lid is included as standard'},
-                                        {label: 'Controller', value: 'Digital PID controller provides precise control'},
-                                        {label: 'Auto-Tuning', value: 'Temperature auto-tuning function available'},
-                                        {label: 'Timer', value: 'Timer 99hr. 59min. available (Timer end alarm available)'},
-                                        {label: 'Temperature Alarm', value: 'High/Low temperature alarm'},
-                                        {label: 'Memory Function', value: 'Setting value is preserved even when the power supply is cut and resupplied'},
-                                        {label: 'Temperature Range', value: 'Ambient + 5°C to 99°C'},
-                                        {label: 'Material Interior', value: 'Seamless stainless steel (STS304)'}
-                                    ]
-                                })">
-                                    <i class="fas fa-eye"></i> View Details
-                                </button>
-                                <div class="product-specs-dropdown" id="specs-lwb111d" style="display:none;">
-                                    <ul>
-                                        <li><strong>General Purpose:</strong> Durable to use in many fields for general purpose</li>
-                                        <li><strong>Bath Construction:</strong> Seamless stainless steel bath for excellent corrosion resistance and easy cleaning</li>
-                                        <li><strong>Design:</strong> Compact design to be able to use in various places</li>
-                                        <li><strong>Protection:</strong> Heater cover is provided to protect the heater and sensor from unexpected damage</li>
-                                        <li><strong>Standard Accessory:</strong> Stainless steel flat lid is included as standard</li>
-                                        <li><strong>Controller:</strong> Digital PID controller provides precise control</li>
-                                        <li><strong>Auto-Tuning:</strong> Temperature auto-tuning function available</li>
-                                        <li><strong>Timer:</strong> Timer 99hr. 59min. available (Timer end alarm available)</li>
-                                        <li><strong>Temperature Alarm:</strong> High/Low temperature alarm</li>
-                                        <li><strong>Memory Function:</strong> Setting value is preserved even when the power supply is cut and resupplied</li>
-                                        <li><strong>Temperature Range:</strong> Ambient + 5°C to 99°C</li>
-                                        <li><strong>Controller:</strong> Digital PID controller with LED display</li>
-                                        <li><strong>Timer:</strong> 99 hr. 59 min. / Continuous</li>
-                                        <li><strong>Material Interior:</strong> Seamless stainless steel (STS304)</li>
-                                        <li><strong>Material Exterior:</strong> Powder coated steel</li>
-                                        <li><strong>Safety Features:</strong> Over temperature protection, Earth leakage circuit breaker</li>
-                                        <li><strong>Electric Supply:</strong> 110 V, 60 Hz or 220 V, 50 or 60 Hz, 1 Phase</li>
-                                        <li><strong>Power Consumption (220V):</strong> 3 A (LWB-106D), 4 A (LWB-111D), 7 A (LWB-122D)</li>
-                                    </ul>
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Laboratory</span>
+                                    <span class="blog-standard">Advanced Temperature Control</span>
+                                </div>
+                                <h3 class="blog-title">Natural Convection Oven</h3>
+                                <p>Stainless Steel chamber for excellent corrosion resistance and easy cleaning. Features natural convection of heated air without a separate fan.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/LDO-060E.pdf') }}" class="btn btn-pdf" target="_blank">
+                                        <i class="fas fa-file-pdf"></i> PDF Specs
+                                    </a>
+                                    <button class="btn btn-details" onclick="openLDO060EModal()">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </button>
                                 </div>
                             </div>
+                        </article>
+                        
+                        <!-- Product 2: LBD-2045D -->
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/LBD-2045-D.jpg') }}" alt="LBD-2045D Hotplate & Stirrer" class="product-img">
+                                <span class="product-code-badge">LBD-2045D</span>
+                            </div>
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Laboratory</span>
+                                    <span class="blog-standard">High Density Ceramic Coating</span>
+                                </div>
+                                <h3 class="blog-title">Hotplate & Stirrer</h3>
+                                <p>High density ceramic coated stainless steel top plate for excellent chemical resistance and durability. Features excellent heat transfer capabilities.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/LBD-2045D.pdf') }}" class="btn btn-pdf" target="_blank">
+                                        <i class="fas fa-file-pdf"></i> PDF Specs
+                                    </a>
+                                    <button class="btn btn-details" onclick="openLBD2045DModal()">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </button>
+                                </div>
+                            </div>
+                        </article>
+                        
+                        <!-- Product 3: LWB-111D -->
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/LWB-111D.jpg') }}" alt="LWB-111D Digital Water Bath" class="product-img">
+                                <span class="product-code-badge">LWB-111D</span>
+                            </div>
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Laboratory</span>
+                                    <span class="blog-standard">Stainless Steel Construction</span>
+                                </div>
+                                <h3 class="blog-title">Digital Water Bath</h3>
+                                <p>Seamless stainless-steel bath for excellent corrosion resistance and easy cleaning. Features temperature auto tuning for precise control.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/LWB-111D.pdf') }}" class="btn btn-pdf" target="_blank">
+                                        <i class="fas fa-file-pdf"></i> PDF Specs
+                                    </a>
+                                    <button class="btn btn-details" onclick="openLWB111DModal()">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </button>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <!-- More Products Section (Modern CTA) -->
+                <div class="more-products-cta">
+                    <div class="cta-card">
+                        <div class="cta-text">
+                            <h3>Looking for more products?</h3>
+                            <p>Contact our sales team for a comprehensive catalog and expert assistance.</p>
+                        </div>
+                        <div class="cta-actions">
+                            <a href="{{ route('contact') }}" class="cta-btn"><i class="fas fa-envelope"></i> Contact Us</a>
                         </div>
                     </div>
                 </div>
-
-                <!-- Inquiry Banner -->
-                <div class="inquiry-banner">
-                <p>
-                    <i class="fas fa-circle-question"></i>
-                    Finding something? Some items may not be listed yet.  
-                    <a href="mailto:sales@gemarcph.com">Email us</a> or 
-                    <a href="tel:+639090879416">call us</a> for inquiries.
-                </p>
-                </div>
                 
-                <div class="services-offered">
-                    <h3>Our Services Include:</h3>
-                    <ul>
-                        <li>Supply of aggregates testing equipment</li>
-                        <li>Calibration and verification services</li>
-                        <li>Equipment maintenance and repair</li>
-                        <li>Technical support and training</li>
-                    </ul>
-                </div>
             </div>
         </div>
     </section>
 
-
+    <!-- Improved Product Modal -->
+    <div id="productModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Product Details</h2>
+                <button class="modal-close" onclick="closeProductModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-product-info">
+                    <div class="modal-product-image">
+                        <img id="modalProductImage" src="" alt="" class="modal-product-img">
+                    </div>
+                    <div class="modal-product-details">
+                        <div class="modal-product-code">
+                            <span id="modalProductCodeBadge" class="product-code-badge" style="position:static;display:inline-block;margin-bottom:8px;"></span>
+                        </div>
+                        <h3 class="modal-product-name" id="modalProductName"></h3>
+                        <div class="modal-product-standard">
+                            <strong>Standard:</strong> <span id="modalProductStandard"></span>
+                        </div>
+                        <div class="modal-product-description">
+                            <strong>Description:</strong>
+                            <p id="modalProductDescription"></p>
+                        </div>
+                        <div class="modal-manufacturer mt-3">
+                            <strong>Manufacturer:</strong> <span id="modalProductManufacturer"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-specs-section">
+                    <h4 class="modal-specs-title">Technical Specifications</h4>
+                    <div id="modalSpecsGrid" class="modal-specs-grid">
+                        <!-- Specifications will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="modal-contact-section">
+                    <h4 class="modal-contact-title">Need More Information?</h4>
+                    <button type="button" class="modal-contact-btn modal-email-btn" onclick="showInquiryForm()">
+                        <i class="fas fa-envelope"></i> Send Inquiry
+                    </button>
+                    
+                    <div id="inquiryForm" style="display:none;width:100%;max-width:600px;margin-top:20px;">
+                        <form class="p-3 bg-light rounded">
+                            <div class="mb-3">
+                                <label for="inquiryName" class="form-label">Your Name</label>
+                                <input type="text" class="form-control" id="inquiryName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="inquiryEmail" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="inquiryEmail" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="inquiryProduct" class="form-label">Product</label>
+                                <input type="text" class="form-control" id="inquiryProduct" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="inquiryMessage" class="form-label">Message</label>
+                                <textarea class="form-control" id="inquiryMessage" rows="4" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">Submit Inquiry</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 
     <!-- Footer -->
     <footer class="footer">
@@ -478,73 +547,20 @@
     }
     </script>
 
-    <!-- Product Modal -->
-    <div id="productModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Product Details</h2>
-                <button class="modal-close" onclick="closeProductModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="modal-product-info">
-                    <div class="modal-product-image">
-                        <img id="modalProductImage" src="" alt="" class="modal-product-img">
-                    </div>
-                    <div class="modal-product-details">
-                        <div class="modal-product-code">
-                            <strong>Product Code:</strong> <span id="modalProductCode"></span>
-                            <span id="modalProductCodeSub" style="display: none;"></span>
-                        </div>
-                        <h3 class="modal-product-name" id="modalProductName"></h3>
-                        <div class="modal-product-standard">
-                            <strong>Standard:</strong> <span id="modalProductStandard"></span>
-                        </div>
-                        <div class="modal-product-description">
-                            <strong>Description:</strong>
-                            <p id="modalProductDescription"></p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="modal-specs-section">
-                    <h4 class="modal-specs-title">Technical Specifications</h4>
-                    <div id="modalSpecsGrid" class="modal-specs-grid">
-                        <!-- Specifications will be populated by JavaScript -->
-                    </div>
-                </div>
-                
-                <div class="modal-contact-section">
-                    <h4 class="modal-contact-title">Need More Information?</h4>
+    <!-- Only one Product Modal is needed -->
+    <!-- The duplicate modal fragment was removed to prevent DOM issues -->
 
-                   <!-- GEMARC Inline Inquiry (drop-in) -->
-                    <div class="gem-inquiry" data-emails="sales@gemarcph.com,technical@gemarcph.com">
-                    <button type="button" class="modal-contact-btn modal-email-btn js-show-inquiry is-full">
-                        <i class="fas fa-envelope"></i> Send Inquiry
-                    </button>
-
-                      <!-- PDF Specs Button -->
-                        <div class="modal-downloads" style="margin-top:12px;">
-                        <!-- Removed redundant View PDF Specs button from modal -->
-                        </div>
-
-
-                    <!-- auto-filled panel; leave empty -->
-                    <div class="inquiry-email-panel js-inquiry-panel" hidden></div>
-                    </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
+    <script src="{{ asset('website/script.js') }}"></script>
+    <script src="{{ asset('js/aggregates.js') }}"></script>
     <script>
-    // Product modal functions for aggregates page
-    function openA024NModal() {
+    // Keep only small page-specific overrides here if needed
+    window.openA024NModal = function() {
         openProductModal({
             code: 'A024N',
             name: 'Ceramic Muffle Furnace',
             standard: 'EN 196-2, EN 196-21, EN 459-2',
             description: 'Used to determine the loss on ignition of cement and lime; chloride, carbon dioxide, alkali content of cement.',
-            image: 'images/A024N.jpg',
+            image: '{{ asset("images/highlights/A024N.jpg") }}',
             manufacturer: 'MATEST',
             manufacturerUrl: 'https://www.matest.com/',
             pdf: 'downloadable content/A024N.pdf',
@@ -561,13 +577,13 @@
         });
     }
 
-    function openA075NModal() {
+    window.openA075NModal = function() {
         openProductModal({
             code: 'A075N',
             name: 'LOS ANGELES ABRASION MACHINE',
             standard: 'ASTM C131, EN 12697-17, EN 12697-43, NF P18-573, AASHTO T96, CNR N. 34',
             description: 'Used to determine the resistance of aggregates to abrasion.',
-            image: 'images/A075N.jpg',
+            image: '{{ asset("images/highlights/A075N.jpg") }}',
             manufacturer: 'MATEST',
             manufacturerUrl: 'https://www.matest.com/',
             pdf: 'downloadable content/A075N.pdf',
@@ -586,13 +602,13 @@
         });
     }
 
-    function openA125NModal() {
+    window.openA125NModal = function() {
         openProductModal({
             code: 'A125N',
             name: 'Digital Point Load Tester 56 KN (ROCK STRENGTH INDEX)',
             standard: 'ASTM D5731, ISRM',
             description: 'Used to determine the strength values of a rock specimen both in the field and in the laboratory.',
-            image: 'images/A125N.jpg',
+            image: '{{ asset("images/highlights/A125N.jpg") }}',
             manufacturer: 'MATEST',
             manufacturerUrl: 'https://www.matest.com/',
             pdf: 'downloadable content/A125N.pdf',
@@ -612,13 +628,13 @@
         });
     }
 
-    function openNL1002X002Modal() {
+    window.openNL1002X002Modal = function() {
     openProductModal({
         code: 'NL 1002 X / 002',
         name: 'Aggregate Impact Value Apparatus (AIV)',
         standard: 'BS 812, NF P18-574',
         description: 'Used to determine the aggregate impact value by measuring the resistance of an aggregate to sudden impact or shock loading, which may vary from its resistance to gradually applied compressive loads on construction materials such as crushed stones and gravel. It is determined by subjecting a sample of aggregate to a standard amount of impact, usually in a testing machine, and then measuring the percentage of fines produced.',
-        image: 'images/nl1002x002-01.jpg',
+        image: '{{ asset("images/highlights/nl1002x002-01.jpg") }}',
         manufacturer: 'NL Scientific',
         manufacturerUrl: 'https://nl-test.com/',
         pdf: 'downloadable content/NL 1002 X _ 002.pdf',
@@ -630,13 +646,13 @@
 }
 
 
-    function openNL1015X011Modal() {
+    window.openNL1015X011Modal = function() {
         openProductModal({
             code: 'NL 1015 X / 011',
             name: 'Sieve Shaker, Triple Motion (From 200 up to 450 mm Dia.)',
             standard: 'EN 932-5, ISO 3310-1, ASTM C136',
             description: 'Triple motion functionality incorporating vertical, horizontal, and rotational motions for thorough and efficient sieving. Features variable speed control, digital timer, and can accommodate sieves from 200mm to 450mm diameter.',
-            image: 'images/NL-1015-X-011.jpg',
+            image: '{{ asset("images/highlights/NL-1015-X-011.jpg") }}',
             manufacturer: 'NL Scientific',
             manufacturerUrl: 'https://nl-test.com/',
             pdf: 'downloadable content/NL 1015 X _ 011.pdf',
@@ -657,13 +673,13 @@
         });
     }
 
-    function openNL1003XModal() {
+    window.openNL1003XModal = function() {
         openProductModal({
             code: 'NL 1003 X',
             name: 'Bulk Density Measure',
             standard: 'ASTM C29, BS EN 1097-3',
             description: 'Steel constructed with handles for capacity 1 litre and above. Used to determine the loose bulk density and void of aggregate. Available in multiple capacities for different testing requirements.',
-            image: 'images/NL-1003-X.jpg',
+            image: '{{ asset("images/highlights/NL-1003-X.jpg") }}',
             manufacturer: 'NL Scientific',
             manufacturerUrl: 'https://nl-test.com/',
             pdf: 'downloadable content/NL 1003 X.pdf',
@@ -682,13 +698,13 @@
         });
     }
 
-    function openLDO060EModal() {
+    window.openLDO060EModal = function() {
         openProductModal({
             code: 'LDO-060E',
             name: 'Natural Convection Oven',
             standard: 'Advanced Temperature Control & Natural Convection',
             description: 'Stainless Steel chamber for excellent corrosion resistance and easy cleaning. Insulation and sealing structure with silicone packing enable excellent temp. uniformity. Natural convection of heated air w/o a separate fan. Temp. auto - tuning function available.',
-            image: 'images/LDO-060E.jpg',
+            image: '{{ asset("images/highlights/LDO-060E.jpg") }}',
             manufacturer: 'LabTech BioMedic',
             manufacturerUrl: 'https://www.labtech.co.kr/',
             pdf: 'downloadable content/LDO-060E.pdf',
@@ -717,60 +733,133 @@
             ]
         });
     }
-    function openLBD2045DModal() {
-  openProductModal({
-    code: 'LBD-2045D',
-    name: 'Hotplate & Stirrer',
-    standard: 'High Density Ceramic Coating & Temperature Control',
-    description: 'High density ceramic coated stainless steel top plate for excellent chemical resistance. High class powder coated aluminium casting body for excellent heat and corrosion resistance. A heater that is durable and excellent in heat transfer is equipped.',
-    image: 'images/LBD-2045-D.jpg',
-    manufacturer: 'LabTech BioMedic',
-    manufacturerUrl: 'https://www.labtech.co.kr/',
+    window.openLBD2045DModal = function() {
+        openProductModal({
+            code: 'LBD-2045D',
+            name: 'Hotplate & Stirrer',
+            standard: 'High Density Ceramic Coating & Temperature Control',
+            description: 'High density ceramic coated stainless steel top plate for excellent chemical resistance. High class powder coated aluminium casting body for excellent heat and corrosion resistance. A heater that is durable and excellent in heat transfer is equipped.',
+            image: '{{ asset("images/highlights/LBD-2045-D.jpg") }}',
+            manufacturer: 'LabTech BioMedic',
+            specs: [
+                {label: 'Top Plate', value: 'High density ceramic coated stainless steel for excellent chemical resistance'},
+                {label: 'Body', value: 'High class powder coated aluminium casting body for excellent heat and corrosion resistance'},
+                {label: 'Heater', value: 'Durable heater with excellent heat transfer'},
+                {label: 'Temperature Range', value: 'Room temperature to 380°C'},
+                {label: 'Stirring Speed', value: '60-1500 rpm'},
+                {label: 'Top Plate Size', value: '180 x 180 mm'},
+                {label: 'Heating Power', value: '600W'},
+                {label: 'Power Supply', value: '220V, 50/60Hz'}
+            ]
+        });
+    }
 
-    // PDF specs (forward slashes para safe):
-    pdf: 'downloadable content\LBD-2045D.pdf',
-    specs: [
-      {label: 'Top Plate', value: 'High density ceramic coated stainless steel for excellent chemical resistance'},
-      {label: 'Body', value: 'High class powder coated aluminium casting body for excellent heat and corrosion resistance'},
-      {label: 'Heater', value: 'Durable heater with excellent heat transfer'},
-      {label: 'Application', value: 'Laboratory heating and stirring applications'},
-      {label: 'Features', value: 'Temperature control and stirring capabilities'}
-    ]
-  });
+    window.openLWB111DModal = function() {
+        openProductModal({
+            code: 'LWB-111D',
+            name: 'Digital Water Bath',
+            standard: 'Stainless Steel Construction & Auto Tuning',
+            description: 'Durable to use in many fields for general purpose. Seamless stainless-steel bath for excellent corrosion resistance and easy cleaning. Heater cover is provided to protect the heater and sensor from unexpected damage. Temperature auto tuning function available.',
+            image: '{{ asset("images/highlights/LWB-111D.jpg") }}',
+            manufacturer: 'LabTech BioMedic',
+            specs: [
+                {label: 'Bath Construction', value: 'Seamless stainless steel'},
+                {label: 'Design', value: 'Compact design for versatile use'},
+                {label: 'Protection', value: 'Heater cover protects heater and sensor'},
+                {label: 'Controller', value: 'Digital PID controller with LED display'},
+                {label: 'Auto-Tuning', value: 'Temperature auto-tuning function'},
+                {label: 'Timer', value: '99 hr. 59 min. / Continuous with end alarm'},
+                {label: 'Temperature Range', value: 'Ambient + 5°C to 99°C'},
+                {label: 'Material Interior', value: 'Seamless stainless steel (STS304)'},
+                {label: 'Safety Features', value: 'Over temperature protection, Earth leakage circuit breaker'},
+                {label: 'Power Supply', value: '220 V 50/60 Hz, 1 Phase'}
+            ]
+        });
+    }
+@endsection
+
+@push('scripts')
+<script>
+// Product modal functions
+function openProductModal(product) {
+    // Set product details
+    document.getElementById('modalProductImage').src = product.image;
+    document.getElementById('modalProductImage').alt = product.code + ' ' + product.name;
+    document.getElementById('modalProductCodeBadge').textContent = product.code;
+    document.getElementById('modalProductName').textContent = product.name;
+    document.getElementById('modalProductStandard').textContent = product.standard;
+    document.getElementById('modalProductDescription').textContent = product.description;
+    document.getElementById('modalProductManufacturer').textContent = product.manufacturer || 'Gemarc Enterprises Inc.';
+    
+    // Set inquiry product field
+    document.getElementById('inquiryProduct').value = product.code + ' - ' + product.name;
+    
+    // Generate specs
+    const specsGrid = document.getElementById('modalSpecsGrid');
+    specsGrid.innerHTML = '';
+    
+    if (product.specs && product.specs.length > 0) {
+        product.specs.forEach(spec => {
+            const specItem = document.createElement('div');
+            specItem.className = 'modal-spec-item';
+            specItem.innerHTML = `
+                <div class="modal-spec-label">${spec.label}</div>
+                <div class="modal-spec-value">${spec.value}</div>
+            `;
+            specsGrid.appendChild(specItem);
+        });
+    } else {
+        specsGrid.innerHTML = '<p>No detailed specifications available. Please refer to the PDF documentation or contact us for more information.</p>';
+    }
+    
+    // Show modal with animation
+    const modal = document.getElementById('productModal');
+    modal.classList.add('active');
+    
+    // Prevent body scrolling
+    document.body.style.overflow = 'hidden';
 }
 
-function openLWB111DModal() {
-  openProductModal({
-    code: 'LWB-111D',
-    name: 'Digital Water Bath',
-    standard: 'Stainless Steel Construction & Auto Tuning',
-    description: 'Durable to use in many fields for general purpose. Seamless stainless-steel bath for excellent corrosion resistance and easy cleaning. Heater cover is provided to protect the heater and sensor from unexpected damage. Temp. auto tuning function available',
-    image: 'images/LWB-111D.jpg',
-    manufacturer: 'LabTech BioMedic',
-    manufacturerUrl: 'https://www.labtech.co.kr/',
-    // PDF specs:
-    pdf: 'downloadable content\LWB-111D.pdf',
-    specs: [
-      {label: 'General Purpose', value: 'Durable to use in many fields for general purpose'},
-      {label: 'Bath Construction', value: 'Seamless stainless steel bath for excellent corrosion resistance and easy cleaning'},
-      {label: 'Design', value: 'Compact design to be able to use in various places'},
-      {label: 'Protection', value: 'Heater cover protects heater and sensor from unexpected damage'},
-      {label: 'Standard Accessory', value: 'Stainless steel flat lid included as standard'},
-      {label: 'Controller', value: 'Digital PID controller provides precise control (LED display)'},
-      {label: 'Auto-Tuning', value: 'Temperature auto-tuning function available'},
-      {label: 'Timer', value: '99 hr. 59 min. / Continuous (with end alarm)'},
-      {label: 'Temperature Alarm', value: 'High/Low temperature alarm'},
-      {label: 'Memory Function', value: 'Settings preserved even after power interruption'},
-      {label: 'Temperature Range', value: 'Ambient + 5°C to 99°C'},
-      {label: 'Material Interior', value: 'Seamless stainless steel (STS304)'},
-      {label: 'Material Exterior', value: 'Powder coated steel'},
-      {label: 'Safety Features', value: 'Over temperature protection, Earth leakage circuit breaker'},
-      {label: 'Electric Supply', value: '110 V 60 Hz or 220 V 50/60 Hz, 1 Phase'},
-      {label: 'Power Consumption (220V)', value: '3 A (LWB-106D), 4 A (LWB-111D), 7 A (LWB-122D)'}
-    ]
-  });
+function closeProductModal() {
+    const modal = document.getElementById('productModal');
+    modal.classList.remove('active');
+    
+    // Re-enable body scrolling
+    document.body.style.overflow = '';
+    
+    // Hide inquiry form
+    document.getElementById('inquiryForm').style.display = 'none';
 }
-    </script>
-    </body>
-</html>
+
+function showInquiryForm() {
+    const form = document.getElementById('inquiryForm');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+// Close modal when clicking outside
+document.getElementById('productModal').addEventListener('click', function(event) {
+    if (event.target === this) {
+        closeProductModal();
+    }
+});
+
+// Close modal on escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeProductModal();
+    }
+});
+
+// Form submission handler
+        // Defensive: bind submit handler only if form exists (aggregates.js already handles core modal)
+        var _inquiryForm = document.querySelector('#inquiryForm form');
+        if (_inquiryForm) {
+            _inquiryForm.addEventListener('submit', function(e){
+                e.preventDefault();
+                alert('Thank you for your inquiry. Our team will contact you shortly.');
+                document.getElementById('inquiryForm').style.display = 'none';
+            });
+        }
+</script>
+@endpush
 

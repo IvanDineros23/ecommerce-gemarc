@@ -5,12 +5,35 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property string|null $email_verified_at
+ * @property string $password
+ * @property string|null $contact_no
+ * @property string|null $address
+ * @property string|null $profile_image
+ * @property array|null $payment_details
+ * @property array|null $delivery_option
+ * @property string|null $remember_token
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property \Carbon\Carbon|null $deleted_at
+ */
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
+    
+    /**
+     * The primary key for the model.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id';
 
     // Always return address, fallback to delivery_option['address'] if empty
     public function getAddressAttribute($value)
@@ -40,9 +63,16 @@ class User extends Authenticatable
         'profile_image',
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
     protected $casts = [
         'payment_details' => 'array',
         'delivery_option' => 'array',
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
     ];
 
     /**
@@ -56,17 +86,16 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be mutated to dates.
      *
-     * @return array<string, string>
+     * @var array
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'email_verified_at',
+        'deleted_at'
+    ];
 
     // Add this method to check if user is admin
     public function isAdmin()

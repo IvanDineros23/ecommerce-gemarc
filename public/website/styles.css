@@ -9494,21 +9494,11 @@ html, body {
     text-decoration: none;
 }
 
-.facebook-btn {
-    background: #1877F2;
-}
+.facebook-btn { background: #1877F2; }
+.facebook-btn:hover { background: #166fe5; }
 
-.facebook-btn:hover {
-    background: #166fe5;
-}
-
-.viber-btn {
-    background: #7360F2;
-}
-
-.viber-btn:hover {
-    background: #665ac1;
-}
+.viber-btn { background: #7360F2; }
+.viber-btn:hover { background: #665ac1; }
 
 @keyframes pulse {
     0% {

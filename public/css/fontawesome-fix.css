@@ -45,6 +45,9 @@ i.fas, i.far, i.fab, i.fal, i.fad, i.fa {
     opacity: 1 !important;
 }
 
+/* Floating buttons icon color follows parent color */
+.floating-btn i { color: inherit !important; }
+
 /* Specific spacing for navigation icons */
 .nav-list > li > a i {
     margin-right: 6px !important;

@@ -341,7 +341,7 @@
             <!-- Capstone Products Section -->
             <div class="brand-section mt-5 mb-4">
                 <div class="brand-header d-flex align-items-center">
-                    <img src="{{ asset('images/highlights/partnership/capstone-logo-2.png') }}" alt="Capstone" class="brand-logo me-3">
+                    <img src="{{ asset('images/highlights/partnership/capping-gypsum-logo.png') }}" alt="Capstone" class="brand-logo me-3">
                 </div>
                 
                 <div class="blogs-grid">
@@ -420,7 +420,7 @@
             </div>            <!-- EHWA Products Section -->
             <div class="brand-section mt-5 mb-4">
                 <div class="brand-header d-flex align-items-center">
-                    <img src="{{ asset('images/highlights/partnership/ehwa-logo.png') }}" alt="EHWA" class="brand-logo me-3">
+                    <img src="{{ asset('images/highlights/partnership/ehwa.png') }}" alt="EHWA" class="brand-logo me-3">
                 </div>
                 
                 <div class="blogs-grid">
@@ -453,7 +453,7 @@
             <!-- TBT Products Section -->
             <div class="brand-section mt-5 mb-4">
                 <div class="brand-header d-flex align-items-center">
-                    <img src="{{ asset('images/highlights/partnership/tbt-logo.png') }}" alt="TBT" class="brand-logo me-3">
+                    <img src="{{ asset('images/highlights/partnership/tbt-Nanjing_logo.jpg') }}" alt="TBT Nanjing" class="brand-logo me-3">
                 </div>
                 
                 <div class="blogs-grid">

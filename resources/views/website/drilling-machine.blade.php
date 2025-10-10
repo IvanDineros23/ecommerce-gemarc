@@ -1,300 +1,249 @@
 ﻿@extends('layouts.app')
+
+@section('title', 'Drilling Machine Equipment | Gemarc Enterprises Inc.')
+
+@push('styles')
+<link href="{{ asset('css/blogs.css') }}?v={{ filemtime(public_path('css/blogs.css')) }}" rel="stylesheet">
+<style>
+    /* Hero background override for Drilling */
+    .page-hero.hero-with-bg.hero-drilling{background:none!important;overflow:hidden}
+    .page-hero.hero-with-bg.hero-drilling .hero-bg{
+        background-image:url('{{ asset('images/highlights/360_F_1589025175_1DxdWO4V6n1gbYRWoVjD0eef0QEi9yq4.jpg') }}') !important;
+            background-position:center;background-size:cover;background-repeat:no-repeat;
+            filter:blur(5px);transform:scale(1.08);
+    }
+    .page-hero.hero-with-bg.hero-drilling .hero-overlay{background:rgba(0,0,0,.45);backdrop-filter:blur(1.5px)}
+    .page-hero.hero-with-bg.hero-drilling.no-image{background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),url('{{ asset('images/highlights/360_F_1589025175_1DxdWO4V6n1gbYRWoVjD0eef0QEi9yq4.jpg') }}') center/cover no-repeat!important;}
+    .page-hero.hero-with-bg.hero-drilling .hero-bg, .page-hero.hero-with-bg.hero-drilling::after{will-change:transform}
+    /* Product cards + actions same as aggregates */
+    .blogs-section .blog-post{box-shadow:0 4px 12px rgba(0,0,0,0.05);transition:all .3s ease}
+    .blogs-section .blog-post:hover{transform:translateY(-5px);box-shadow:0 10px 20px rgba(0,0,0,0.1)}
+    .blogs-section .blog-post .blog-content h3{font-weight:700!important;font-size:1.15rem!important;letter-spacing:-.3px!important}
+    .blog-image{position:relative;height:220px;overflow:hidden}
+    .blog-image img{width:100%;height:100%;object-fit:cover;transition:all .5s ease}
+    .blog-post:hover .blog-image img{transform:scale(1.05)}
+    .product-code-badge{position:absolute;top:10px;right:10px;background:rgba(46,125,50,.85);color:#fff;padding:4px 8px;border-radius:4px;font-size:.85rem;font-weight:600}
+    .blog-meta{display:flex;flex-wrap:wrap;align-items:center;margin-bottom:.5rem}
+    .blog-category{display:inline-block;padding:3px 10px;background:#e8f5e9;color:#2e7d32;border-radius:4px;font-size:.8rem;font-weight:500}
+    .blog-standard{margin-left:auto;font-size:.8rem;color:#666}
+    .blog-actions{display:flex;margin-top:1rem;gap:.5rem}
+    .blog-actions .btn{flex:1;padding:8px 12px;font-size:.9rem;border-radius:6px;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s ease}
+    .blog-actions .btn-pdf{background:#f5f5f5;color:#333}
+    .blog-actions .btn-pdf:hover{background:#e0e0e0}
+    .blog-actions .btn-details{background:#2e7d32;color:#fff}
+    .blog-actions .btn-details:hover{background:#1b5e20}
+    .brand-header{margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #e0e0e0}
+    .brand-logo{height:64px;max-height:64px;width:auto;object-fit:contain}
+    .brand-title{display:none!important}
+    /* Modern CTA Styles (match concrete-mortar) */
+    .more-products-cta{margin:3rem 0}
+    .cta-card{
+        background:linear-gradient(135deg,#1b5e20,#43a047);
+        color:#fff;border-radius:14px;padding:24px 28px;
+        display:flex;align-items:center;justify-content:space-between;
+        box-shadow:0 10px 30px rgba(27,94,32,.25);
+    }
+    .cta-text h3{margin:0 0 6px;font-size:1.4rem;font-weight:800;letter-spacing:-.2px}
+    .cta-text p{margin:0;opacity:.9}
+    .cta-actions .cta-btn{
+        display:inline-flex;align-items:center;gap:10px;
+        background:#ffffff;color:#1b5e20;padding:12px 18px;border-radius:10px;
+        font-weight:700;text-decoration:none;transition:transform .15s ease,box-shadow .15s ease;
+        box-shadow:0 6px 18px rgba(0,0,0,.15)
+    }
+    .cta-actions .cta-btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.2)}
+    @media (max-width:768px){.cta-card{flex-direction:column;align-items:flex-start;gap:14px}}
+    /* Modal styles - use existing drilling markup */
+    .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;visibility:hidden;transition:all .3s ease}
+    .modal-overlay.active{opacity:1;visibility:visible}
+    .modal-content{background:#fff;border-radius:12px;width:90%;max-width:900px;max-height:90vh;overflow:hidden;box-shadow:0 25px 50px -12px rgba(0,0,0,.25);transform:scale(.95);opacity:0;transition:all .3s ease}
+    .modal-overlay.active .modal-content{transform:scale(1);opacity:1}
+    .modal-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;border-bottom:1px solid #e0e0e0}
+    .modal-title{margin:0;font-size:1.5rem;color:#2e7d32;font-weight:700}
+    .modal-close{background:none;border:none;font-size:1.75rem;color:#666;cursor:pointer;transition:color .2s ease}
+    .modal-close:hover{color:#d32f2f}
+    .modal-body{padding:1.5rem;overflow-y:auto;max-height:calc(90vh - 70px)}
+    .modal-product-info{display:grid;grid-template-columns:1fr 1.5fr;gap:2rem}
+    .modal-product-image{background:#f5f5f5;border-radius:8px;padding:1rem;display:flex;align-items:center;justify-content:center}
+    .modal-product-img{max-width:100%;max-height:300px;object-fit:contain}
+    .modal-specs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}
+    .modal-spec-item{background:#f9f9f9;border-radius:6px;padding:.75rem 1rem}
+    .modal-spec-label{font-weight:600;margin-right:.35rem}
+    .modal-contact-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;padding:.9rem 1.75rem;border:0;border-radius:12px;font-weight:700;letter-spacing:.2px;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,background .2s ease,filter .2s ease;outline:0}
+    .modal-email-btn{background:linear-gradient(135deg,#2e7d32 0%,#1b5e20 100%);color:#fff;box-shadow:0 10px 20px rgba(46,125,50,.25),inset 0 1px 0 rgba(255,255,255,.15)}
+    .modal-email-btn:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(46,125,50,.28);filter:saturate(1.1)}
+    @media (max-width:768px){.modal-product-info{grid-template-columns:1fr}.modal-specs-grid{grid-template-columns:1fr}}
+</style>
+@endpush
+
 @section('content')
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="logo">
-                <a href="index.html" class="logo-link">
-                    <img src="{{ asset('website/images/gemarclogo.png') }}" alt="Gemarc Enterprises" class="logo-img">
-// ...existing code...
-@endsection
-                </a>
-            </div>
-            <nav class="nav">
-                <ul class="nav-list desktop-nav">
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle"><i class="fas fa-newspaper"></i> News <i class="fas fa-chevron-down"></i></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="news.html">News</a></li>
-                            <li><a href="blogs.html">Blogs</a></li>
-                        </ul>
-                    </li>
-                    
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle"><i class="fas fa-industry"></i> Products <i class="fas fa-chevron-down"></i></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="aggregates.html">Aggregates</a></li>
-                            <li><a href="asphalt-bitumen.html">Asphalt & Bitumen</a></li>
-                            <li><a href="cement-mortar.html">Cement & Mortar</a></li>
-                            <li><a href="concrete-mortar.html">Concrete & Mortar</a></li>
-                            <li><a href="drilling-machine.html" class="active">Drilling Machine</a></li>
-                            <li><a href="industrial-equipment.html">Industrial Equipment</a></li>
-                            <li><a href="soil.html">Soil Testing</a></li>
-                            <li><a href="steel.html">Steel Testing</a></li>
-                            <li><a href="pavetest.html">Pavetest Equipment</a></li>
-                        </ul>
-                    </li>
-                    
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle"><i class="fas fa-wrench"></i> Services <i class="fas fa-chevron-down"></i></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="calibration.html">Calibration Services</a></li>
-                            <li><a href="services.html">Repair Services</a></li>
-                        </ul>
-                    </li>
-                    
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle"><i class="fas fa-users"></i> About <i class="fas fa-chevron-down"></i></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="about.html">Company</a></li>
-                            <li><a href="contact.html">Contact</a></li>
-                        <li><a href="customerfeedback.html">Customer Feedback</a></li>
-</ul>
-                    </li>
-                </ul>
-                <!-- Mobile Menu Overlay -->
-                <div class="mobile-menu-overlay" id="mobileMenu"><button class="mobile-menu-close" id="closeMenu">&times;</button>
-                  <ul class="mobile-menu-list">
-                    <li>
-                      <button class="mobile-menu-main">News</button>
-                      <ul class="mobile-menu-sub">
-                        <li><a href="news.html">News</a></li>
-                        <li><a href="blogs.html">Blogs</a></li>
-                      </ul>
-                    </li>
-                    <li>
-                      <button class="mobile-menu-main">Products</button>
-                      <ul class="mobile-menu-sub">
-                        <li><a href="aggregates.html">Aggregates</a></li>
-                        <li><a href="asphalt-bitumen.html">Asphalt & Bitumen</a></li>
-                        <li><a href="cement-mortar.html">Cement & Mortar</a></li>
-                        <li><a href="concrete-mortar.html">Concrete & Mortar</a></li>
-                        <li><a href="drilling-machine.html" class="active">Drilling Machine</a></li>
-                        <li><a href="industrial-equipment.html">Industrial Equipment</a></li>
-                        <li><a href="soil.html">Soil Testing</a></li>
-                        <li><a href="steel.html">Steel Testing</a></li>
-                        <li><a href="pavetest.html">Pavetest Equipment</a></li>
-                      </ul>
-                    </li>
-                    <li>
-                      <button class="mobile-menu-main">Services</button>
-                      <ul class="mobile-menu-sub">
-                        <li><a href="calibration.html">Calibration Services</a></li>
-                        <li><a href="services.html">Repair Services</a></li>
-                      </ul>
-                    </li>
-                    <li>
-                      <button class="mobile-menu-main">About</button>
-                      <ul class="mobile-menu-sub">
-                        <li><a href="about.html">Company</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                      <li><a href="customerfeedback.html">Customer Feedback</a></li>
-</ul>
-                    </li>
-                  </ul>
-<!-- Quick Actions (mobile only) -->
-<div class="mobile-actions">
-  <a href="contact.html" class="action-btn quote-btn">
-    <i class="fas fa-calculator"></i> Get Quote
-  </a>
-  <a href="tel:+639090879416" class="action-btn call-btn">
-    <i class="fas fa-phone"></i> Call Now
-  </a>
-</div>
-</div>
-                
-                <!-- Quick Actions -->
-                <div class="nav-actions">
-                    <a href="contact.html" class="action-btn quote-btn">
-                        <i class="fas fa-calculator"></i> Get Quote
-                    </a>
-                    <a href="tel:+639090879416" class="action-btn call-btn">
-                        <i class="fas fa-phone"></i> Call Now
-                    </a>
-                </div>
-                </ul>
-                <div class="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </nav>
-        </div>
-    </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Drilling Machine Equipment</h1>
-        </div>
-    </section>
+        <!-- Drilling Hero -->
+        <section class="page-hero hero-with-bg hero-drilling">
+                <div class="hero-bg"></div>
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                        <h1>Drilling Machine Equipment</h1>
+                        <p>Geotechnical, soil sampling, and construction drilling solutions</p>
+                </div>
+        </section>
 
-    <!-- Main Content -->
-    <section class="page-content">
+    <!-- Products Section (match concrete-mortar format) -->
+    <section class="blogs-section">
         <div class="container">
             <!-- Search Bar -->
             <div class="products-search">
                 <input type="search" placeholder="Search products, services..." class="search-input" autocomplete="off">
                 <button class="search-btn" type="button"><i class="fas fa-search"></i></button>
             </div>
-            
-            <div class="content-wrapper">
+
                 <p>We provide comprehensive drilling machine equipment for geotechnical investigation, soil sampling, and construction applications. Our drilling equipment is designed for various soil conditions and project requirements.</p>
 
-                <!-- TOHO Products Section -->
-                <div class="brand-section toho-section" style="margin-bottom: 32px;">
-                    <div class="brand-header">
-                        <div class="brand-logo">
-                            <img src="images/partnership/toho-logo-200.jpg" alt="TOHO" class="brand-logo-img">
-                        </div>
+                <!-- TOHO Products Section (Aggregates-style cards) -->
+                <div class="brand-section mt-5 mb-4">
+                    <div class="brand-header d-flex align-items-center">
+                        <img src="{{ asset('images/highlights/partnership/toho-logo-200.jpg') }}" alt="TOHO" class="brand-logo me-3">
                     </div>
-                    
-                    <div class="products-grid">
-                        <div class="product-card" style="margin-bottom: 24px;">
-                            <div class="product-image">
-                                <img src="images/AK-01.jpg" alt="AK-01 Air operated Drill type" class="product-img">
+                    <div class="blogs-grid">
+                        <!-- AK-01 -->
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/AK-01.jpg') }}" alt="AK-01 Air operated Drill type" class="product-img">
+                                <span class="product-code-badge">AK-01</span>
                             </div>
-                            <div class="product-info">
-                                <h4 class="product-code">AK-01</h4>
-                                <h3 class="product-name">Air operated Drill type</h3>
-                                <p class="product-description">Able to reduce running cost and time using air driving method. Drill head with reduction gear exerts great drilling torque Makes it easy to drill into unstable stratum</p>
-                                <a href="downloadable content\AK-01.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                                <button class="expand-btn" onclick="openProductModal({
-                                    code: 'AK-01',
-                                    name: 'Air operated Drill type',
-                                    standard: 'Advanced Air Drilling Technology',
-                                    description: 'The AK-01 Air operated Drill is a high-performance drilling machine designed to reduce running costs and operational time through its efficient air driving method. Equipped with a drill head featuring reduction gear that exerts exceptional drilling torque, making it highly effective for drilling operations in unstable stratum conditions. The air-driven system provides reliable operation with reduced maintenance requirements compared to traditional hydraulic systems.',
-                                    image: 'images/AK-01.jpg',
-                                    manufacturer: 'TOHO',
-                                    manufacturerUrl: 'https://www.tohochikakoki.co.jp',
-                                    specs: [
-                                        {label: 'Model', value: 'AK-01'},
-                                        {label: 'Drilling Angle', value: 'Free'},
-                                        {label: 'Down The Hole Drill', value: 'ϕ65 mm'},
-                                        {label: 'Down The Hole Drill with Outer Casing', value: 'Drilling Diameter: ϕ105 mm (Inside Diameter ϕ67 mm), Drill Rod: ϕ50 mm, Outer Casing: ϕ89.1 mm (ϕ105 mm Bit Dia.)'},
-                                        {label: 'Spindle Speeds', value: '15-30 r/min'},
-                                        {label: 'Torque (Max)', value: '1.23 kN⋅m (3rd gear)'},
-                                        {label: 'Drill Frame', value: 'Air Motor + Chain Drive'},
-                                        {label: 'Thrust Force (Max)', value: '7.84 kN (800 kgf)'},
-                                        {label: 'Balance Force (Max)', value: '7.84 kN (800 kgf)'},
-                                        {label: 'Feed Length', value: '1400 mm'},
-                                        {label: 'Air Consumption', value: '10-15 m³/min × 1-1.5 MPa'},
-                                        {label: 'Dimensions (L × W × H)', value: '2190 × 660 × 980 mm'},
-                                        {label: 'Net Weight', value: 'Drive Unit: 230 kg'},
-                                        {label: 'Disassembly', value: 'Drill Head: 65 kg, Mast: 125 kg, Base: 40 kg'},
-                                        {label: 'Operation Stand', value: '65 kg'},
-                                        {label: 'Feed Length', value: '3500 mm'},
-                                        {label: 'Key Features', value: 'Air drilling, Drill head with strong air motor, Double tube drilling'},
-                                        {label: 'Benefits', value: 'Reduced running cost and time, Great drilling torque, Easy drilling in unstable stratum'}
-                                    ]
-                                })">
-                                    <i class="fas fa-eye"></i> View Details
-                                </button>
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Drilling</span>
+                                    <span class="blog-standard">Air Drilling</span>
+                                </div>
+                                <h3 class="blog-title">Air operated Drill type</h3>
+                                <p>Able to reduce running cost and time using air driving method. High-torque drill head ideal for unstable stratum.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/AK-01.pdf') }}" class="btn btn-pdf" target="_blank"><i class="fas fa-file-pdf"></i> PDF Specs</a>
+                                    <button class="btn btn-details" onclick="openProductModal({
+                                        code:'AK-01',
+                                        name:'Air operated Drill type',
+                                        standard:'Advanced Air Drilling Technology',
+                                        description:'The AK-01 Air operated Drill is a high-performance drilling machine designed to reduce running costs and operational time through its efficient air driving method. Equipped with a drill head featuring reduction gear that exerts exceptional drilling torque, making it highly effective for drilling operations in unstable stratum conditions.',
+                                        image:'{{ asset('images/highlights/AK-01.jpg') }}',
+                                        manufacturer:'TOHO',
+                                        specs:[
+                                            {label:'Model',value:'AK-01'},
+                                            {label:'Drilling Angle',value:'Free'},
+                                            {label:'Down The Hole Drill',value:'ϕ65 mm'},
+                                            {label:'DTH with Outer Casing',value:'ϕ105 mm (ID ϕ67 mm), Rod ϕ50 mm, Casing ϕ89.1 mm'},
+                                            {label:'Spindle Speeds',value:'15-30 r/min'},
+                                            {label:'Torque (Max)',value:'1.23 kN⋅m (3rd gear)'},
+                                            {label:'Drive',value:'Air Motor + Chain'},
+                                            {label:'Thrust / Balance',value:'7.84 kN (800 kgf) each'},
+                                            {label:'Feed Length',value:'1400 mm (mast 3500 mm)'},
+                                            {label:'Air Consumption',value:'10-15 m³/min × 1-1.5 MPa'},
+                                            {label:'Dimensions',value:'2190 × 660 × 980 mm; Drive Unit 230 kg'}
+                                        ]
+                                    })"><i class=\"fas fa-eye\"></i> View Details</button>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="product-card" style="margin-bottom: 24px;">
-                            <div class="product-image">
-                                <img src="images/Spindle-Type-D2-KS-58.png" alt="D2-K92 Spindle Type" class="product-img">
+                        </article>
+                        <!-- D2-K92 -->
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/Spindle-Type-D2-KS-58.png') }}" alt="D2-K92 Spindle Type" class="product-img">
+                                <span class="product-code-badge">D2-K92</span>
                             </div>
-                            <div class="product-info">
-                                <h4 class="product-code">D2-K92</h4>
-                                <h3 class="product-name">Spindle Type</h3>
-                                <p class="product-description">Oil hydraulic chuck Oil hydraulic slide base Low speed and high torque rotary spindle Both right and left side operation available</p>
-                                <a href="downloadable content\D2-K92.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                               <button class="expand-btn" onclick="openProductModal({
-                                    code: 'D2-K92',
-                                    name: 'Spindle Type',
-                                    standard: 'Advanced Hydraulic Drilling System',
-                                    description: 'The D2-K92 Spindle Type drilling machine represents advanced hydraulic drilling technology with versatile operation capabilities. Features oil hydraulic chuck and slide base systems for precision drilling operations. Designed with low speed and high torque rotary spindle configuration, providing exceptional drilling power for demanding applications. The machine offers both right and left side operation flexibility, making it adaptable to various drilling site configurations and operational requirements.',
-                                    image: 'images/Spindle-Type-D2-KS-58.png',
-                                    manufacturer: 'TOHO',
-                                    manufacturerUrl: 'https://www.tohochikakoki.co.jp',
-                                    specs: [
-                                        {label: 'Model', value: 'D2-K92'},
-                                        {label: 'Standard Equipment', value: 'Oil hydraulic slide base'},
-                                        {label: 'I.D. of Spindle', value: '92 mm'},
-                                        {label: 'Spindle Speeds', value: 'At 60-380/125-63 r/min, At 90 Lpm: 385/200-100 r/min'},
-                                        {label: 'Torque', value: '1.57 kN⋅m (160 kg⋅m)'},
-                                        {label: 'Stroke of Spindle', value: '500 mm'},
-                                        {label: 'Thrust Force', value: '22.1 kN (2260 kgf)'},
-                                        {label: 'Balance Force', value: '29.5 kN (3010 kgf)'},
-                                        {label: 'Slide System', value: 'Oil Hydraulic Stroke 400 mm'},
-                                        {label: 'Power', value: '7.5 kW/4P or 15ps/1800 rpm'},
-                                        {label: 'Dimensions (L × W × H)', value: '1800 × 870 × 1620 mm'},
-                                        {label: 'Net Weight', value: '700 kg'},
-                                        {label: 'Maximum Equipment', value: 'Oil hydraulic chuck is optional equipment'},
-                                        {label: 'Low Speed & High Torque', value: 'Rotary spindle for demanding applications'},
-                                        {label: 'Operation Flexibility', value: 'Both right and left side operation available'},
-                                        {label: 'Long Brake & Hoist Lever', value: 'Easy hoisting operation'},
-                                        {label: 'Chuck System', value: 'Oil hydraulic slide base is standard equipment'}
-                                    ]
-                                })">
-                                    <i class="fas fa-eye"></i> View Details
-                                </button>
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Drilling</span>
+                                    <span class="blog-standard">Hydraulic System</span>
+                                </div>
+                                <h3 class="blog-title">Spindle Type</h3>
+                                <p>Oil hydraulic chuck and slide base. Low speed, high torque rotary spindle with left/right operation.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/D2-K92.pdf') }}" class="btn btn-pdf" target="_blank"><i class="fas fa-file-pdf"></i> PDF Specs</a>
+                                    <button class="btn btn-details" onclick="openProductModal({
+                                        code:'D2-K92',
+                                        name:'Spindle Type',
+                                        standard:'Advanced Hydraulic Drilling System',
+                                        description:'Advanced hydraulic spindle drill with oil hydraulic chuck and slide base. High torque rotary spindle for demanding applications.',
+                                        image:'{{ asset('images/highlights/Spindle-Type-D2-KS-58.png') }}',
+                                        manufacturer:'TOHO',
+                                        specs:[
+                                            {label:'I.D. of Spindle',value:'92 mm'},
+                                            {label:'Speeds',value:'60-380/125-63 r/min; at 90 Lpm: 385/200-100 r/min'},
+                                            {label:'Torque',value:'1.57 kN⋅m'},
+                                            {label:'Stroke',value:'500 mm'},
+                                            {label:'Thrust / Balance',value:'22.1 kN / 29.5 kN'},
+                                            {label:'Slide System',value:'Oil Hydraulic Stroke 400 mm'},
+                                            {label:'Power',value:'7.5 kW/4P or 15ps/1800 rpm'},
+                                            {label:'Dimensions',value:'1800 × 870 × 1620 mm; 700 kg'}
+                                        ]
+                                    })"><i class=\"fas fa-eye\"></i> View Details</button>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="product-card" style="margin-bottom: 24px;">
-                            <div class="product-image">
-                                <img src="images/1618466271839904_116764.jpg" alt="DM-03 Drilling Machine" class="product-img">
+                        </article>
+                        <!-- DM-03 -->
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/1618466271839904_116764.jpg') }}" alt="DM-03 Drilling Machine" class="product-img">
+                                <span class="product-code-badge">DM-03</span>
                             </div>
-                            <div class="product-info">
-                                <h4 class="product-code">DM-03</h4>
-                                <h3 class="product-name">Drilling Machine</h3>
-                                <p class="product-description">Professional drilling machine with hydraulic operation system designed for efficient drilling operations in various geological conditions and construction applications.</p>
-                                <a href="downloadable content\DM-03.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                                <button class="expand-btn" onclick="openProductModal({
-                                    code: 'DM-03',
-                                    name: 'Drilling Machine',
-                                    standard: 'Professional Hydraulic Drilling System',
-                                    description: 'The DM-03 Drilling Machine is a professional-grade hydraulic drilling system engineered for efficient drilling operations across various geological conditions. This versatile drilling machine combines robust construction with advanced hydraulic technology to deliver reliable performance in construction, geotechnical investigation, and foundation work applications. Designed for both precision and durability, the DM-03 offers excellent drilling capabilities with user-friendly operation.',
-                                    image: 'images/1618466271839904_116764.jpg',
-                                    manufacturer: 'TOHO',
-                                    manufacturerUrl: 'https://www.tohochikakoki.co.jp',
-                                    specs: [
-                                        {label: 'Model', value: 'DM-03'},
-                                        {label: 'I.D. of Spindle', value: '47 mm'},
-                                        {label: 'Spindle Speeds', value: '65 : 125 : 370 r/min'},
-                                        {label: 'Torque', value: '0.54 kN⋅m (55 kg⋅m)'},
-                                        {label: 'Stroke of Spindle', value: '400 mm'},
-                                        {label: 'Thrust Force', value: '8.4 kN (860 kgf)'},
-                                        {label: 'Balance Force', value: '13.8 kN (1410 kgf)'},
-                                        {label: 'Power', value: '3.4kW/4P or 5ps/1800 rpm'},
-                                        {label: 'Dimensions (L × W × H)', value: '1115 × 570 × 1060 mm'},
-                                        {label: 'Net Weight', value: '240 kg'},
-                                    ]
-                                })">
-                                    <i class="fas fa-eye"></i> View Details
-                                </button>
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Drilling</span>
+                                    <span class="blog-standard">Hydraulic</span>
+                                </div>
+                                <h3 class="blog-title">Drilling Machine</h3>
+                                <p>Professional hydraulic drilling machine for efficient operations in various geological conditions.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/DM-03.pdf') }}" class="btn btn-pdf" target="_blank"><i class="fas fa-file-pdf"></i> PDF Specs</a>
+                                    <button class="btn btn-details" onclick="openProductModal({
+                                        code:'DM-03',
+                                        name:'Drilling Machine',
+                                        standard:'Professional Hydraulic Drilling System',
+                                        description:'Professional-grade hydraulic drilling system engineered for reliable performance in construction and geotechnical work.',
+                                        image:'{{ asset('images/highlights/1618466271839904_116764.jpg') }}',
+                                        manufacturer:'TOHO',
+                                        specs:[
+                                            {label:'I.D. of Spindle',value:'47 mm'},
+                                            {label:'Spindle Speeds',value:'65 : 125 : 370 r/min'},
+                                            {label:'Torque',value:'0.54 kN⋅m'},
+                                            {label:'Stroke of Spindle',value:'400 mm'},
+                                            {label:'Thrust / Balance',value:'8.4 kN / 13.8 kN'},
+                                            {label:'Power',value:'3.4kW/4P or 5ps/1800 rpm'},
+                                            {label:'Dimensions',value:'1115 × 570 × 1060 mm; 240 kg'}
+                                        ]
+                                    })"><i class=\"fas fa-eye\"></i> View Details</button>
+                                </div>
                             </div>
-                        </div>
+                        </article>
                     </div>
                 </div>
 
                 <!-- FRASTE Products Section -->
-                <div class="brand-section fraste-section">
-                    <div class="brand-header" style="margin-top: 40px;">
-                        <div class="brand-logo">
-                            <img src="images/logo.svg" alt="FRASTE" class="brand-logo-img" style="max-height:60px;">
-                        </div>
+                <div class="brand-section mt-5 mb-4">
+                    <div class="brand-header d-flex align-items-center">
+                        <img src="{{ asset('images/highlights/logo.svg') }}" alt="FRASTE" class="brand-logo me-3" style="max-height:60px;">
                     </div>
-                    <div class="products-grid">
-                        <div class="product-card">
-                            <div class="product-image">
-                                <img src="images/multidrill-xl-140DR_.jpg" alt="MULTIDRILL XL 140 DR" class="product-img">
+                    <div class="blogs-grid">
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/multidrill-xl-140DR_.jpg') }}" alt="MULTIDRILL XL 140 DR" class="product-img">
+                                <span class="product-code-badge">XL 140 DR</span>
                             </div>
-                            <div class="product-info">
-                                <h4 class="product-code">MULTIDRILL XL 140 DR</h4>
-                                <h3 class="product-name">MULTIDRILL XL 140 DR</h3>
-                                <p class="product-description">Experience, innovation, high quality, continuous ideas sharing with the final users are the strong points that in the course of time, made the FRASTE MULTIDRIL XL140 DR one of the most versatile and reliable Geothermal drilling rigs. Expressly designed for air drilling, its dual rotary head allows simultaneous drilling with drill pipe and casing pipe.</p>
-                                <a href="downloadable content\XL 140 DR.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                                <button class="expand-btn" onclick='openProductModal({
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Geothermal</span>
+                                    <span class="blog-standard">Dual Rotary</span>
+                                </div>
+                                <h3 class="blog-title">MULTIDRILL XL 140 DR</h3>
+                                <p>Versatile and reliable geothermal drilling rig with dual rotary head for simultaneous drilling.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/XL 140 DR.pdf') }}" class="btn btn-pdf" target="_blank"><i class="fas fa-file-pdf"></i> PDF Specs</a>
+                                    <button class="btn btn-details" onclick='openProductModal({
                                     code: "XL 140 DR",
                                     name: "MULTIDRILL XL 140 DR",
                                     standard: "Geothermal Drilling Rig",
                                     description: "Experience, innovation, high quality, continuous ideas sharing with the final users are the strong points that in the course of time, made the FRASTE MULTIDRIL XL140 DR one of the most versatile and reliable Geothermal drilling rigs. Expressly designed for air drilling, its dual rotary head allows simultaneous drilling with drill pipe and casing pipe. It’s a friendly-use drill unit, thanks also to the employ of the Preventer, the cuttings conveyor that permits working without any drilling site and environment contamination. The MULTIDRILL XL 140 DR, like all Fraste rigs, assures the best safety factor with its ergonomic control panels and with all safety devices made under the most rigorous current laws and regulations. Different optional equipment are available for various drilling purposes.",
-                                    image: "images/multidrill-xl-140DR_.jpg",
+                                    image: "{{ asset('images/highlights/multidrill-xl-140DR_.jpg') }}",
                                     manufacturer: "FRASTE",
                                     manufacturerUrl: "https://www.fraste.com/en",
                                     specs: [
@@ -314,23 +263,29 @@
                                 })'>
                                     <i class="fas fa-eye"></i> View Details
                                 </button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="product-card">
-                            <div class="product-image">
-                                <img src="images/multidrill-sl__1.jpg" alt="MULTIDRILL SL" class="product-img">
+                        </article>
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/multidrill-sl__1.jpg') }}" alt="MULTIDRILL SL" class="product-img">
+                                <span class="product-code-badge">MULTIDRILL SL</span>
                             </div>
-                            <div class="product-info">
-                                <h4 class="product-code">MULTIDRILL SL</h4>
-                                <h3 class="product-name">MULTIDRILL SL</h3>
-                                <p class="product-description">FRASTE MULTIDRILL SL: Innovation, Hi-Tech and Freshness. Pocket-sized: only 780 mm width and 2,5 ton weight, the standard version of the Multidrill SL features all high qualities of a large drilling rig! Updated and manufactured according to the strictest quality and safety standards, it will surprise you with its high reliability and productivity.</p>
-                                <a href="downloadable content\MULTIDRILL SL.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                                <button class="expand-btn" onclick='openProductModal({
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Compact Rig</span>
+                                    <span class="blog-standard">Soil Investigation</span>
+                                </div>
+                                <h3 class="blog-title">MULTIDRILL SL</h3>
+                                <p>Pocket-sized rig with high reliability and productivity. Perfect for soil investigation and monitoring.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/MULTIDRILL SL.pdf') }}" class="btn btn-pdf" target="_blank"><i class="fas fa-file-pdf"></i> PDF Specs</a>
+                                    <button class="btn btn-details" onclick='openProductModal({
                                     code: "MULTIDRILL SL",
                                     name: "MULTIDRILL SL",
                                     standard: "Compact Drilling Rig",
                                     description: "FRASTE MULTIDRILL SL: Innovation, Hi-Tech and Freshness. Pocket-sized: only 780 mm width and 2,5 ton weight, the standard version of the Multidrill SL features all high qualities of a large drilling rig! Updated and manufactured according to the strictest quality and safety standards, it will surprise you with its high reliability and productivity. Versatile: the modular mast and a great fitting availability to choose from, make the Multidrill SL perfect for different applications: soil investigation, environmental monitoring and small-size water wells. A great small drilling rig to make it stick!",
-                                    image: "images/multidrill-sl__1.jpg",
+                                    image: "{{ asset('images/highlights/multidrill-sl__1.jpg') }}",
                                     manufacturer: "FRASTE",
                                     manufacturerUrl: "https://www.fraste.com/en",
                                     specs: [
@@ -346,35 +301,38 @@
                                 })'>
                                     <i class="fas fa-eye"></i> View Details
                                 </button>
+                                </div>
                             </div>
-                        </div>
+                        </article>
                     </div>
                 </div>
                 
                 <!-- Tae Sung Co. Products Section -->
-                <div class="brand-section taesung-section">
-                    <div class="brand-header">
-                        <div class="brand-logo">
-                            <img src="images/partnership/Tae-Sung-Co_logo.png" alt="Tae Sung Co." class="brand-logo-img">
-                        </div>
+                <div class="brand-section mt-5 mb-4">
+                    <div class="brand-header d-flex align-items-center">
+                        <img src="{{ asset('images/highlights/partnership/Tae-Sung-Co_logo.png') }}" alt="Tae Sung Co." class="brand-logo me-3">
                     </div>
-                    
-                    <div class="products-grid">
-                        <div class="product-card">
-                            <div class="product-image">
-                                <img src="images/impregnated-diamond-core-bits-01.jpg" alt="Impregnated Diamond Core Bits" class="product-img">
+                    <div class="blogs-grid">
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/impregnated-diamond-core-bits-01.jpg') }}" alt="Impregnated Diamond Core Bits" class="product-img">
+                                <span class="product-code-badge">TS-IDCB-001</span>
                             </div>
-                            <div class="product-info">
-                                <h4 class="product-code">TS-IDCB-001</h4>
-                                <h3 class="product-name">Impregnated Diamond Core Bits</h3>
-                                <p class="product-description">Premium impregnated diamond core bits attached to the foremost part of core barrels for direct drilling of hard rocks. Available in multiple sizes and designed for optimal performance based on ground conditions.</p>
-                                <a href="downloadable content\TS-IDCB-001.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                                <button class="expand-btn" onclick="openProductModal({
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Core Bits</span>
+                                    <span class="blog-standard">Hard Rocks</span>
+                                </div>
+                                <h3 class="blog-title">Impregnated Diamond Core Bits</h3>
+                                <p>Premium bits made from synthetic diamond powder; matrix tuned to formation strength.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/TS-IDCB-001.pdf') }}" class="btn btn-pdf" target="_blank"><i class="fas fa-file-pdf"></i> PDF Specs</a>
+                                    <button class="btn btn-details" onclick="openProductModal({
                                     code: 'TS-IDCB-001',
                                     name: 'Impregnated Diamond Core Bits',
                                     standard: 'Global Quality Level Diamond Core Drilling',
                                     description: 'Impregnated Diamond Core Bits are attached to the foremost part of the Core barrels to be used in direct drilling of the ground, and play the most important role among the equipments that are used in drilling. These premium bits are made from synthetic diamond powder, metal powder, and shank of top quality. The hardness of matrix is carefully selected based on rock conditions - large size diamond with strong matrix for soft rocks, medium size diamond with medium strength matrix for medium rocks, and small size diamond with soft matrix for strong rocks.',
-                                    image: 'images/impregnated-diamond-core-bits-01.jpg',
+                                    image: '{{ asset('images/highlights/impregnated-diamond-core-bits-01.jpg') }}',
                                     manufacturer: 'Tae Sung Co.',
                                     manufacturerUrl: 'https://www.taesungdia.com/?ckattempt=1',
                                     specs: [
@@ -398,24 +356,29 @@
                                 })">
                                     <i class="fas fa-eye"></i> View Details
                                 </button>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="product-card">
-                            <div class="product-image">
-                                <img src="images/reaming-shells-1.jpg" alt="Diamond Reaming Shells" class="product-img">
+                        </article>
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/reaming-shells-1.jpg') }}" alt="Diamond Reaming Shells" class="product-img">
+                                <span class="product-code-badge">TS-DRS-002</span>
                             </div>
-                            <div class="product-info">
-                                <h4 class="product-code">TS-DRS-002</h4>
-                                <h3 class="product-name">Diamond Reaming Shells</h3>
-                                <p class="product-description">Cylindrical diamond reaming shells connected with bits for simultaneous drilling and side surface grinding. Prevents early wear of bit outer diameter and hole wall deformation.</p>
-                               <a href="downloadable content\TS-DRS-002.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                               <button class="expand-btn" onclick="openProductModal({
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Reaming</span>
+                                    <span class="blog-standard">Shells</span>
+                                </div>
+                                <h3 class="blog-title">Diamond Reaming Shells</h3>
+                                <p>Connected with core bit for reaming; prevents early wear and hole wall deformation.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/TS-DRS-002.pdf') }}" class="btn btn-pdf" target="_blank"><i class="fas fa-file-pdf"></i> PDF Specs</a>
+                                    <button class="btn btn-details" onclick="openProductModal({
                                     code: 'TS-DRS-002',
                                     name: 'Diamond Reaming Shells',
                                     standard: 'Professional Reaming Technology',
                                     description: 'Diamond Reaming Shell is connected with a Bit to be used, and the drilling by Bit and grinding of side surface can be done simultaneously, but the drilled hole should be kept not smaller than the diameter of the Bit (Reaming). It prevents early wear and tear of the outer diameter of the Bit, and also prevents vibration and deformation of the hole walls. Has a cylindrical shape with diamond particles attached at outside diameter and touchable screws at both ends.',
-                                    image: 'images/reaming-shells-1.jpg',
+                                    image: '{{ asset('images/highlights/reaming-shells-1.jpg') }}',
                                     manufacturer: 'Tae Sung Co.',
                                     manufacturerUrl: 'https://www.taesungdia.com/?ckattempt=1',
                                     specs: [
@@ -439,24 +402,29 @@
                                 })">
                                     <i class="fas fa-eye"></i> View Details
                                 </button>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="product-card">
-                            <div class="product-image">
-                                <img src="images/surface-set-diamond-core-bits-01.jpg" alt="Surface Set Diamond Core Bits" class="product-img">
+                        </article>
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/surface-set-diamond-core-bits-01.jpg') }}" alt="Surface Set Diamond Core Bits" class="product-img">
+                                <span class="product-code-badge">TS-SSDCB-003</span>
                             </div>
-                            <div class="product-info">
-                                <h4 class="product-code">TS-SSDCB-003</h4>
-                                <h3 class="product-name">Surface Set Diamond Core Bits</h3>
-                                <p class="product-description">Surface set diamond core bits designed for drilling in soft ground conditions. Available in multiple types with superior life span using high quality natural diamonds.</p>
-                                <a href="downloadable content\TS-SSDCB-003.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                                <button class="expand-btn" onclick="openProductModal({
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Core Bits</span>
+                                    <span class="blog-standard">Soft Ground</span>
+                                </div>
+                                <h3 class="blog-title">Surface Set Diamond Core Bits</h3>
+                                <p>Designed for soft ground; multiple step configurations and round type options.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/TS-SSDCB-003.pdf') }}" class="btn btn-pdf" target="_blank"><i class="fas fa-file-pdf"></i> PDF Specs</a>
+                                    <button class="btn btn-details" onclick="openProductModal({
                                     code: 'TS-SSDCB-003',
                                     name: 'Surface Set Diamond Core Bits',
                                     standard: 'Soft Ground Drilling Technology',
                                     description: 'Surface Set Diamond Core Bits are specifically designed for drilling operations in soft ground conditions. These bits feature natural diamonds set on the surface of the cutting matrix, providing excellent cutting performance in soft formations. Available in multiple configurations including Multi Type and Round Type designs to suit different drilling requirements.',
-                                    image: 'images/surface-set-diamond-core-bits-01.jpg',
+                                    image: '{{ asset('images/highlights/surface-set-diamond-core-bits-01.jpg') }}',
                                     manufacturer: 'Tae Sung Co.',
                                     manufacturerUrl: 'https://www.taesungdia.com/?ckattempt=1',
                                     specs: [
@@ -480,24 +448,29 @@
                                 })">
                                     <i class="fas fa-eye"></i> View Details
                                 </button>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="product-card">
-                            <div class="product-image">
-                                <img src="images/impregnated-diamond-casing-shoe-1.jpg" alt="Impregnated Diamond Casing Shoe" class="product-img">
+                        </article>
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/impregnated-diamond-casing-shoe-1.jpg') }}" alt="Impregnated Diamond Casing Shoe" class="product-img">
+                                <span class="product-code-badge">TS-IDCS-004</span>
                             </div>
-                            <div class="product-info">
-                                <h4 class="product-code">TS-IDCS-004</h4>
-                                <h3 class="product-name">Impregnated Diamond Casing Shoe</h3>
-                                <p class="product-description">Impregnated diamond casing shoes for drilling in soil or soft ground. Connected with casing pipe for drilling through collapsible holes with excellent quality synthetic diamonds.</p>
-                                <a href="downloadable content\TS-IDCS-004.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                                <button class="expand-btn" onclick="openProductModal({
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Casing</span>
+                                    <span class="blog-standard">Soft Ground</span>
+                                </div>
+                                <h3 class="blog-title">Impregnated Diamond Casing Shoe</h3>
+                                <p>For drilling soil/soft ground with casing advance technique; prevents hole collapse.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/TS-IDCS-004.pdf') }}" class="btn btn-pdf" target="_blank"><i class="fas fa-file-pdf"></i> PDF Specs</a>
+                                    <button class="btn btn-details" onclick="openProductModal({
                                     code: 'TS-IDCS-004',
                                     name: 'Impregnated Diamond Casing Shoe',
                                     standard: 'Advanced Casing Drilling Technology',
                                     description: 'Impregnated Diamond Casing Shoe is used for drilling in soil or soft ground conditions, connected with casing pipe and designed to drill through holes that can collapse anytime. During operations, it should be buried under the ground surface. The Casing Shoe Bit variant is specifically used for drilling soft ground with much gravel content. Made with synthetic diamond of top quality and proper matrix for excellent performance.',
-                                    image: 'images/impregnated-diamond-casing-shoe-1.jpg',
+                                    image: '{{ asset('images/highlights/impregnated-diamond-casing-shoe-1.jpg') }}',
                                     manufacturer: 'Tae Sung Co.',
                                     manufacturerUrl: 'https://www.taesungdia.com/?ckattempt=1',
                                     specs: [
@@ -521,24 +494,29 @@
                                 })">
                                     <i class="fas fa-eye"></i> View Details
                                 </button>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="product-card">
-                            <div class="product-image">
-                                <img src="images/pdc-non-core-bits.jpg" alt="PDC Bits & Tricone Bits" class="product-img">
+                        </article>
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/pdc-non-core-bits.jpg') }}" alt="PDC Bits & Tricone Bits" class="product-img">
+                                <span class="product-code-badge">TS-PDC-005</span>
                             </div>
-                            <div class="product-info">
-                                <h4 class="product-code">TS-PDC-005</h4>
-                                <h3 class="product-name">PDC Bits & Tricone Bits</h3>
-                                <p class="product-description">Professional PDC (Polycrystalline Diamond Compact) bits and Tricone bits for various drilling applications. High-performance drilling solutions for different geological formations.</p>
-                                <a href="downloadable content\TS-PDC-005.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                                <button class="expand-btn" onclick="openProductModal({
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Bits</span>
+                                    <span class="blog-standard">PDC, Tricone</span>
+                                </div>
+                                <h3 class="blog-title">PDC Bits & Tricone Bits</h3>
+                                <p>High-performance drilling solutions engineered for various formations and conditions.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/TS-PDC-005.pdf') }}" class="btn btn-pdf" target="_blank"><i class="fas fa-file-pdf"></i> PDF Specs</a>
+                                    <button class="btn btn-details" onclick="openProductModal({
                                     code: 'TS-PDC-005',
                                     name: 'PDC Bits & Tricone Bits',
                                     standard: 'Advanced Drilling Bit Technology',
                                     description: 'Comprehensive range of PDC (Polycrystalline Diamond Compact) bits and Tricone bits designed for various drilling applications. These high-performance drilling solutions are engineered to handle different geological formations and drilling conditions. PDC bits offer excellent cutting efficiency and extended life in suitable formations, while Tricone bits provide versatile drilling capability across various rock types.',
-                                    image: 'images/pdc-non-core-bits.jpg',
+                                    image: '{{ asset('images/highlights/pdc-non-core-bits.jpg') }}',
                                     manufacturer: 'Tae Sung Co.',
                                     manufacturerUrl: 'https://www.taesungdia.com/?ckattempt=1',
                                     specs: [
@@ -562,24 +540,29 @@
                                 })">
                                     <i class="fas fa-eye"></i> View Details
                                 </button>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="product-card">
-                            <div class="product-image">
-                                <img src="images/core-barrels-1.jpg" alt="Core Barrels" class="product-img">
+                        </article>
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/core-barrels-1.jpg') }}" alt="Core Barrels" class="product-img">
+                                <span class="product-code-badge">TS-CB-006</span>
                             </div>
-                            <div class="product-info">
-                                <h4 class="product-code">TS-CB-006</h4>
-                                <h3 class="product-name">Core Barrels</h3>
-                                <p class="product-description">Comprehensive range of core barrels including single, double, triple tube, and wire line systems. Made of best quality raw materials for excellent life span and currently exported worldwide.</p>
-                                <a href="downloadable content\TS-CB-006.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                                <button class="expand-btn" onclick="openProductModal({
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Sampling</span>
+                                    <span class="blog-standard">Wireline/Tube</span>
+                                </div>
+                                <h3 class="blog-title">Core Barrels</h3>
+                                <p>Single, double, triple tube and wire line systems for maximum core recovery across conditions.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/TS-CB-006.pdf') }}" class="btn btn-pdf" target="_blank"><i class="fas fa-file-pdf"></i> PDF Specs</a>
+                                    <button class="btn btn-details" onclick="openProductModal({
                                     code: 'TS-CB-006',
                                     name: 'Core Barrels',
                                     standard: 'Professional Core Sampling Systems',
                                     description: 'Core barrels are devices used to take cores drilled by the core bit, made of high-quality pipe materials. Available in multiple configurations including Single Tube, Double Tube, Triple Tube, and Wire Line systems. Each type is designed for specific applications and ground conditions, from simple core collection to complex geological sampling in challenging formations.',
-                                    image: 'images/core-barrels-1.jpg',
+                                    image: '{{ asset('images/highlights/core-barrels-1.jpg') }}',
                                     manufacturer: 'Tae Sung Co.',
                                     manufacturerUrl: 'https://www.taesungdia.com/?ckattempt=1',
                                     specs: [
@@ -603,24 +586,29 @@
                                 })">
                                     <i class="fas fa-eye"></i> View Details
                                 </button>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="product-card">
-                            <div class="product-image">
-                                <img src="images/drill-rods-casing-pipe-3.jpg" alt="Drill Rods & Casing Pipe" class="product-img">
+                        </article>
+                        <article class="blog-post">
+                            <div class="blog-image">
+                                <img src="{{ asset('images/highlights/drill-rods-casing-pipe-3.jpg') }}" alt="Drill Rods & Casing Pipe" class="product-img">
+                                <span class="product-code-badge">TS-DRC-007</span>
                             </div>
-                            <div class="product-info">
-                                <h4 class="product-code">TS-DRC-007</h4>
-                                <h3 class="product-name">Drill Rods & Casing Pipe</h3>
-                                <p class="product-description">Superior drill rods and casing pipes that meet 100% of drilling standards. Made from best quality raw materials with precise specifications and heat treatment for optimal performance.</p>
-                                <a href="downloadable content\TS-DRC-007.pdf" class="expand-btn" target="_blank"><i class="fas fa-file-pdf"></i> View PDF Specs</a>
-                                <button class="expand-btn" onclick="openProductModal({
+                            <div class="blog-content p-3">
+                                <div class="blog-meta">
+                                    <span class="blog-category">Drill Rods</span>
+                                    <span class="blog-standard">Casing Pipe</span>
+                                </div>
+                                <h3 class="blog-title">Drill Rods & Casing Pipe</h3>
+                                <p>Premium drill rods and casing pipes with precise specs and heat treatment to meet standards.</p>
+                                <div class="blog-actions">
+                                    <a href="{{ asset('downloadable content/TS-DRC-007.pdf') }}" class="btn btn-pdf" target="_blank"><i class="fas fa-file-pdf"></i> PDF Specs</a>
+                                    <button class="btn btn-details" onclick="openProductModal({
                                     code: 'TS-DRC-007',
                                     name: 'Drill Rods & Casing Pipe',
                                     standard: 'Premium Drilling Equipment Standards',
                                     description: 'Comprehensive range of drill rods and casing pipes manufactured to meet 100% of drilling standards using the best quality raw materials. Drill rods are maintained by the chuck of the drill rig and convey rotation, pressure, and drilling water while also handling rapid cooling and slime removal. Casing pipes provide structural support and prevent hole collapse during drilling operations.',
-                                    image: 'images/drill-rods-casing-pipe-3.jpg',
+                                    image: '{{ asset('images/highlights/drill-rods-casing-pipe-3.jpg') }}',
                                     manufacturer: 'Tae Sung Co.',
                                     manufacturerUrl: 'https://www.taesungdia.com/?ckattempt=1',
                                     specs: [
@@ -645,35 +633,30 @@
                                 })">
                                     <i class="fas fa-eye"></i> View Details
                                 </button>
+                                </div>
                             </div>
-                        </div>
+                        </article>
                     </div>
                 </div>
 
-                  <!-- Inquiry Banner -->
-                <div class="inquiry-banner">
-                <p>
-                    <i class="fas fa-circle-question"></i>
-                    Finding something? Some items may not be listed yet.  
-                    <a href="mailto:sales@gemarcph.com">Email us</a> or 
-                    <a href="tel:+639090879416">call us</a> for inquiries.
-                </p>
+                <!-- CTA Section (copied from concrete-mortar) -->
+                <div class="more-products-cta">
+                    <div class="cta-card">
+                        <div class="cta-text">
+                            <h3>Need help finding the right equipment?</h3>
+                            <p>Contact our product specialists for personalized assistance with your testing requirements</p>
+                        </div>
+                        <div class="cta-actions">
+                            <a href="mailto:sales@gemarcph.com?subject=General Inquiry – Drilling Machine" class="cta-btn">
+                                <i class="fas fa-envelope"></i> Send an Inquiry
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="services-offered">
-                    <h3>Our Services Include:</h3>
-                    <ul>
-                        <li>Supply of drilling machine equipment</li>
-                        <li>Equipment rental and leasing</li>
-                        <li>Maintenance and repair services</li>
-                        <li>Technical support and training</li>
-                    </ul>
-                </div>
-            </div>
         </div>
     </section>
 
-    <!-- Product Modal -->
+    <!-- Product Modal (IDs must match website/script.js) -->
     <div id="productModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -715,51 +698,14 @@
                     </button>
                     <div class="inquiry-email-panel js-inquiry-panel" hidden></div>
                 </div>
-
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content horizontal-footer">
-                <div class="footer-section">
-                    <h4><i class="fas fa-map-marker-alt"></i> Office Address</h4>
-                    <p>No. 15 Chile St. Ph1 Greenheights Subdivision, Concepcion 1, Marikina City, Philippines 1807</p>
-                </div>
-                <div class="footer-section">
-                    <h4><i class="fas fa-phone"></i> Telephone Numbers</h4>
-                    <p>(632)8-997-7959 | (632)8-584-5572</p>
-                </div>
-                <div class="footer-section">
-                    <h4><i class="fas fa-mobile-alt"></i> Mobile Numbers</h4>
-                    <p>+63 909 087 9416<br>+63 928 395 3532 | +63 918 905 8316</p>
-                </div>
-                <div class="footer-section">
-                    <h4><i class="fas fa-envelope"></i> Email Address</h4>
-                    <p>sales@gemarcph.com<br>technical@gemarcph.com</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 Gemarc Enterprises Incorporated. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+    @push('scripts')
+    <script src="{{ asset('website/script.js') }}?v={{ filemtime(public_path('website/script.js')) }}"></script>
+    <script src="{{ asset('website/search.js') }}?v={{ filemtime(public_path('website/search.js')) }}"></script>
+    @endpush
 
-    <script src="script.js"></script>
-    <script src="search.js"></script>
-    <!-- Floating Social Buttons -->
-    <div class="floating-buttons">
-        <a href="https://www.facebook.com/gmrcsales" target="_blank" class="floating-btn facebook-btn" title="Visit our Facebook Page">
-            <i class="fab fa-facebook-f"></i>
-        </a>
-        <a href="viber://chat?number=09090879416" class="floating-btn viber-btn" title="Contact us on Viber: 0909 087 9416">
-            <i class="fab fa-viber"></i>
-        </a>
-    </div>
-
-
-</body>
-</html>
+@endsection
 

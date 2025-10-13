@@ -16,6 +16,7 @@
                 <div class="flex-1"></div>
 
                 <!-- Custom Navbar Menu: Separate Dropdowns/Links (right side) -->
+                @if(!(auth()->check() && auth()->user()->isEmployee()))
                 <div class="hidden sm:flex items-center gap-2">
                     <!-- News Dropdown -->
                     <div x-data="{ open: false }" class="relative">
@@ -43,6 +44,7 @@
                     <!-- Call Now Button -->
                     <a href="tel:+639123456789" class="ml-2 inline-flex items-center px-4 py-2 border border-orange-600 text-orange-700 font-semibold rounded-md bg-white hover:bg-orange-50 transition">Call Now</a>
                 </div>
+                @endif
             </div>
 
             <!-- Cart Icon and User Dropdown on the right (hide cart for employees) -->

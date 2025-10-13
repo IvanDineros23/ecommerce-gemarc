@@ -50,14 +50,32 @@
             });
     }
     function fetchChat() {
-        if (!selectedUserId) return;
+        if (!selectedUserId) {
+            // Stop auto-fetching if no user is selected
+            return;
+        }
         fetch(`{{ url('/chat/fetch') }}?with_user_id=${selectedUserId}`, {
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })
             .then(r => r.json())
             .then(msgs => {
-                let html = msgs.map(m => `<div><b>${m.sender_id == {{ auth()->id() }} ? 'You' : selectedUserName}:</b> ${m.message}</div>`).join('');
-                document.getElementById('chat-messages').innerHTML = html;
+                let html = msgs.map(m => {
+                    const isUser = m.sender_id == {{ auth()->id() }};
+                    const alignClass = isUser ? 'justify-content-end' : 'justify-content-start';
+                    const bubbleClass = isUser ? 'bg-success text-white' : 'bg-light text-dark';
+                    const name = isUser ? 'You' : selectedUserName;
+                    const time = new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    return `
+                        <div class="d-flex ${alignClass} mb-2">
+                            <div class="chat-bubble ${bubbleClass} px-3 py-2 rounded-3" style="max-width: 70%;">
+                                <div class="fw-semibold mb-1">${name}</div>
+                                <div>${m.message}</div>
+                                <div class="text-end text-muted small mt-1">${time}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                document.getElementById('chat-messages').innerHTML = html || '<div class="text-center text-muted mt-5">No messages yet.</div>';
                 let box = document.getElementById('chat-messages');
                 box.scrollTop = box.scrollHeight;
             });
@@ -67,12 +85,11 @@
         selectedUserName = name;
         document.getElementById('chat-header').innerText = 'Chat with ' + name;
         document.getElementById('chat-form').style.display = '';
-        fetchChat();
+        fetchChat(); // Only fetch once
         fetchUserList();
     }
     fetchUserList();
     setInterval(fetchUserList, 5000);
-    setInterval(fetchChat, 3000);
     function deleteUserChat(userId) {
         if (!confirm('Are you sure you want to delete/archive this chat?')) return;
         fetch("{{ url('/chat/clear') }}", {
@@ -107,9 +124,42 @@
             body: JSON.stringify({ message: msg, to_user_id: selectedUserId })
         }).then(r => r.json()).then(() => {
             document.getElementById('chat-input').value = '';
-            fetchChat();
+            fetchChat(); // Fetch again after sending
         });
     };
     </script>
 </div>
+@push('styles')
+<style>
+    #chat-messages::-webkit-scrollbar {
+        width: 8px;
+    }
+    #chat-messages::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    #chat-messages::-webkit-scrollbar-thumb {
+        background: #28a745;
+        border-radius: 10px;
+    }
+    #chat-messages::-webkit-scrollbar-thumb:hover {
+        background: #218838;
+    }
+    .chat-bubble {
+        word-break: break-word;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        animation: fadeIn 0.3s ease-in-out;
+    }
+    .justify-content-end .chat-bubble {
+        margin-left: auto;
+    }
+    .justify-content-start .chat-bubble {
+        margin-right: auto;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+@endpush
 @endsection

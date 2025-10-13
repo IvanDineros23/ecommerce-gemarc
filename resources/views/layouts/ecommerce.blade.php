@@ -275,6 +275,7 @@
             <!-- Navigation Links -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
+                    @if(!(auth()->check() && auth()->user()->isEmployee()))
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('shop.index') ? 'active' : '' }}" href="{{ route('shop.index') }}">
                             <i class="fas fa-shopping-bag me-1"></i> Shop
@@ -296,11 +297,13 @@
                             <i class="fas fa-file-invoice me-1"></i> Quotes
                         </a>
                     </li>
+                    @endif
                 </ul>
 
                 <!-- Quick Icons + User Menu -->
                 <ul class="navbar-nav align-items-center gap-2">
                     <!-- Cart Icon -->
+                    @if(!(auth()->check() && auth()->user()->isEmployee()))
                     <li class="nav-item position-relative me-2">
                         <a class="nav-link" href="{{ route('cart.index') }}" title="Cart">
                             <i class="fas fa-shopping-cart"></i>
@@ -309,6 +312,7 @@
                             @endif
                         </a>
                     </li>
+                    @endif
                     
                     <!-- Notifications Icon with Dropdown -->
                     <li class="nav-item dropdown position-relative me-2">

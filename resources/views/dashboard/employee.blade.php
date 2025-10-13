@@ -39,7 +39,7 @@
             <div class="font-bold text-green-800 text-center">Order Management</div>
             <div class="text-xs text-gray-500 text-center">Process and track orders</div>
         </a>
-        <a href="{{ route('employee.chat.page') }}" class="flex-1 max-w-xs bg-white rounded-xl shadow p-4 flex flex-col items-center hover:bg-green-50 transition mx-auto md:mx-0">
+    <a href="{{ route('employee.chat.page') }}" class="flex-1 max-w-xs bg-white rounded-xl shadow p-4 flex flex-col items-center hover:bg-green-50 transition mx-auto md:mx-0">
             <!-- Chat Management Icon -->
             <svg class="w-16 h-16 mb-2 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <rect x="3" y="7" width="18" height="10" rx="2" fill="#dbeafe"/>

@@ -56,14 +56,15 @@
 .products-search .search-input{flex:1;border:none;font-size:1rem;padding:.75rem 1rem;background:transparent;outline:none;color:#111;}
 .products-search .search-btn{width:56px;height:56px;border:none;border-radius:50%;background:#15803d;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.15rem;cursor:pointer;transition:.35s;background-image:linear-gradient(135deg,#16a34a,#15803d);} 
 .products-search .search-btn:hover{filter:brightness(1.1);transform:translateY(-2px);} 
-.highlights-container{position:relative;overflow:visible !important;}
+.highlights-container{position:relative;overflow:hidden;}
 /* Fade style slider (isolated hero variant) */
 .hero-carousel{position:relative;width:100%;min-height:440px;}
-.hero-track{position:relative;width:100%;height:100%;}
-.hero-slide{position:absolute;inset:0;display:none;transform:translateX(60px) scale(.98);transition:opacity .9s ease,transform 1s cubic-bezier(.77,0,.18,1),filter 1s;filter:blur(2px);} 
-.hero-slide.preparing{display:none;transform:translateX(60px) scale(.98);}
-.hero-slide.leaving{display:none;transform:translateX(-60px) scale(.98);filter:blur(4px);} 
-.hero-slide.active{display:flex;transform:translateX(0) scale(1);filter:blur(0);pointer-events:auto;opacity:1;} 
+.hero-track{position:relative;width:100%;height:100%;min-height:440px;}
+/* Ensure only one slide is visible at a time */
+.hero-track > .hero-slide{position:absolute;inset:0;display:none !important;transform:translateX(60px) scale(.98);transition:opacity .9s ease,transform 1s cubic-bezier(.77,0,.18,1),filter 1s;filter:blur(2px);} 
+.hero-slide.preparing{display:none !important;transform:translateX(60px) scale(.98);} 
+.hero-slide.leaving{display:none !important;transform:translateX(-60px) scale(.98);filter:blur(4px);} 
+.hero-track > .hero-slide.active{display:flex !important;transform:translateX(0) scale(1);filter:blur(0);pointer-events:auto;opacity:1;z-index:2;} 
 .no-js .hero-slide{display:none;}
 .no-js .hero-slide:first-child{display:flex;opacity:1;}
 .hero-slide .hero-highlights-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:3rem;align-items:center;min-height:430px;width:100%;}
@@ -100,58 +101,68 @@
 }
 /* Force machines to stay horizontal */
 .material-testing-highlights .compression-machines-showcase{flex-wrap:nowrap;}
+
+/* Smaller font for Calibration & Maintenance and Superpave slides */
+.hero-slide[data-slide="2"] .highlights-title,
+.hero-slide[data-slide="3"] .highlights-title { font-size: clamp(2.1rem, 5vw, 3.2rem); }
+.hero-slide[data-slide="2"] .highlights-description,
+.hero-slide[data-slide="3"] .highlights-description { font-size: 1rem; }
 </style>
 @endpush
 @push('scripts')
 <script>
-// Advanced Fade+Slide Slider (autoplay 8s)
-let currentHighlight = 0; let highlightTimer; let highlightSlides; let highlightDots; let isAnimating=false;
-function setActiveSlide(idx){
-    if(isAnimating || idx===currentHighlight) return;
-    const prev = currentHighlight;
-    currentHighlight = idx;
-    isAnimating=true;
-    const prevSlide = highlightSlides[prev];
-    const nextSlide = highlightSlides[idx];
-    prevSlide?.classList.remove('active');
-    prevSlide?.classList.add('leaving');
-    nextSlide?.classList.add('preparing');
-    requestAnimationFrame(()=>{
-        nextSlide?.classList.remove('preparing');
-        nextSlide?.classList.add('active');
-        highlightDots.forEach((d,i)=> d.classList.toggle('active', i===currentHighlight));
-    });
-    setTimeout(()=>{ prevSlide?.classList.remove('leaving'); isAnimating=false; },900); // match opacity duration
-}
-function showHighlight(i){
-    if(!highlightSlides.length) return;
-    const target = ((i % highlightSlides.length)+highlightSlides.length)%highlightSlides.length;
-    if(target!==currentHighlight){ setActiveSlide(target); restartHighlightAutoplay(); }
-}
-function nextHighlight(){ showHighlight(currentHighlight+1); }
-function startHighlightAutoplay(){ stopHighlightAutoplay(); highlightTimer=setInterval(nextHighlight,8000); }
-function stopHighlightAutoplay(){ if(highlightTimer) clearInterval(highlightTimer); }
-function restartHighlightAutoplay(){ startHighlightAutoplay(); }
-let highlightsInitialized=false;
-document.addEventListener('DOMContentLoaded',()=>{
-    if(highlightsInitialized) return; // guard against double init
-    const hero=document.querySelector('.material-testing-highlights');
-    if(!hero) return;
-    hero.classList.remove('no-js');
-    highlightSlides=[...hero.querySelectorAll('.hero-slide')];
-    highlightDots=[...document.querySelectorAll('.highlights-navigation .nav-dot')];
-    if(highlightSlides.length){
-        highlightSlides.forEach((s,i)=>{ if(i===0){ s.classList.add('active'); } else { s.classList.remove('active','leaving','preparing'); }});
-        highlightDots[0]?.classList.add('active');
+// Home hero slider (scoped and namespaced to avoid global collisions)
+window.homeHero = (function(){
+    let current = 0; let timer; let slides = []; let dots = []; let animating=false; let initialized=false;
+    function setActive(idx){
+        if(animating || idx===current) return;
+        const prev=current; current=idx; animating=true;
+        const prevSlide = slides[prev];
+        const nextSlide = slides[idx];
+        prevSlide?.classList.remove('active');
+        prevSlide?.classList.add('leaving');
+        nextSlide?.classList.add('preparing');
+        requestAnimationFrame(()=>{
+            nextSlide?.classList.remove('preparing');
+            nextSlide?.classList.add('active');
+            dots.forEach((d,i)=> d.classList.toggle('active', i===current));
+        });
+        setTimeout(()=>{ prevSlide?.classList.remove('leaving'); animating=false; },900);
     }
-    startHighlightAutoplay();
-    hero.addEventListener('pointerenter',stopHighlightAutoplay);
-    hero.addEventListener('pointerleave',startHighlightAutoplay);
-    hero.querySelectorAll('.hero-slide img').forEach(img=>{
-        img.addEventListener('error',()=>{ if(!img.dataset.fallback){ img.dataset.fallback='1'; img.src='{{ asset('images/gemarclogo.png') }}'; }});
-    });
-    highlightsInitialized=true;
-});
+    function show(i){
+        if(!slides.length) return;
+        const target=((i%slides.length)+slides.length)%slides.length;
+        if(target!==current){ setActive(target); restart(); }
+    }
+    function next(){ show(current+1); }
+    function start(){ stop(); timer=setInterval(next,8000); }
+    function stop(){ if(timer) clearInterval(timer); }
+    function restart(){ start(); }
+    function init(){
+        if(initialized) return;
+        const hero=document.querySelector('.material-testing-highlights');
+        if(!hero) return;
+        hero.classList.remove('no-js');
+        slides=[...hero.querySelectorAll('.hero-slide')];
+        dots=[...document.querySelectorAll('.highlights-navigation .nav-dot')];
+        if(slides.length){
+            slides.forEach((s,i)=>{ if(i===0){ s.classList.add('active'); } else { s.classList.remove('active','leaving','preparing'); }});
+            dots[0]?.classList.add('active');
+        }
+        // attach dot handlers to avoid inline globals if present
+        dots.forEach((d,i)=> d.addEventListener('click',()=> show(i)));
+        start();
+        hero.addEventListener('pointerenter',stop);
+        hero.addEventListener('pointerleave',start);
+        document.addEventListener('visibilitychange',()=>{ document.hidden ? stop() : start(); });
+        hero.querySelectorAll('.hero-slide img').forEach(img=>{
+            img.addEventListener('error',()=>{ if(!img.dataset.fallback){ img.dataset.fallback='1'; img.src='{{ asset('images/gemarclogo.png') }}'; }});
+        });
+        initialized=true;
+    }
+    document.addEventListener('DOMContentLoaded',init);
+    return { show, next, start, stop };
+})();
 </script>
 @endpush
 
@@ -261,11 +272,11 @@ document.addEventListener('DOMContentLoaded',()=>{
                         </div>
                     </div>
                     <div class="highlights-navigation">
-                        <button class="nav-dot" onclick="showHighlight(0)"></button>
-                        <button class="nav-dot" onclick="showHighlight(1)"></button>
-                        <button class="nav-dot" onclick="showHighlight(2)"></button>
-                        <button class="nav-dot" onclick="showHighlight(3)"></button>
-                        <button class="nav-dot" onclick="showHighlight(4)"></button>
+                        <button class="nav-dot" data-index="0" type="button"></button>
+                        <button class="nav-dot" data-index="1" type="button"></button>
+                        <button class="nav-dot" data-index="2" type="button"></button>
+                        <button class="nav-dot" data-index="3" type="button"></button>
+                        <button class="nav-dot" data-index="4" type="button"></button>
                     </div>
                 </div>
             </div>
@@ -420,7 +431,7 @@ document.addEventListener('DOMContentLoaded',()=>{
             const nextBtn = document.getElementById('partners-next');
             
             // Number of logos to show at once (adjust based on screen size)
-            const logosPerView = window.innerWidth < 768 ? 2 : 4;
+            let logosPerView = window.innerWidth < 768 ? 2 : 4;
             let currentPosition = 0;
             
             function updateNavigation() {

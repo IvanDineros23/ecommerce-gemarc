@@ -71,14 +71,15 @@ document.querySelectorAll('.mobile-menu-sub a').forEach(link => {
 // ===================================================================
 // HOMEPAGE HIGHLIGHTS CAROUSEL
 // ===================================================================
+// Guard legacy highlights logic behind DOM presence to avoid collisions
 let currentHighlightIndex = 0;
 const totalHighlights = 5; // Total number of highlights
 let highlightAutoPlay;
 
 function showHighlight(index) {
-    const highlightsSlides = document.querySelectorAll('.highlights-slide');
+  const highlightsSlides = document.querySelectorAll('.highlights-slide');
     const navDots = document.querySelectorAll('.nav-dot');
-    if (!highlightsSlides.length) return;
+  if (!highlightsSlides.length) return; // run only on pages with legacy highlights markup
     
     currentHighlightIndex = index;
     
@@ -128,12 +129,13 @@ function stopHighlightAutoPlay() {
 
 // Initialize highlights on page load
 document.addEventListener('DOMContentLoaded', function() {
-    if (document.querySelector('.highlights-container')) {
+  // Only initialize if legacy highlights markup is present
+  if (document.querySelector('.highlights-container') && document.querySelector('.highlights-slide')) {
         showHighlight(0);
         startHighlightAutoPlay();
         
         // Pause autoplay on hover
-        const highlightsSection = document.querySelector('.material-testing-highlights');
+    const highlightsSection = document.querySelector('.material-testing-highlights');
         if (highlightsSection) {
             highlightsSection.addEventListener('mouseenter', stopHighlightAutoPlay);
             highlightsSection.addEventListener('mouseleave', startHighlightAutoPlay);

@@ -1,320 +1,194 @@
 @extends('layouts.app')
+@section('title', 'Customer Feedback & Partners | Gemarc Enterprises Incorporated')
+
+@push('styles')
+<style>
+/* ===== Header: force WHITE ===== */
+.header{
+  background:#fff !important;
+  box-shadow:0 4px 16px rgba(0,0,0,.06);
+}
+.header .nav-list > li > a,
+.header .dropdown-toggle,
+.header .dropdown-toggle i{
+  color:#0f172a !important;   /* dark text for white nav */
+}
+.header .hamburger span{ background:#0f172a !important; }
+
+
+/* ===== Hero ===== */
+.cf-hero{
+  position:relative; min-height:52vh; padding:5rem 0 6rem; color:#fff; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+}
+.cf-hero::before{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(rgba(0,0,0,.78),rgba(0,0,0,.78)),
+             url('{{ asset('images/360_F_1589025175_1DxdWO4V6n1gbYRWoVjD0eef0QEi9yq4.jpg') }}') center/cover no-repeat;
+  opacity:.95;
+}
+.cf-hero .hero-content{position:relative; z-index:2; text-align:center; max-width:1000px; margin:0 auto;}
+.cf-hero h1{font-size:clamp(2.2rem,6vw,3.5rem); font-weight:800; margin:0 0 1rem;}
+.cf-hero p{font-size:1.1rem; color:#f1f5f9;}
+
+/* ===== Page wrapper & local search ===== */
+.page-content{background:#fff; padding:2.5rem 0 2rem;}
+.page-content .products-search{
+  max-width:720px; margin:1rem auto 2rem; display:flex; align-items:center; gap:.75rem;
+  background:#fff; border:1px solid #e5e7eb; border-radius:9999px; padding:.5rem .75rem;
+  box-shadow:0 6px 20px -8px rgba(0,0,0,.12);
+}
+.page-content .products-search .search-input{flex:1; height:46px; padding:0 1rem; border:0; outline:0; background:transparent;}
+.page-content .products-search .search-btn{
+  width:46px; height:46px; border:0; border-radius:9999px; background:#16a34a; color:#fff;
+  display:inline-flex; align-items:center; justify-content:center;
+}
+@media (max-width:480px){
+  .page-content .products-search{padding:.35rem .5rem;}
+  .page-content .products-search .search-input{height:40px;}
+  .page-content .products-search .search-btn{width:40px; height:40px;}
+}
+
+/* ================= PARTNERS SLIDER (same as index) ================= */
+.partner-logo{
+  height:60px; width:180px; flex:0 0 180px; object-fit:contain;
+  transition:.3s ease; filter:grayscale(.2); scroll-snap-align:start;
+}
+.partner-logo:hover{ filter:grayscale(0); transform:scale(1.05); }
+#partners-track{
+  display:flex; gap:2rem; scroll-behavior:smooth;
+  -ms-overflow-style:none; scrollbar-width:none;
+}
+#partners-track::-webkit-scrollbar{ display:none; }
+#partners-track-container{ overflow-x:hidden; margin:0 3rem; }
+@media (max-width:768px){
+  .partner-logo{ height:50px; width:140px; flex:0 0 140px; }
+  #partners-track{ gap:1rem; }
+  #partners-track-container{ margin:0 2rem; }
+}
+
+/* ===== CTA ===== */
+.cta-section{background:#f8fafc; padding:2.25rem 0;}
+.cta-section .container{max-width:1100px; margin:0 auto; text-align:center; padding:0 1rem;}
+.highlights-btn.primary{
+  display:inline-flex; align-items:center; gap:.5rem; padding:.9rem 1.4rem; border-radius:14px;
+  text-decoration:none; font-weight:700; color:#fff;
+  background:linear-gradient(135deg,#f59e0b,#ea580c); box-shadow:0 12px 32px -8px rgba(234,88,12,.45);
+}
+.highlights-btn.primary:hover{filter:brightness(1.05); transform:translateY(-1px);}
+</style>
+@endpush
+
 @section('content')
-  <!-- Header -->
-  <header class="header">
-    <div class="container">
-      <div class="logo">
-        <a href="{{ url('/static') }}" class="logo-link">
-          <img src="{{ asset('website/images/gemarclogo.png') }}" alt="Gemarc Enterprises" class="logo-img">
-        </a>
-      </div>
-// ...existing code...
-@endsection
-      <nav class="nav">
-        <!-- Desktop -->
-        <ul class="nav-list desktop-nav">
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle"><i class="fas fa-newspaper"></i> News <i class="fas fa-chevron-down"></i></a>
-            <ul class="dropdown-menu">
-              <li><a href="news.html">News</a></li>
-              <li><a href="blogs.html">Blogs</a></li>
-            </ul>
-          </li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle"><i class="fas fa-industry"></i> Products <i class="fas fa-chevron-down"></i></a>
-            <ul class="dropdown-menu">
-              <li><a href="aggregates.html">Aggregates</a></li>
-              <li><a href="asphalt-bitumen.html">Asphalt & Bitumen</a></li>
-              <li><a href="cement-mortar.html">Cement & Mortar</a></li>
-              <li><a href="concrete-mortar.html">Concrete & Mortar</a></li>
-              <li><a href="drilling-machine.html">Drilling Machine</a></li>
-              <li><a href="industrial-equipment.html">Industrial Equipment</a></li>
-              <li><a href="/soil">Soil Testing</a></li>
-              <li><a href="/steel">Steel Testing</a></li>
-              <li><a href="pavetest.html">Pavetest Equipment</a></li>
-            </ul>
-          </li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle"><i class="fas fa-wrench"></i> Services <i class="fas fa-chevron-down"></i></a>
-            <ul class="dropdown-menu">
-              <li><a href="calibration.html">Calibration Services</a></li>
-              <li><a href="services.html">Repair Services</a></li>
-            </ul>
-          </li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle"><i class="fas fa-users"></i> About <i class="fas fa-chevron-down"></i></a>
-            <ul class="dropdown-menu">
-              <li><a href="about.html">Company</a></li>
-              <li><a href="contact.html">Contact</a></li>
-            <li><a href="customerfeedback.html">Customer Feedback</a></li>
-</ul>
-          </li>
-        </ul>
-
-        <!-- Mobile Menu Overlay -->
-        <div class="mobile-menu-overlay" id="mobileMenu"><button class="mobile-menu-close" id="closeMenu">&times;</button>
-          <ul class="mobile-menu-list">
-            <li>
-              <button class="mobile-menu-main">News</button>
-              <ul class="mobile-menu-sub">
-                <li><a href="news.html">News</a></li>
-                <li><a href="blogs.html">Blogs</a></li>
-              </ul>
-            </li>
-            <li>
-              <button class="mobile-menu-main">Products</button>
-              <ul class="mobile-menu-sub">
-                <li><a href="aggregates.html">Aggregates</a></li>
-                <li><a href="asphalt-bitumen.html">Asphalt & Bitumen</a></li>
-                <li><a href="cement-mortar.html">Cement & Mortar</a></li>
-                <li><a href="concrete-mortar.html">Concrete & Mortar</a></li>
-                <li><a href="drilling-machine.html">Drilling Machine</a></li>
-                <li><a href="industrial-equipment.html">Industrial Equipment</a></li>
-                <li><a href="/soil">Soil Testing</a></li>
-                <li><a href="/steel">Steel Testing</a></li>
-                <li><a href="pavetest.html">Pavetest Equipment</a></li>
-              </ul>
-            </li>
-            <li>
-              <button class="mobile-menu-main">Services</button>
-              <ul class="mobile-menu-sub">
-                <li><a href="calibration.html">Calibration Services</a></li>
-                <li><a href="services.html">Repair Services</a></li>
-              </ul>
-            </li>
-            <li>
-              <button class="mobile-menu-main">About</button>
-              <ul class="mobile-menu-sub">
-                <li><a href="about.html">Company</a></li>
-                <li><a href="contact.html">Contact</a></li>
-              <li><a href="customerfeedback.html">Customer Feedback</a></li>
-</ul>
-            </li>
-          </ul>
-<!-- Quick Actions (mobile only) -->
-<div class="mobile-actions">
-  <a href="contact.html" class="action-btn quote-btn">
-    <i class="fas fa-calculator"></i> Get Quote
-  </a>
-  <a href="tel:+639090879416" class="action-btn call-btn">
-    <i class="fas fa-phone"></i> Call Now
-  </a>
-</div>
-</div>
-
-        <!-- Quick Actions -->
-        <div class="nav-actions">
-          <a href="contact.html" class="action-btn quote-btn">
-            <i class="fas fa-calculator"></i> Get Quote
-          </a>
-          <a href="tel:+639090879416" class="action-btn call-btn">
-            <i class="fas fa-phone"></i> Call Now
-          </a>
-        </div>
-
-        <div class="hamburger">
-          <span></span><span></span><span></span>
-        </div>
-      </nav>
-    </div>
-  </header>
-
-  <!-- Hero -->
-  <section class="hero about-hero">
+  {{-- HERO --}}
+  <section class="cf-hero">
     <div class="hero-content">
       <h1>Customer Feedback & Partners</h1>
       <p>Real stories, trusted partners, and proof of performance</p>
     </div>
   </section>
 
-  <!-- Page Content -->
+  {{-- PAGE CONTENT --}}
   <section class="page-content">
     <div class="container">
 
-      <!-- Search Bar -->
+      {{-- Search Bar --}}
       <div class="products-search">
-        <input type="search" placeholder="Search products, services..." class="search-input" autocomplete="off">
-        <button class="search-btn" type="button"><i class="fas fa-search"></i></button>
+        <input type="search" class="search-input" placeholder="Search products, services..." autocomplete="off" aria-label="Search products and services">
+        <button class="search-btn" type="button" aria-label="Search"><i class="fas fa-search"></i></button>
       </div>
 
-      <!-- Trust Metrics
-      <div class="stats-grid" >
-        <div class="stat-card">
-          <h2>200+</h2><p>Active Clients</p>
-        </div>
-        <div class="stat-card">
-          <h2>1,000+</h2><p>Projects Delivered</p>
-        </div>
-        <div class="stat-card">
-          <h2>30+ Years</h2><p>Industry Experience</p>
-        </div>
-        <div class="stat-card">
-          <h2>98%</h2><p>Client Satisfaction</p>
-        </div>
-      </div> -->
+      {{-- ===== Our Global Partners (copied from index) ===== --}}
+      <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+          <div class="text-center mb-10">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">Our Global Partners</h2>
+            <p class="text-xl text-gray-600">Trusted by leading companies worldwide</p>
+          </div>
 
-      <!-- Testimonials TSAKA NA LAGYAN PAG MERON NA TALAGA -->
-     <!-- <section class="testimonials-section">
-        <div class="section-header">
-          <h2>What Our Customers Say</h2>
-          <p>Selected feedback from engineering firms, contractors, and laboratories</p>
-        </div>
+          <div class="relative max-w-6xl mx-auto">
+            <button type="button" id="partners-prev"
+              class="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-white text-gray-700 rounded-full shadow z-10">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button type="button" id="partners-next"
+              class="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-white text-gray-700 rounded-full shadow z-10">
+              <i class="fas fa-chevron-right"></i>
+            </button>
 
-        <div class="testimonials-grid" >
-          <article class="testimonial-card">
-            <div class="testimonial-header">
-              <img src="images/avatars/avatar1.png" alt="Client 1" class="avatar">
-              <div>
-                <h4>Engr. Maria Santos</h4>
-                <span>QA/QC Head, PrimeBuild Corp.</span>
+            <div id="partners-track-container" class="overflow-hidden mx-10">
+              <div id="partners-track" class="flex gap-8 snap-x snap-mandatory scroll-pl-8" style="scroll-behavior:smooth;">
+                <img src="{{ asset('images/highlights/partnership/gilson_logo.png') }}" alt="Gilson" class="partner-logo snap-start">
+                <img src="{{ asset('images/highlights/partnership/logo-matest.png') }}" alt="Matest" class="partner-logo snap-start">
+                <img src="{{ asset('images/highlights/partnership/ehwa.png') }}" alt="Ehwa" class="partner-logo snap-start">
+                <img src="{{ asset('images/highlights/partnership/labtech_logo.jpg') }}" alt="Labtech" class="partner-logo snap-start">
+                <img src="{{ asset('images/highlights/partnership/dualmfg-logo.jpg') }}" alt="Dual MFG" class="partner-logo snap-start">
+                <img src="{{ asset('images/highlights/partnership/NL-Scientific_logo.png') }}" alt="NL Scientific" class="partner-logo snap-start">
+                <img src="{{ asset('images/highlights/partnership/QLab-Corporation.jpg') }}" alt="QLab" class="partner-logo snap-start">
+                <img src="{{ asset('images/highlights/partnership/Tae-Sung-Co_logo.png') }}" alt="Tae Sung" class="partner-logo snap-start">
+                <img src="{{ asset('images/highlights/partnership/toho-logo-200.jpg') }}" alt="Toho" class="partner-logo snap-start">
+                <img src="{{ asset('images/highlights/partnership/WandJ.jpg') }}" alt="W&J" class="partner-logo snap-start">
               </div>
             </div>
-            <p class="testimonial-quote">“Responsive service at mabilis ang delivery ng calibrated equipment. Nakaabot kami sa project milestones nang walang downtime.”</p>
-            <div class="rating">
-              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-            </div>
-          </article>
-
-          <article class="testimonial-card">
-            <div class="testimonial-header">
-              <img src="images/avatars/avatar2.png" alt="Client 2" class="avatar">
-              <div>
-                <h4>Ar. Kevin Dela Cruz</h4>
-                <span>Project Manager, MetroInfra</span>
-              </div>
-            </div>
-            <p class="testimonial-quote">“From procurement to after-sales, professional at maayos kausap ang Gemarc. Reliable yung test results — pasado sa audit.”</p>
-            <div class="rating">
-              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-            </div>
-          </article>
-
-          <article class="testimonial-card">
-            <div class="testimonial-header">
-              <img src="images/avatars/avatar3.png" alt="Client 3" class="avatar">
-              <div>
-                <h4>Engr. Liza Ramos</h4>
-                <span>Laboratory Supervisor, GeoTest Labs</span>
-              </div>
-            </div>
-            <p class="testimonial-quote">“Complete lineup ng material testing equipment at mabilis ang support. Highly recommended for labs and contractors.”</p>
-            <div class="rating">
-              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-            </div>
-          </article>
+          </div>
         </div>
-      </section> -->
-
-                     <h2>Our Global Partners</h2>
-                <p>We collaborate with leading brands in the industry to deliver exceptional quality and service</p>
-                <div class="partners-carousel-container">
-                    <button class="carousel-btn carousel-btn-left" onclick="moveCarousel(-1)">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <div class="partners-carousel">
-                        <div class="partners-track" id="partnersTrack">
-                            <div class="partner-item">
-                                <img src="images/partnership/gilson_logo.png" alt="Gilson" class="partner-logo">
-                            </div>
-                            <div class="partner-item">
-                                <img src="images/partnership/logo-matest.png" alt="Matest" class="partner-logo">
-                            </div>
-                            <div class="partner-item">
-                                <img src="images/partnership/ehwa.png" alt="Ehwa" class="partner-logo">
-                            </div>
-                            <div class="partner-item">
-                                <img src="images/partnership/labtech_logo.jpg" alt="Labtech" class="partner-logo">
-                            </div>
-                            <div class="partner-item">
-                                <img src="images/partnership/dualmfg-logo.jpg" alt="Dual MFG" class="partner-logo">
-                            </div>
-                            <div class="partner-item">
-                                <img src="images/partnership/NL-Scientific_logo.png" alt="NL Scientific" class="partner-logo">
-                            </div>
-                            <div class="partner-item">
-                                <img src="images/partnership/QLab-Corporation.jpg" alt="QLab Corporation" class="partner-logo">
-                            </div>
-                            <div class="partner-item">
-                                <img src="images/partnership/Tae-Sung-Co_logo.png" alt="Tae Sung Co" class="partner-logo">
-                            </div>
-                            <div class="partner-item">
-                                <img src="images/partnership/toho-logo-200.jpg" alt="Toho" class="partner-logo">
-                            </div>
-                            <div class="partner-item">
-                                <img src="images/partnership/WandJ.jpg" alt="W&J" class="partner-logo">
-                            </div>
-                            <div class="partner-item">
-                                <img src="images/partnership/tbt-Nanjing_logo.jpg" alt="TBT Nanjing" class="partner-logo">
-                            </div>
-                            <div class="partner-item">
-                                <img src="images/partnership/capping-gypsum-logo.png" alt="Capping Gypsum" class="partner-logo">
-                            </div>
-                            <!-- Duplicate items for seamless loop -->
-                            <div class="partner-item">
-                                <img src="images/partnership/gilson_logo.png" alt="Gilson" class="partner-logo">
-                            </div>
-                            <div class="partner-item">
-                                <img src="images/partnership/logo-matest.png" alt="Matest" class="partner-logo">
-                            </div>
-                            <div class="partner-item">
-                                <img src="images/partnership/ehwa.png" alt="Ehwa" class="partner-logo">
-                            </div>
-                            <div class="partner-item">
-                                <img src="images/partnership/labtech_logo.jpg" alt="Labtech" class="partner-logo">
-                            </div>
-                        </div>
-                    </div>
-                    <button class="carousel-btn carousel-btn-right" onclick="moveCarousel(1)">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-      <!-- CTA -->
-      <section class="cta-section">
-  <div class="container">
-    <h2>Want to share your experience with Gemarc?</h2>
-    <p>We’d love to hear from you. Send us your feedback or request a case study.</p>
-    <div class="cta-buttons">
-      <a class="highlights-btn primary" href="contact.html">Send Feedback</a>
-    </div>
-  </div>
-</section>
-
-
+      </section>
 
     </div>
   </section>
 
-  <!-- Footer scripts -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content horizontal-footer">
-                <div class="footer-section">
-                    <h4><i class="fas fa-map-marker-alt"></i> Office Address</h4>
-                    <p>No. 15 Chile St. Ph1 Greenheights Subdivision, Concepcion 1, Marikina City, Philippines 1807</p>
-                </div>
-                <div class="footer-section">
-                    <h4><i class="fas fa-phone"></i> Telephone Numbers</h4>
-                    <p>(632)8-997-7959 | (632)8-584-5572</p>
-                </div>
-                <div class="footer-section">
-                    <h4><i class="fas fa-mobile-alt"></i> Mobile Numbers</h4>
-                    <p>+63 909 087 9416<br>+63 928 395 3532 | +63 918 905 8316</p>
-                </div>
-                <div class="footer-section">
-                    <h4><i class="fas fa-envelope"></i> Email Address</h4>
-                    <p>sales@gemarcph.com<br>technical@gemarcph.com</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 Gemarc Enterprises Incorporated. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-  <script src="script.js" defer></script>
-  <script src="search.js" defer></script>
-</body>
-</html>
+  {{-- CTA --}}
+  <section class="cta-section">
+    <div class="container">
+      <h2>Want to share your experience with Gemarc?</h2>
+      <p>We’d love to hear from you. Send us your feedback or request a case study.</p>
+      <div class="cta-buttons">
+        <a class="highlights-btn primary" href="{{ url('/contact') }}">Send Feedback</a>
+      </div>
+    </div>
+  </section>
+@endsection
+
+@push('scripts')
+<script>
+/* Partners slider — same logic as index */
+document.addEventListener('DOMContentLoaded', function() {
+  const partnersTrack = document.getElementById('partners-track');
+  if(!partnersTrack) return;
+
+  const logos = partnersTrack.querySelectorAll('.partner-logo');
+  const prevBtn = document.getElementById('partners-prev');
+  const nextBtn = document.getElementById('partners-next');
+
+  let logosPerView = window.innerWidth < 768 ? 2 : 4;
+  let currentPosition = 0;
+
+  function updateNavigation(){
+    prevBtn.disabled = currentPosition <= 0;
+    nextBtn.disabled = currentPosition >= logos.length - logosPerView;
+    prevBtn.style.opacity = prevBtn.disabled ? '0.5' : '1';
+    nextBtn.style.opacity = nextBtn.disabled ? '0.5' : '1';
+  }
+
+  function scrollPartners(direction){
+    const newPos = currentPosition + direction;
+    if(newPos < 0 || newPos > logos.length - logosPerView) return;
+    currentPosition = newPos;
+
+    const targetLogo = logos[currentPosition];
+    targetLogo?.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'start' });
+
+    updateNavigation();
+  }
+
+  prevBtn?.addEventListener('click', ()=> scrollPartners(-1));
+  nextBtn?.addEventListener('click', ()=> scrollPartners(1));
+  window.addEventListener('resize', ()=>{
+    logosPerView = window.innerWidth < 768 ? 2 : 4;
+    updateNavigation();
+  });
+
+  updateNavigation();
+});
+</script>
+@endpush

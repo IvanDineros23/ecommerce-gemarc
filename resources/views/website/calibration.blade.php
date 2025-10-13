@@ -54,7 +54,7 @@
     <div class="container">
         <div class="calib-hero-content">
             <h1>Professional Calibration Services</h1>
-            <p>At Gemarc Enterprises, we provide comprehensive calibration services for construction and materials testing equipment. Our team of certified technicians ensures that your equipment meets the highest standards of accuracy and reliability, following ISO 9001 quality management protocols.</p>
+            <p>At Gemarc Enterprises, we provide comprehensive calibration services for construction and materials testing equipment. Our team of certified technicians ensures that your equipment meets the highest standards of accuracy and reliability.</p>
         </div>
     </div>
 </section>

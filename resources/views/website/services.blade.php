@@ -1,235 +1,123 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Repair Services - Gemarc Enterprises Incorporated</title>
-    <link rel="icon" type="image/png" href="images/gemarclogo.png">
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-</head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="logo">
-                <a href="index.html" class="logo-link">
-                    <img src="images\gemarclogo.png" alt="Gemarc Enterprises" class="logo-img">
-                </a>
-            </div>
-            <nav class="nav">
-                                <ul class="nav-list desktop-nav">
-                                    <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle"><i class="fas fa-newspaper"></i> News <i class="fas fa-chevron-down"></i></a>
-                                        <ul class="dropdown-menu">
-                                            <li><a href="news.html">News</a></li>
-                                            <li><a href="blogs.html">Blogs</a></li>
-                                        </ul>
-                                    </li>
-                                    
-                                    <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle"><i class="fas fa-industry"></i> Products <i class="fas fa-chevron-down"></i></a>
-                                        <ul class="dropdown-menu">
-                                            <li><a href="aggregates.html">Aggregates</a></li>
-                                            <li><a href="asphalt-bitumen.html">Asphalt & Bitumen</a></li>
-                                            <li><a href="cement-mortar.html">Cement & Mortar</a></li>
-                                            <li><a href="concrete-mortar.html">Concrete & Mortar</a></li>
-                                            <li><a href="drilling-machine.html">Drilling Machine</a></li>
-                                            <li><a href="industrial-equipment.html">Industrial Equipment</a></li>
-                                            <li><a href="/soil">Soil Testing</a></li>
-                                            <li><a href="/steel">Steel Testing</a></li>
-                                            <li><a href="pavetest.html">Pavetest Equipment</a></li>
-                                        </ul>
-                                    </li>
-                                    
-                                    <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle"><i class="fas fa-wrench"></i> Services <i class="fas fa-chevron-down"></i></a>
-                                        <ul class="dropdown-menu">
-                                            <li><a href="calibration.html">Calibration Services</a></li>
-                                            <li><a href="services.html">Repair Services</a></li>
-                                        </ul>
-                                    </li>
-                                    
-                                    <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle"><i class="fas fa-users"></i> About <i class="fas fa-chevron-down"></i></a>
-                                        <ul class="dropdown-menu">
-                                            <li><a href="about.html">Company</a></li>
-                                            <li><a href="contact.html">Contact</a></li>
-                                        <li><a href="customerfeedback.html">Customer Feedback</a></li>
-</ul>
-                                    </li>
-                                </ul>
-                                <!-- Mobile Menu Overlay -->
-                                <div class="mobile-menu-overlay" id="mobileMenu"><button class="mobile-menu-close" id="closeMenu">&times;</button>
-                                    <ul class="mobile-menu-list">
-                                        <li>
-                                            <button class="mobile-menu-main">News</button>
-                                            <ul class="mobile-menu-sub">
-                                                <li><a href="news.html">News</a></li>
-                                                <li><a href="blogs.html">Blogs</a></li>
-                                            </ul>
-                                        </li>
-                                        <li>
-                                            <button class="mobile-menu-main">Products</button>
-                                            <ul class="mobile-menu-sub">
-                                                <li><a href="aggregates.html">Aggregates</a></li>
-                                                <li><a href="asphalt-bitumen.html">Asphalt & Bitumen</a></li>
-                                                <li><a href="cement-mortar.html">Cement & Mortar</a></li>
-                                                <li><a href="concrete-mortar.html">Concrete & Mortar</a></li>
-                                                <li><a href="drilling-machine.html">Drilling Machine</a></li>
-                                                <li><a href="industrial-equipment.html">Industrial Equipment</a></li>
-                                                <li><a href="/soil">Soil Testing</a></li>
-                                                <li><a href="/steel">Steel Testing</a></li>
-                                                <li><a href="pavetest.html">Pavetest Equipment</a></li>
-                                            </ul>
-                                        </li>
-                                        <li>
-                                            <button class="mobile-menu-main">Services</button>
-                                            <ul class="mobile-menu-sub">
-                                                <li><a href="calibration.html">Calibration Services</a></li>
-                                                <li><a href="services.html">Repair Services</a></li>
-                                            </ul>
-                                        </li>
-                                        <li>
-                                            <button class="mobile-menu-main">About</button>
-                                            <ul class="mobile-menu-sub">
-                                                <li><a href="about.html">Company</a></li>
-                                                <li><a href="contact.html">Contact</a></li>
-                                            <li><a href="customerfeedback.html">Customer Feedback</a></li>
-                                        </ul>
-                                        </li>
-                                    </ul>
-<!-- Quick Actions (mobile only) -->
-<div class="mobile-actions">
-  <a href="contact.html" class="action-btn quote-btn">
-    <i class="fas fa-calculator"></i> Get Quote
-  </a>
-  <a href="tel:+639090879416" class="action-btn call-btn">
-    <i class="fas fa-phone"></i> Call Now
-  </a>
-</div>
-</div>
-                
-                <!-- Action Buttons -->
-                <div class="nav-actions">
-                    <a href="contact.html" class="action-btn quote-btn">
-                        <i class="fas fa-file-invoice"></i>Get Quote
-                    </a>
-                    <a href="tel:+639090879416" class="action-btn call-btn">
-                        <i class="fas fa-phone"></i> Call Now
-                    </a>
-                </div>
-                
-                <div class="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </nav>
-        </div>
-    </header>
+﻿
+@extends('layouts.app')
+@section('content')
+@section('title', 'Services | Gemar Enterprises Incorporated')
+@push('styles')
+<style>
+.svc-hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background: linear-gradient(rgba(15,23,42,.78),rgba(15,23,42,.78)), url('{{ asset('images/360_F_1589025175_1DxdWO4V6n1gbYRWoVjD0eef0QEi9yq4.jpg') }}') center/cover no-repeat;
+    opacity: .95;
+}
+.svc-hero-section {
+    position: relative; min-height: 60vh; padding: 5rem 0 6rem; color: #fff; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+}
+.svc-hero-content {
+    position: relative; z-index: 2; max-width: 900px; margin: 0 auto; text-align: center;
+}
+.svc-hero-content h1 {
+    font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; margin-bottom: 1.5rem; letter-spacing: .5px;
+}
+.svc-hero-content p {
+    font-size: 1.15rem; color: #f1f5f9; margin-bottom: 2.5rem;
+}
+.svc-title-strip {
+    background: #222; color: #ffc107; padding: 0.7rem 0; text-align: center; letter-spacing: 2px; font-weight: 700; font-size: 1.3rem; margin-bottom: 0;
+}
+.svc-title-strip h2 { margin: 0; font-size: 1.3rem; font-weight: 700; letter-spacing: 2px; }
+.svc-services-list { background: #fff; padding: 2.5rem 0 2rem; }
+.svc-list {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; max-width: 1100px; margin: 0 auto; padding: 0; list-style: disc inside;
+}
+.svc-list li { font-size: 1.08rem; color: #222; margin-bottom: .5rem; }
+.svc-gallery-wrap { background: #f8fafc; padding: 2.5rem 0; }
+.svc-clickable-header { background: #fff; border-radius: 1.2rem; box-shadow: 0 8px 32px -12px rgba(0,0,0,.12); padding: 1.5rem 2rem; margin-bottom: 1.5rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+.svc-clickable-header h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: .5rem; color: #222; }
+.svc-clickable-header p { color: #555; margin-bottom: .5rem; }
+.svc-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 1.2rem; transition: max-height .4s; overflow: hidden; }
+.svc-gallery.collapsed { max-height: 0; padding: 0; }
+.svc-gallery img { width: 100%; height: 160px; object-fit: cover; border-radius: 1rem; box-shadow: 0 4px 18px -8px rgba(0,0,0,.13); background: #fff; }
+@media (max-width: 700px) {
+    .svc-hero-content h1 { font-size: 2.2rem; }
+    .svc-list { grid-template-columns: 1fr 1fr; }
+    .svc-gallery img { height: 120px; }
+}
+@media (max-width: 480px) {
+    .svc-hero-content h1 { font-size: 1.5rem; }
+    .svc-list { grid-template-columns: 1fr; }
+}
+</style>
+@endpush
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Repair Services</h1>
+<section class="svc-hero-section">
+    <div class="svc-hero-bg"></div>
+    <div class="container">
+        <div class="svc-hero-content">
+            <h1>Repair & Training Services</h1>
+            <p>Gemarc Enterprises offers expert repair, maintenance, and training for construction and testing equipment. Our technical team provides on-site diagnostics, preventive maintenance, and hands-on operator training to ensure your equipment runs reliably and safely.</p>
         </div>
-    </section>
+    </div>
+</section>
 
-         <!-- === TECHNICAL SERVICES TITLE STRIP (matches calibration look) === -->
 <section class="svc-title-strip">
-  <div class="container">
-    <h2>REPAIR & TRAINING SERVICES</h2>
-  </div>
+    <div class="container">
+        <h2>REPAIR & TRAINING SERVICES</h2>
+    </div>
 </section>
 
-<!-- === NUMBERED SERVICE LIST (multi-column, responsive) === -->
 <section class="svc-services-list">
-  <div class="container">
-    <ul class="svc-list">
-      <!-- Repair / Maintenance -->
-      <li>On-site Diagnostics & Troubleshooting</li>
-      <li>Preventive Maintenance for Testing Equipment</li>
-      <li>Corrective Repair & Parts Replacement</li>
-      <li>Electrical & Mechanical Overhaul</li>
-      <li>Load Cell / Sensor Checking & Alignment</li>
-      <li>Software/Firmware Configuration & Tuning</li>
-      <li>Equipment Commissioning & Start-up Support</li>
-      <li>Warranty & Post-warranty Service</li>
-      <!-- Training / Demo -->
-      <li>Operator Training (Hands-on)</li>
-      <li>Method/Procedure Demo</li>
-      <li>Best Practices & Safety Orientation</li>
-      <li>Documentation & Test Report Walkthrough</li>
-      <li>Refresher Sessions (per request)</li>
-      <li>Remote Support & Quick Guidance</li>
-    </ul>
-  </div>
+    <div class="container">
+        <ul class="svc-list">
+            <li>On-site Diagnostics & Troubleshooting</li>
+            <li>Preventive Maintenance for Testing Equipment</li>
+            <li>Corrective Repair & Parts Replacement</li>
+            <li>Electrical & Mechanical Overhaul</li>
+            <li>Load Cell / Sensor Checking & Alignment</li>
+            <li>Software/Firmware Configuration & Tuning</li>
+            <li>Equipment Commissioning & Start-up Support</li>
+            <li>Warranty & Post-warranty Service</li>
+            <li>Operator Training (Hands-on)</li>
+            <li>Method/Procedure Demo</li>
+            <li>Best Practices & Safety Orientation</li>
+            <li>Documentation & Test Report Walkthrough</li>
+            <li>Refresher Sessions (per request)</li>
+            <li>Remote Support & Quick Guidance</li>
+        </ul>
+    </div>
 </section>
 
-<!-- === ONE CONSOLIDATED GALLERY: DEMOS & TRAININGS === -->
 <section class="svc-gallery-wrap">
-  <div class="container">
-    <header class="svc-clickable-header" onclick="toggleSvcGallery(this)">
-      <h3><i class="fas fa-chalkboard-user"></i> Showcase: On-site Demos & Trainings</h3>
-      <p>Real sessions conducted by Gemarc technicians</p>
-      <span class="chev"><i class="fas fa-chevron-down"></i></span>
-    </header>
-
-    <div class="svc-gallery collapsed" id="svcGallery">
-      <!-- TIP: just copy/add items; keep forward slashes in paths -->
-      <!-- Replace these with your actual training/demo images -->
-      <div class="sg-item"><img src="images/Pictures/viber_image_2025-09-10_11-40-06-421.jpg" alt="Equipment training"></div>
-      <div class="sg-item"><img src="images/Pictures/viber_image_2025-09-10_11-41-30-552.jpg" alt="Commissioning"></div>
-      <div class="sg-item"><img src="images/Pictures/viber_image_2025-09-10_11-40-06-764.jpg" alt="On-site demo"></div>
-      <div class="sg-item"><img src="images/Pictures/viber_image_2025-09-10_11-45-28-817.jpg" alt="Hands-on session"></div>
-      <div class="sg-item"><img src="images/Pictures/494814749_1916317242538175_7655088993599564921_n.jpg" alt="demo"></div>
-      <div class="sg-item"><img src="images/Pictures/476458768_540083412423925_7677882325727688935_n.jpg" alt="demo"></div>
-      <!-- add more as needed -->
+    <div class="container">
+        <header class="svc-clickable-header" id="svcDropdownHeader">
+            <h3><i class="fas fa-chalkboard-user"></i> Showcase: On-site Demos & Trainings</h3>
+            <p>Real sessions conducted by Gemarc technicians</p>
+            <span class="chev"><i class="fas fa-chevron-down"></i></span>
+        </header>
+        <div class="svc-gallery collapsed" id="svcGallery">
+            <div class="sg-item"><img src="{{ asset('images/highlights/Pictures/viber_image_2025-09-10_11-40-06-421.jpg') }}" alt="Equipment training"></div>
+            <div class="sg-item"><img src="{{ asset('images/highlights/Pictures/viber_image_2025-09-10_11-41-30-552.jpg') }}" alt="Commissioning"></div>
+            <div class="sg-item"><img src="{{ asset('images/highlights/Pictures/viber_image_2025-09-10_11-40-06-764.jpg') }}" alt="On-site demo"></div>
+            <div class="sg-item"><img src="{{ asset('images/highlights/Pictures/viber_image_2025-09-10_11-45-28-817.jpg') }}" alt="Hands-on session"></div>
+            <div class="sg-item"><img src="{{ asset('images/highlights/Pictures/494814749_1916317242538175_7655088993599564921_n.jpg') }}" alt="demo"></div>
+            <div class="sg-item"><img src="{{ asset('images/highlights/Pictures/476458768_540083412423925_7677882325727688935_n.jpg') }}" alt="demo"></div>
+        </div>
     </div>
-  </div>
 </section>
 
+@endsection
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content horizontal-footer">
-                <div class="footer-section">
-                    <h4><i class="fas fa-map-marker-alt"></i> Office Address</h4>
-                    <p>No. 15 Chile St. Ph1 Greenheights Subdivision, Concepcion 1, Marikina City, Philippines 1807</p>
-                </div>
-                <div class="footer-section">
-                    <h4><i class="fas fa-phone"></i> Telephone Numbers</h4>
-                    <p>(632)8-997-7959 | (632)8-584-5572</p>
-                </div>
-                <div class="footer-section">
-                    <h4><i class="fas fa-mobile-alt"></i> Mobile Numbers</h4>
-                    <p>+63 909 087 9416<br>+63 928 395 3532 | +63 918 905 8316</p>
-                </div>
-                <div class="footer-section">
-                    <h4><i class="fas fa-envelope"></i> Email Address</h4>
-                    <p>sales@gemarcph.com<br>technical@gemarcph.com</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 Gemarc Enterprises Incorporated. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Floating Social Buttons -->
-    <div class="floating-buttons">
-        <a href="https://www.facebook.com/gmrcsales" target="_blank" class="floating-btn facebook-btn" title="Visit our Facebook Page">
-            <i class="fab fa-facebook-f"></i>
-        </a>
-        <a href="viber://chat?number=09090879416" class="floating-btn viber-btn" title="Contact us on Viber: 0909 087 9416">
-            <i class="fab fa-viber"></i>
-        </a>
-    </div>
-
-    <script src="script.js"></script>
-    <script src="search.js"></script>
-
-</body>
-</html>
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var header = document.getElementById('svcDropdownHeader');
+    var gallery = document.getElementById('svcGallery');
+    var chev = header.querySelector('.chev i');
+    header.addEventListener('click', function() {
+        gallery.classList.toggle('collapsed');
+        chev.classList.toggle('fa-chevron-down');
+        chev.classList.toggle('fa-chevron-up');
+    });
+});
+</script>
+@endpush

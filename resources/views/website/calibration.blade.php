@@ -1,5 +1,6 @@
 ﻿@extends('layouts.app')
 @section('content')
+@section('title', 'Calibration | Gemar Enterprises Incorporated')
 @push('styles')
 <style>
 .calib-hero-bg {

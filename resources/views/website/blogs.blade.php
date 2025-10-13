@@ -51,13 +51,11 @@
 @endpush
 
 @section('content')
-    <!-- Blogs Hero -->
-    <section class="page-hero hero-with-bg hero-blog" style="background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),url('{{ asset('images/360_F_1589025175_1DxdWO4V6n1gbYRWoVjD0eef0QEi9yq4.jpg') }}') center/cover no-repeat;">
-        <div class="hero-bg" style="background-image:url('{{ asset('images/360_F_1589025175_1DxdWO4V6n1gbYRWoVjD0eef0QEi9yq4.jpg') }}');"></div>
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <h1>Blogs & Articles</h1>
-            <p>Stay updated with industry insights and company updates</p>
+    <!-- Blogs Hero (identical to News) -->
+    <section class="hero blogs-hero" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{{ asset('images/highlights/360_F_1589025175_1DxdWO4V6n1gbYRWoVjD0eef0QEi9yq4.jpg') }}') center/cover no-repeat; min-height: 400px; display: flex; align-items: center; justify-content: center;">
+        <div class="hero-content" style="text-align: center; color: white; z-index: 2;">
+            <h1 style="font-size: 3rem; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); margin-bottom: 1rem;">Blogs & Articles</h1>
+            <p style="font-size: 1.2rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Stay updated with industry insights and company updates</p>
         </div>
     </section>
 

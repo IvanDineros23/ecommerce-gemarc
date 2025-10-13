@@ -5,16 +5,48 @@
 @push('styles')
 <link href="{{ asset('css/blogs.css') }}?v={{ filemtime(public_path('css/blogs.css')) }}" rel="stylesheet">
 <style>
-    /* Force hero background (last-resort override) */
-    .page-hero.hero-with-bg.hero-blog .hero-bg{background-image:var(--hero-blog-bg)!important;}
-    .page-hero.hero-with-bg.hero-blog{background:none!important;}
-    /* Bold article titles override */
-    .blogs-section .blog-post .blog-content h3{font-weight:800!important;font-size:1.18rem!important;letter-spacing:-.3px!important;}
-    /* If still gray, apply fallback background directly */
-    .page-hero.hero-with-bg.hero-blog.no-image{background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),url('{{ asset('images/360_F_1589025175_1DxdWO4V6n1gbYRWoVjD0eef0QEi9yq4.jpg') }}') center/cover no-repeat!important;}
-    /* Ensure stacking context correct */
-    .page-hero.hero-with-bg.hero-blog .hero-bg, .page-hero.hero-with-bg.hero-blog::after{will-change:transform;}
-    @media (min-width:1024px){.blogs-section .blog-post .blog-content h3{font-size:1.22rem!important;}}
+    /* Hero background for blogs page */
+    .page-hero.hero-with-bg.hero-blog {
+        position: relative;
+        background: linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)), url('{{ asset('images/highlights/360_F_1589025175_1DxdWO4V6n1gbYRWoVjD0eef0QEi9yq4.jpg') }}') center/cover no-repeat !important;
+        color: #fff;
+    }
+    .page-hero.hero-with-bg.hero-blog .hero-bg {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background: url('{{ asset('images/highlights/360_F_1589025175_1DxdWO4V6n1gbYRWoVjD0eef0QEi9yq4.jpg') }}') center/cover no-repeat;
+        opacity: 0.85;
+    }
+    .page-hero.hero-with-bg.hero-blog .hero-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        padding: 4rem 0 3rem;
+    }
+    .page-hero.hero-with-bg.hero-blog h1 {
+        font-size: clamp(2.2rem, 6vw, 3.5rem);
+        font-weight: 800;
+        margin-bottom: 1.2rem;
+        letter-spacing: 0.5px;
+    }
+    .page-hero.hero-with-bg.hero-blog p {
+        font-size: 1.15rem;
+        color: #f1f5f9;
+        margin-bottom: 2.5rem;
+    }
+    /* Blog article titles: firmer, not bold */
+    .blogs-section .blog-post .blog-content h3.blog-title {
+        font-weight: 600 !important;
+        font-size: 1.18rem !important;
+        letter-spacing: -0.3px !important;
+        color: #1e293b !important;
+        font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+        margin-bottom: 0.7rem;
+    }
+    @media (min-width:1024px){
+        .blogs-section .blog-post .blog-content h3.blog-title{font-size:1.22rem!important;}
+    }
 </style>
 @endpush
 

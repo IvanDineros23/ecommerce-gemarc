@@ -481,16 +481,16 @@
                         </div>
                     </article>
                 </div>
-            <!-- CTA Section -->
+            <!-- CTA Section (Unified) -->
             <div class="more-products-cta">
                 <div class="cta-card">
                     <div class="cta-text">
-                        <h3>Need help finding the right equipment?</h3>
-                        <p>Contact our product specialists for personalized assistance with your testing requirements</p>
+                        <h3>Looking for more products?</h3>
+                        <p>Contact our sales team for a comprehensive catalog and expert assistance.</p>
                     </div>
                     <div class="cta-actions">
-                        <a href="javascript:void(0)" onclick="openInquiryModal('General Inquiry', 'Concrete & Mortar')" class="cta-btn">
-                            <i class="fas fa-envelope"></i> Send an Inquiry
+                        <a href="{{ route('contact') }}" class="cta-btn">
+                            <i class="fas fa-envelope"></i> Contact Us
                         </a>
                     </div>
                 </div>

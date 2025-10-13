@@ -66,17 +66,17 @@ const allProducts = [
   { code: "GT-7001-DSU", name: "Servo Control Container Compression Tester", page: "industrial-equipment.html" },
 
   // Soil
-  { code: "S172-01N", name: "Motorized liquid limit device, NF", page: "soil.html" },
-  { code: "S165-02", name: "Semiautomatic cone digital penetrometer", page: "soil.html" },
-  { code: "S276-01M", name: "Auto ShearLab - Direct and Residual Shear Testing Machine", page: "soil.html" },
-  { code: "NL 5002 X / 010", name: "Eco Smartz Advanced CBR Loading Tester 50kN", page: "soil.html" },
-  { code: "NL 5032 X / 001", name: "Electrical Density Gauge (EDG)", page: "soil.html" },
-  { code: "NL 5025 X / SAS", name: "Automatic CBR or MOD Soil Compactor", page: "soil.html" },
-  { code: "PSK-001", name: "Polycarbonate Sieve Kits", page: "soil.html" },
-  { code: "MFS-001", name: "Metric Frame Sieves", page: "soil.html" },
+  { code: "S172-01N", name: "Motorized liquid limit device, NF", page: "/soil" },
+  { code: "S165-02", name: "Semiautomatic cone digital penetrometer", page: "/soil" },
+  { code: "S276-01M", name: "Auto ShearLab - Direct and Residual Shear Testing Machine", page: "/soil" },
+  { code: "NL 5002 X / 010", name: "Eco Smartz Advanced CBR Loading Tester 50kN", page: "/soil" },
+  { code: "NL 5032 X / 001", name: "Electrical Density Gauge (EDG)", page: "/soil" },
+  { code: "NL 5025 X / SAS", name: "Automatic CBR or MOD Soil Compactor", page: "/soil" },
+  { code: "PSK-001", name: "Polycarbonate Sieve Kits", page: "/soil" },
+  { code: "MFS-001", name: "Metric Frame Sieves", page: "/soil" },
 
   // Steel
-  { code: "AI-7000-LAU", name: "Servo Control System Universal Testing Machine", page: "steel.html" },
+  { code: "AI-7000-LAU", name: "Servo Control System Universal Testing Machine", page: "/steel" },
   { code: "WA-100C/WA-300C/WA-600C/WA-1000C", name: "Universal Testing Machine with PC&Servo Control", page: "steel.html" },
 
   // Pavetest

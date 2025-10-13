@@ -29,8 +29,8 @@
                             <li><a href="concrete-mortar.html">Concrete & Mortar</a></li>
                             <li><a href="drilling-machine.html">Drilling Machine</a></li>
                             <li><a href="industrial-equipment.html">Industrial Equipment</a></li>
-                            <li><a href="soil.html">Soil Testing</a></li>
-                            <li><a href="steel.html">Steel Testing</a></li>
+                            <li><a href="/soil">Soil Testing</a></li>
+                            <li><a href="/steel">Steel Testing</a></li>
                             <li><a href="pavetest.html">Pavetest Equipment</a></li>
                         </ul>
                     </li>
@@ -71,8 +71,8 @@
                         <li><a href="concrete-mortar.html">Concrete & Mortar</a></li>
                         <li><a href="drilling-machine.html">Drilling Machine</a></li>
                         <li><a href="industrial-equipment.html">Industrial Equipment</a></li>
-                        <li><a href="soil.html">Soil Testing</a></li>
-                        <li><a href="steel.html">Steel Testing</a></li>
+                        <li><a href="/soil">Soil Testing</a></li>
+                        <li><a href="/steel">Steel Testing</a></li>
                         <li><a href="pavetest.html">Pavetest Equipment</a></li>
                       </ul>
                     </li>

@@ -15,6 +15,11 @@ Route::view('/industrial-equipment', 'website.industrial-equipment');
 Route::view('/pavetest', 'website.pavetest');
 Route::view('/soil', 'website.soil');
 Route::view('/steel', 'website.steel');
+// Redirect legacy URLs to canonical slugs (SEO-friendly)
+Route::redirect('/soil-testing', '/soil', 301);
+Route::redirect('/steel-testing', '/steel', 301);
+Route::view('/customer-feedback', 'website.customerfeedback');
+Route::view('/services', 'website.services');
 
 // Public inquiry submission (for product/category pages)
 Route::post('/inquiry/submit', [\App\Http\Controllers\InquiryController::class, 'submit'])->name('inquiry.submit');

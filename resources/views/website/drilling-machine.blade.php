@@ -639,16 +639,16 @@
                     </div>
                 </div>
 
-                <!-- CTA Section (copied from concrete-mortar) -->
+                <!-- CTA Section (Unified) -->
                 <div class="more-products-cta">
                     <div class="cta-card">
                         <div class="cta-text">
-                            <h3>Need help finding the right equipment?</h3>
-                            <p>Contact our product specialists for personalized assistance with your testing requirements</p>
+                            <h3>Looking for more products?</h3>
+                            <p>Contact our sales team for a comprehensive catalog and expert assistance.</p>
                         </div>
                         <div class="cta-actions">
-                            <a href="mailto:sales@gemarcph.com?subject=General Inquiry – Drilling Machine" class="cta-btn">
-                                <i class="fas fa-envelope"></i> Send an Inquiry
+                            <a href="{{ route('contact') }}" class="cta-btn">
+                                <i class="fas fa-envelope"></i> Contact Us
                             </a>
                         </div>
                     </div>

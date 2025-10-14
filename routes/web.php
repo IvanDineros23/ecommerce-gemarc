@@ -2,6 +2,7 @@
 // Static website page routes
 Route::view('/about', 'website.about');
 Route::view('/contact', 'website.contact')->name('contact');
+Route::post('/contact/submit', [\App\Http\Controllers\ContactSubmissionController::class, 'submit'])->name('contact.submit');
 Route::view('/customerfeedback', 'website.customerfeedback');
 Route::view('/news', 'website.news')->name('news');
 Route::view('/blogs', 'website.blogs');
@@ -213,12 +214,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Simple employee home (authorization check inline; consider moving to middleware)
     Route::get('/employee/dashboard', function () {
-        if (!auth()->user() || !method_exists(auth()->user(), 'isEmployee') || !auth()->user()->isEmployee()) {
-            abort(403, 'Unauthorized');
-        }
-        $notifications = [];
-        return view('dashboard.employee', compact('notifications'));
+        // ...existing code...
+        return view('dashboard.employee');
     })->name('employee.dashboard');
+
+    // Employee contact submissions page (outside closure)
+    Route::get('/employee/contact-submissions', [\App\Http\Controllers\EmployeeContactSubmissionController::class, 'index'])->name('employee.contact_submissions');
 
     // Employee: Inventory / Products / Orders / Quotes
     Route::prefix('employee')->name('employee.')->group(function () {

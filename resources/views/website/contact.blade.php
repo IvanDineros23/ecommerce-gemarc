@@ -167,7 +167,8 @@
               <div class="contact-icon"><i class="fas fa-clock"></i></div>
               <div class="contact-details">
                 <h4>Business Hours</h4>
-                <p>Monday - Friday: 7:00 AM - 5:00 PM</p>
+                <p>Monday - Thursday: 7:00 AM - 5:00 PM</p>
+                <p>Friday: 7:00 AM - 4:00 PM</p>
               </div>
             </div>
           </div>
@@ -176,9 +177,23 @@
         {{-- RIGHT: Form --}}
         <div class="contact-form">
           <h2>Send Us a Message</h2>
-          <div id="form-status" style="display:none; margin-bottom:1rem; padding:10px; border-radius:6px;"></div>
+          @if(session('success'))
+            <!-- Success Modal -->
+            <div id="successModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+              <div class="bg-white rounded-xl shadow-lg p-8 max-w-sm w-full text-center">
+                <svg class="mx-auto mb-4 text-green-600" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" stroke="#16a34a" stroke-width="2" fill="#dcfce7"/>
+                  <path d="M8 12l2 2 4-4" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="text-lg font-bold text-green-700 mb-2">Successfully sent a message!</div>
+                <div class="text-gray-700 mb-4">{{ session('success') }}</div>
+                <button onclick="document.getElementById('successModal').style.display='none'" class="bg-green-600 text-white px-4 py-2 rounded font-semibold">OK</button>
+              </div>
+            </div>
+            <script>setTimeout(function(){ document.getElementById('successModal').style.display = 'none'; }, 2000);</script>
+          @endif
 
-          <form id="contactForm" method="POST" novalidate>
+          <form id="contactForm" method="POST" action="{{ route('contact.submit') }}" novalidate>
             @csrf
             <div class="form-group">
               <label for="fullname">Full Name *</label>

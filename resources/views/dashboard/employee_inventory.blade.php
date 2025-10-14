@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.ecommerce')
 @section('title', 'Inventory Management | Gemarc Enterprises Inc.')
 @section('content')
 <div class="max-w-5xl mx-auto py-10">

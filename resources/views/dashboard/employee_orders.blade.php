@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.ecommerce')
 @section('title', 'Order Management | Gemarc Enterprises Inc.')
 @section('content')
 <div class="py-8">

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.ecommerce')
 @section('content')
 <style>
 [x-cloak] { display: none !important; }

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.ecommerce')
 
 @section('content')
 <div class="container mx-auto max-w-2xl p-6 bg-white rounded shadow">

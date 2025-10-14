@@ -40,7 +40,7 @@
                         <form action="{{ route('admin.user_management.delete', $user->id) }}" method="POST" style="display:inline">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="border border-red-600 text-red-600 px-3 py-1 rounded hover:bg-red-50 transition" onclick="return confirm('Delete this user?')">Delete</button>
+                            <button type="button" class="border border-red-600 text-red-600 px-3 py-1 rounded hover:bg-red-50 transition delete-user-btn" data-user-id="{{ $user->id }}">Delete</button>
                         </form>
                     </td>
                 </tr>
@@ -51,7 +51,10 @@
 
     <!-- Add User Modal -->
     <div id="add-user-modal" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded shadow-lg p-8 w-full max-w-md">
+        <div class="bg-white rounded shadow-lg p-8 w-full max-w-md relative">
+            <div id="add-user-loading" class="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10 hidden">
+                <div class="loader border-4 border-green-600 border-t-transparent rounded-full w-8 h-8 animate-spin"></div>
+            </div>
             <h2 class="text-xl font-bold mb-4">Add New User</h2>
             <form id="add-user-form">
                 <div class="mb-3">
@@ -76,13 +79,22 @@
                 </div>
                 <div class="mb-3">
                     <label class="block mb-1 font-semibold">Password</label>
-                    <input type="password" name="password" class="border px-3 py-2 rounded w-full" required>
+                    <div class="relative">
+                        <input type="password" name="password" id="add-user-password" class="border px-3 py-2 rounded w-full pr-10" required>
+                        <span id="toggle-add-user-password" class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500">
+                            <svg id="add-user-eye-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </span>
+                    </div>
                 </div>
                 <div class="flex gap-2 justify-end">
                     <button type="button" id="cancel-add-user" class="px-4 py-2 rounded border">Cancel</button>
                     <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Add</button>
                 </div>
             </form>
+            <div id="add-user-toast" class="fixed top-6 right-6 bg-green-600 text-white px-6 py-3 rounded shadow-lg z-50 hidden">User added successfully!</div>
         </div>
     </div>
 
@@ -154,22 +166,91 @@
             role: form.role.value,
             password: form.password.value
         };
+        document.getElementById('add-user-loading').classList.remove('hidden');
         fetch('/admin/user-management/add', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
             body: JSON.stringify(data)
-        }).then(r => r.json()).then(res => {
+        })
+        .then(async r => {
+            let text = await r.text();
+            try {
+                return JSON.parse(text);
+            } catch (err) {
+                console.error('Response not JSON:', text);
+                throw new Error('Server error: ' + text);
+            }
+        })
+        .then(res => {
+            document.getElementById('add-user-loading').classList.add('hidden');
             if (res.success) {
                 document.getElementById('add-user-modal').classList.add('hidden');
                 fetchUsers();
+                var toast = document.getElementById('add-user-toast');
+                toast.classList.remove('hidden');
+                setTimeout(function() { toast.classList.add('hidden'); }, 1500);
             } else {
                 alert(res.message || 'Failed to add user.');
             }
+        })
+        .catch(err => {
+            document.getElementById('add-user-loading').classList.add('hidden');
+            alert('Error: ' + err.message);
         });
     };
+    // Delete user AJAX + toast
+    setTimeout(function() {
+        document.querySelectorAll('.delete-user-btn').forEach(function(btn) {
+            btn.onclick = function() {
+                if (!confirm('Delete this user?')) return;
+                var userId = btn.getAttribute('data-user-id');
+                fetch(`/admin/user-management/${userId}/delete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ _method: 'DELETE' })
+                }).then(r => r.json()).then(res => {
+                    if (res.success || res.status === 'success') {
+                        var toast = document.createElement('div');
+                        toast.className = 'fixed top-6 right-6 bg-green-600 text-white px-6 py-3 rounded shadow-lg z-50';
+                        toast.innerText = 'User deleted successfully!';
+                        document.body.appendChild(toast);
+                        setTimeout(function() { toast.remove(); }, 1500);
+                        setTimeout(function() { window.location.href = '/admin/user-management'; }, 800);
+                    } else {
+                        alert(res.message || 'Failed to delete user.');
+                    }
+                });
+            };
+        });
+    }, 500);
+    document.addEventListener('DOMContentLoaded', function() {
+        var addUserPasswordInput = document.getElementById('add-user-password');
+        var addUserToggle = document.getElementById('toggle-add-user-password');
+        var addUserEyeIcon = document.getElementById('add-user-eye-icon');
+        var addUserVisible = false;
+        addUserToggle.addEventListener('click', function() {
+            addUserVisible = !addUserVisible;
+            addUserPasswordInput.type = addUserVisible ? 'text' : 'password';
+            addUserEyeIcon.innerHTML = addUserVisible
+                ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.978 9.978 0 012.042-3.362m1.528-1.68A9.956 9.956 0 0112 5c4.477 0 8.268 2.943 9.542 7a9.978 9.978 0 01-4.422 5.568M15 12a3 3 0 11-6 0 3 3 0 016 0z" />' // eye-off
+                : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268-2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />'; // eye
+        });
+    });
     </script>
+    <style>
+    .loader {
+        border-top-color: transparent;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    </style>
 </div>
 @endsection

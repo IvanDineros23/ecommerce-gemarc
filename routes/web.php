@@ -284,6 +284,7 @@ Route::middleware(['auth', 'verified', 'can:access-admin'])->prefix('admin')->na
     Route::get('/user-management/{id}/edit', [\App\Http\Controllers\Admin\UserManagementController::class, 'edit'])->name('user_management.edit');
     Route::put('/user-management/{id}/edit', [\App\Http\Controllers\Admin\UserManagementController::class, 'update'])->name('user_management.edit');
     Route::delete('/user-management/{id}/delete', [\App\Http\Controllers\Admin\UserManagementController::class, 'delete'])->name('user_management.delete');
+    Route::post('/user-management/add', [\App\Http\Controllers\Admin\UserManagementController::class, 'add'])->name('user_management.add');
     Route::view('/brands',          'admin.placeholders.brands')->name('brands');
     Route::view('/business',        'admin.placeholders.business')->name('business');
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');

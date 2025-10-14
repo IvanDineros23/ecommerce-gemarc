@@ -24,7 +24,7 @@ class UserManagementController extends Controller
         if ($request->ajax() || $request->input('ajax')) {
             return response()->json($users);
         }
-        return view('admin.users.index', compact('users'));
+        return view('admin.user-management', compact('users'));
     }
 
     public function view($id)
@@ -51,6 +51,12 @@ class UserManagementController extends Controller
                 $changes[] = "$key: '$value' → '{$after[$key]}'";
             }
         }
+        // Handle password reset
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->input('password'));
+            $user->save();
+            $changes[] = "password: [FORCED RESET]";
+        }
         $changeDetails = $changes ? ('Changes: ' . implode(', ', $changes)) : 'No changes.';
         \App\Helpers\AuditLogger::log(
             'edit_user',
@@ -65,9 +71,12 @@ class UserManagementController extends Controller
 
     public function delete($id)
     {
-        $user = User::findOrFail($id);
-        $user->delete();
-        return redirect()->route('admin.users')->with('success', 'User deleted successfully.');
+    $user = User::findOrFail($id);
+    $user->forceDelete();
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
+        return redirect()->route('admin.user_management')->with('success', 'User deleted successfully.');
     }
 
     public function add(Request $request)
@@ -84,8 +93,15 @@ class UserManagementController extends Controller
         $user->role = $request->role;
         $user->password = bcrypt($request->password);
         $user->save();
-        // Send email verification notification
-        $user->sendEmailVerificationNotification();
-        return response()->json(['success' => true, 'user' => $user]);
+        // Audit log for user creation
+        \App\Helpers\AuditLogger::log(
+            'create_user',
+            'user',
+            $user->id,
+            [],
+            $user->only(['name', 'email', 'role']),
+            'Admin created user: ' . $user->name . ' (ID: ' . $user->id . ')'
+        );
+        return response()->json(['success' => true, 'user' => $user, 'message' => 'User created successfully!']);
     }
 }

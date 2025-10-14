@@ -327,6 +327,7 @@ Route::middleware(['auth', 'verified', 'can:access-admin'])->prefix('admin')->na
     Route::get('/audit', [\App\Http\Controllers\Admin\AuditLogController::class, 'index'])->name('audit');
     Route::get('/audit/print-all', [\App\Http\Controllers\Admin\AuditLogController::class, 'printAll'])->name('audit.printAll');
     Route::get('/audit/save-all', [\App\Http\Controllers\Admin\AuditLogController::class, 'saveAll'])->name('audit.saveAll');
+    Route::post('/audit/clear', [\App\Http\Controllers\Admin\AuditLogController::class, 'clear'])->name('audit.clear');
     Route::view('/freight',         'admin.placeholders.freight')->name('freight');
     Route::view('/site-settings',   'admin.placeholders.site_settings')->name('site_settings');
 });

@@ -58,6 +58,12 @@ class UserManagementController extends Controller
             $changes[] = "password: [FORCED RESET]";
         }
         $changeDetails = $changes ? ('Changes: ' . implode(', ', $changes)) : 'No changes.';
+
+        // Force logout if role changed
+        if (isset($before['role']) && $before['role'] !== $after['role']) {
+            // Remove all sessions for this user
+            \DB::table('sessions')->where('user_id', $user->id)->delete();
+        }
         \App\Helpers\AuditLogger::log(
             'edit_user',
             'user',

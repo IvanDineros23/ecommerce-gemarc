@@ -42,8 +42,25 @@ class UserManagementController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
+        $before = $user->only(['name', 'email', 'role']);
         $user->update($request->only(['name', 'email', 'role']));
-        return redirect()->route('admin.users')->with('success', 'User updated successfully.');
+        $after = $user->only(['name', 'email', 'role']);
+        $changes = [];
+        foreach ($before as $key => $value) {
+            if ($after[$key] != $value) {
+                $changes[] = "$key: '$value' → '{$after[$key]}'";
+            }
+        }
+        $changeDetails = $changes ? ('Changes: ' . implode(', ', $changes)) : 'No changes.';
+        \App\Helpers\AuditLogger::log(
+            'edit_user',
+            'user',
+            $user->id,
+            $before,
+            $after,
+            'Admin edited user: ' . $user->name . ' (ID: ' . $user->id . '). ' . $changeDetails
+        );
+        return redirect()->route('admin.user_management')->with('success', 'User updated successfully.');
     }
 
     public function delete($id)
@@ -51,5 +68,24 @@ class UserManagementController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
         return redirect()->route('admin.users')->with('success', 'User deleted successfully.');
+    }
+
+    public function add(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'role' => 'required|string',
+            'password' => 'required|string|min:6',
+        ]);
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->role = $request->role;
+        $user->password = bcrypt($request->password);
+        $user->save();
+        // Send email verification notification
+        $user->sendEmailVerificationNotification();
+        return response()->json(['success' => true, 'user' => $user]);
     }
 }

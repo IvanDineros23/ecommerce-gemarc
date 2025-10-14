@@ -77,15 +77,6 @@
                                     @enderror
                                 </div>
                                 
-                                <div class="mb-4">
-                                    <label for="profile_image" class="form-label">Profile Image</label>
-                                    <input id="profile_image" name="profile_image" type="file" accept="image/*" class="form-control @error('profile_image') is-invalid @enderror">
-                                    <div class="form-text">Maximum size: 1MB. Supported formats: JPG, PNG, GIF.</div>
-                                    @error('profile_image')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                     <button type="submit" class="btn btn-success">
                                         <i class="fas fa-save me-1"></i> Save Changes
@@ -144,13 +135,10 @@
                 <div class="col-lg-4">
                     <div class="card border-0 shadow-sm rounded-3 overflow-hidden mb-4 text-center p-4">
                         <div class="avatar-container mx-auto mb-3">
-                            @if($user->profile_image)
-                                <img src="{{ asset('storage/' . $user->profile_image) }}" class="rounded-circle img-thumbnail" width="120" height="120" alt="Profile Image">
-                            @else
-                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto" style="width: 120px; height: 120px;">
-                                    <span class="display-4 text-success">{{ substr($user->name, 0, 1) }}</span>
-                                </div>
-                            @endif
+                            <!-- Removed profile image display -->
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto" style="width: 120px; height: 120px;">
+                                <span class="display-4 text-success">{{ substr($user->name, 0, 1) }}</span>
+                            </div>
                         </div>
                         <h5 class="fw-bold text-success">{{ $user->name }}</h5>
                         <p class="text-muted mb-0">{{ $user->email }}</p>

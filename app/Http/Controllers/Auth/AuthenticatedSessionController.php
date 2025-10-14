@@ -48,12 +48,11 @@ class AuthenticatedSessionController extends Controller
         }
         if ($user) {
             if (method_exists($user, 'isAdmin') && $user->isAdmin()) {
-                return redirect()->intended(route('admin.dashboard', absolute: false));
+                return redirect()->route('admin.dashboard');
             } elseif (method_exists($user, 'isEmployee') && $user->isEmployee()) {
-                // Always redirect to employee dashboard, not intended
-                return redirect(route('employee.dashboard', absolute: false));
+                return redirect()->route('employee.dashboard');
             } elseif (method_exists($user, 'isUser') && $user->isUser()) {
-                return redirect()->intended(route('dashboard', absolute: false));
+                return redirect()->route('dashboard');
             }
         }
         // fallback

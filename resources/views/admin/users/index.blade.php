@@ -2,7 +2,10 @@
 
 @section('content')
 <div class="p-8">
-    <h1 class="text-2xl font-bold mb-6">User Management</h1>
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-bold">User Management</h1>
+        <button id="add-user-btn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Add User</button>
+    </div>
     <form id="user-search-form" class="flex items-center gap-4 mb-4" onsubmit="return false;">
         <input type="text" id="user-search" name="search" value="{{ request('search') }}" placeholder="Search name or email..." class="border px-3 py-2 rounded w-64">
         <select id="user-sort" name="sort" class="border px-3 py-2 rounded">
@@ -45,6 +48,55 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Add User Modal -->
+    <div id="add-user-modal" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded shadow-lg p-8 w-full max-w-md">
+            <h2 class="text-xl font-bold mb-4">Add New User</h2>
+            <form id="add-user-form">
+                <div class="mb-3">
+                    <label class="block mb-1 font-semibold">Name</label>
+                    <input type="text" name="name" class="border px-3 py-2 rounded w-full" required>
+                </div>
+                <div class="mb-3">
+                    <label class="block mb-1 font-semibold">Email</label>
+                    <input type="email" name="email" class="border px-3 py-2 rounded w-full" required>
+                </div>
+                <div class="mb-3">
+                    <label class="block mb-1 font-semibold">Role</label>
+                    <select name="role" class="border px-3 py-2 rounded w-full" required>
+                        <option value="user">User</option>
+                        <option value="employee">Employee</option>
+                        <option value="admin">Admin</option>
+                        <option value="accounting">Accounting</option>
+                        <option value="purchasing">Purchasing</option>
+                        <option value="marketing">Marketing</option>
+                        <option value="technical">Technical</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="block mb-1 font-semibold">Password</label>
+                    <input type="password" name="password" class="border px-3 py-2 rounded w-full" required>
+                </div>
+                <div class="flex gap-2 justify-end">
+                    <button type="button" id="cancel-add-user" class="px-4 py-2 rounded border">Cancel</button>
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if(session('success'))
+    <div id="toast-success" class="fixed top-6 right-6 bg-green-600 text-white px-6 py-3 rounded shadow-lg z-50 animate-fade-in">
+        {{ session('success') }}
+    </div>
+    <script>
+        setTimeout(function() {
+            document.getElementById('toast-success').style.display = 'none';
+        }, 1500);
+    </script>
+    @endif
+
     <script>
     function fetchUsers() {
         const search = document.getElementById('user-search').value;
@@ -87,6 +139,37 @@
     document.getElementById('user-filter-btn').addEventListener('click', function() {
         fetchUsers();
     });
+    document.getElementById('add-user-btn').onclick = function() {
+        document.getElementById('add-user-modal').classList.remove('hidden');
+    };
+    document.getElementById('cancel-add-user').onclick = function() {
+        document.getElementById('add-user-modal').classList.add('hidden');
+    };
+    document.getElementById('add-user-form').onsubmit = function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const data = {
+            name: form.name.value,
+            email: form.email.value,
+            role: form.role.value,
+            password: form.password.value
+        };
+        fetch('/admin/user-management/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify(data)
+        }).then(r => r.json()).then(res => {
+            if (res.success) {
+                document.getElementById('add-user-modal').classList.add('hidden');
+                fetchUsers();
+            } else {
+                alert(res.message || 'Failed to add user.');
+            }
+        });
+    };
     </script>
 </div>
 @endsection

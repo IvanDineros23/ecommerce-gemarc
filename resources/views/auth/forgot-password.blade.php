@@ -54,9 +54,6 @@
                         <div class="text-center mt-3">
                             <a href="{{ route('login') }}" class="btn btn-outline-secondary w-100 mb-2" style="text-decoration:none;">Back to sign in</a>
                         </div>
-                <p class="text-center text-muted small mt-3 mb-0">
-                    ISO-certified supplier • Secure sign-in
-                </p>
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

@@ -187,6 +187,10 @@
     
     main {
         flex: 1 0 auto;
+        min-height: 60vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
     
     /* Footer Styles */

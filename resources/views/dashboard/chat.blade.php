@@ -37,21 +37,34 @@
     let selectedUserId = null;
     let selectedUserName = '';
 
+    let departmentFilter = 'marketing';
+    function renderUserList(usersByDept) {
+        let html = '';
+        let depts = Object.keys(usersByDept);
+        html += `<div class='mb-3'>
+            <label for='department-select' class='fw-semibold'>Department:</label>
+            <select id='department-select' class='form-select' onchange='departmentFilter=this.value;fetchUserList();'>
+                ${depts.map(d => `<option value='${d}' ${d===departmentFilter?'selected':''}>${usersByDept[d].label}</option>`).join('')}
+            </select>
+        </div>`;
+        let users = usersByDept[departmentFilter]?.employees || [];
+        html += users.length ? users.map(u => `
+            <li class='mb-2'>
+                <button onclick='selectUser(${u.id}, "${u.name}")' class='btn btn-outline-success w-100 text-start ${selectedUserId==u.id?'active':''}'>
+                    ${u.name}
+                    ${u.unread_count > 0 ? `<span class='badge bg-warning ms-2'>${u.unread_count} new</span>` : ''}
+                </button>
+            </li>
+        `).join('') : `<div class='text-muted'>No employees in this department.</div>`;
+        document.getElementById('user-list').innerHTML = html;
+    }
     function fetchUserList() {
         fetch("{{ url('/chat/users') }}", {
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })
             .then(r => r.json())
-            .then(users => {
-                let html = users.map(u => `
-                    <li class='mb-2'>
-                        <button onclick='selectUser(${u.id}, "${u.name}")' class='btn btn-outline-success w-100 text-start ${selectedUserId==u.id?'active':''}'>
-                            ${u.name}
-                            ${u.unread_count > 0 ? `<span class='badge bg-warning ms-2'>${u.unread_count} new</span>` : ''}
-                        </button>
-                    </li>
-                `).join('');
-                document.getElementById('user-list').innerHTML = html;
+            .then(usersByDept => {
+                renderUserList(usersByDept);
             });
     }
     function fetchChat() {

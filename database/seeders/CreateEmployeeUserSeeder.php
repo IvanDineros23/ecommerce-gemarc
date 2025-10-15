@@ -17,6 +17,7 @@ class CreateEmployeeUserSeeder extends Seeder
                 'email' => 'kitona@gemarcph.com',
                 'password' => Hash::make('salesdepartment'),
                 'role' => 'employee',
+                'department' => 'marketing',
                 'created_at' => now(),
                 'updated_at' => now(),
             ]

@@ -107,23 +107,78 @@ class ChatController extends Controller
     // For employee: get list of users with active chats
     public function userList()
     {
-        $employeeId = Auth::id();
-        // Get all users who have chatted with this employee, with unread count and last message time
-        $users = DB::table('chat_messages')
-            ->select('users.id', 'users.name', 'users.email',
-                DB::raw('MAX(chat_messages.created_at) as last_message_at'),
-                DB::raw('SUM(CASE WHEN chat_messages.receiver_id = '.$employeeId.' AND chat_messages.sender_id = users.id AND chat_messages.read_at IS NULL THEN 1 ELSE 0 END) as unread_count')
-            )
-            ->join('users', 'users.id', '=', 'chat_messages.sender_id')
-            ->where(function($q) use ($employeeId) {
-                $q->where('chat_messages.receiver_id', $employeeId)
-                  ->orWhere('chat_messages.sender_id', $employeeId);
-            })
-            ->where('users.id', '!=', $employeeId)
-            ->groupBy('users.id', 'users.name', 'users.email')
-            ->orderByDesc('last_message_at')
-            ->get();
-        return response()->json($users);
+        $user = Auth::user();
+        // If employee, show users who chatted with them
+        if ($user->isEmployee()) {
+            $employeeId = $user->id;
+            $users = DB::table('chat_messages')
+                ->select('users.id', 'users.name', 'users.email',
+                    DB::raw('MAX(chat_messages.created_at) as last_message_at'),
+                    DB::raw('SUM(CASE WHEN chat_messages.receiver_id = '.$employeeId.' AND chat_messages.sender_id = users.id AND chat_messages.read_at IS NULL THEN 1 ELSE 0 END) as unread_count')
+                )
+                ->join('users', 'users.id', '=', 'chat_messages.sender_id')
+                ->where(function($q) use ($employeeId) {
+                    $q->where('chat_messages.receiver_id', $employeeId)
+                      ->orWhere('chat_messages.sender_id', $employeeId);
+                })
+                ->where('users.id', '!=', $employeeId)
+                ->groupBy('users.id', 'users.name', 'users.email')
+                ->orderByDesc('last_message_at')
+                ->get();
+            return response()->json($users);
+        }
+        // If user, show employees grouped by department
+        if ($user->isUser()) {
+            $departments = [
+                'marketing' => 'Marketing',
+                'purchasing' => 'Purchasing',
+                'accounting' => 'Accounting',
+                'technical' => 'Technical',
+            ];
+            $employees = DB::table('users')
+                ->select('id', 'name', 'email', 'department')
+                ->where('role', 'employee')
+                ->get();
+            $grouped = [];
+            foreach ($departments as $key => $label) {
+                $grouped[$key] = [
+                    'label' => $label,
+                    'employees' => []
+                ];
+            }
+            $grouped['undefined'] = [
+                'label' => 'IT',
+                'employees' => []
+            ];
+            foreach ($employees as $emp) {
+                $dept = $emp->department ?? 'undefined';
+                if (!isset($grouped[$dept])) {
+                    $dept = 'undefined';
+                }
+                $lastMsg = DB::table('chat_messages')
+                    ->where(function($q) use ($user, $emp) {
+                        $q->where('sender_id', $user->id)->where('receiver_id', $emp->id)
+                          ->orWhere('sender_id', $emp->id)->where('receiver_id', $user->id);
+                    })
+                    ->orderByDesc('created_at')
+                    ->first();
+                $unread = DB::table('chat_messages')
+                    ->where('sender_id', $emp->id)
+                    ->where('receiver_id', $user->id)
+                    ->whereNull('read_at')
+                    ->count();
+                $grouped[$dept]['employees'][] = [
+                    'id' => $emp->id,
+                    'name' => $emp->name,
+                    'email' => $emp->email,
+                    'last_message_at' => $lastMsg ? $lastMsg->created_at : null,
+                    'unread_count' => $unread,
+                ];
+            }
+            return response()->json($grouped);
+        }
+        // Default: return empty
+        return response()->json([]);
     }
 
     // Clear chat between user and employee

@@ -242,11 +242,8 @@
 <section class="about-content-list">
   <div class="container">
 
-    <!-- Search Bar (existing site styles apply) -->
-    <div class="products-search" style="margin-bottom:2rem;">
-        <input type="search" class="search-input" placeholder="Search products, services..." aria-label="Search products and services" autocomplete="off">
-        <button class="search-btn" type="button" aria-label="Search"><i class="fas fa-search"></i></button>
-    </div>
+    <!-- Search Bar -->
+            @include('components.searchbar')
 
     <!-- Tabs -->
     <div class="about-tabs">

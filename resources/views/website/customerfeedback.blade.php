@@ -92,11 +92,8 @@
   <section class="page-content">
     <div class="container">
 
-      {{-- Search Bar --}}
-      <div class="products-search">
-        <input type="search" class="search-input" placeholder="Search products, services..." autocomplete="off" aria-label="Search products and services">
-        <button class="search-btn" type="button" aria-label="Search"><i class="fas fa-search"></i></button>
-      </div>
+        <!-- Search Bar -->
+        @include('components.searchbar')
 
       {{-- ===== Our Global Partners (copied from index) ===== --}}
       <section class="py-16 bg-white">

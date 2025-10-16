@@ -85,11 +85,8 @@
     <!-- Products Section -->
     <section class="blogs-section">
         <div class="container">
-            <!-- Search Bar -->
-            <div class="products-search">
-                <input type="search" placeholder="Search products, services..." class="search-input" autocomplete="off">
-                <button class="search-btn" type="button"><i class="fas fa-search"></i></button>
-            </div>
+         <!-- Search Bar -->
+            @include('components.searchbar')
 
             <p class="mb-4">We provide comprehensive steel testing equipment for quality control and material characterization in construction and manufacturing industries. Our equipment meets international standards for steel testing and analysis.</p>
 

@@ -171,10 +171,7 @@
     <section class="blogs-section">
         <div class="container">
             <!-- Search Bar -->
-            <div class="products-search">
-                <input type="search" placeholder="Search products, services..." class="search-input" autocomplete="off">
-                <button class="search-btn" type="button"><i class="fas fa-search"></i></button>
-            </div>
+            @include('components.searchbar')
             
             <p class="mb-4">We provide comprehensive aggregates testing equipment and services to ensure the quality and performance of construction materials. Our range includes equipment for testing various properties of aggregates used in construction and infrastructure projects.</p>
                 
@@ -544,24 +541,7 @@
         </a>
     </div>
 
-    <script>
-    // Simple expand/collapse for product specs (unique to this page)
-    function toggleProductSpecs(specsId) {
-        var specsDiv = document.getElementById(specsId);
-        if (!specsDiv) return;
-        var btn = specsDiv.previousElementSibling;
-        if (!btn) return;
-        if (specsDiv.style.display === 'none' || specsDiv.style.display === '') {
-            specsDiv.style.display = 'block';
-            btn.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Specifications';
-            btn.classList.add('expanded');
-        } else {
-            specsDiv.style.display = 'none';
-            btn.innerHTML = '<i class="fas fa-chevron-down"></i> View Specifications';
-            btn.classList.remove('expanded');
-        }
-    }
-    </script>
+    <!-- Removed inline search bar and related JS functions -->
 
     <!-- Only one Product Modal is needed -->
     <!-- The duplicate modal fragment was removed to prevent DOM issues -->

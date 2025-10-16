@@ -91,11 +91,8 @@
     <!-- Products Section (match concrete-mortar format) -->
     <section class="blogs-section">
         <div class="container">
-            <!-- Search Bar -->
-            <div class="products-search">
-                <input type="search" placeholder="Search products, services..." class="search-input" autocomplete="off">
-                <button class="search-btn" type="button"><i class="fas fa-search"></i></button>
-            </div>
+             <!-- Search Bar -->
+            @include('components.searchbar')
 
                 <p>We provide comprehensive drilling machine equipment for geotechnical investigation, soil sampling, and construction applications. Our drilling equipment is designed for various soil conditions and project requirements.</p>
 
@@ -704,7 +701,6 @@
 
     @push('scripts')
     <script src="{{ asset('website/script.js') }}?v={{ filemtime(public_path('website/script.js')) }}"></script>
-    <script src="{{ asset('website/search.js') }}?v={{ filemtime(public_path('website/search.js')) }}"></script>
     @endpush
 
 @endsection

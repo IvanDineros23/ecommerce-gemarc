@@ -102,10 +102,8 @@
     <!-- Products Section -->
     <section class="blogs-section">
         <div class="container">
-            <div class="products-search">
-                <input type="search" placeholder="Search products, services..." class="search-input" autocomplete="off">
-                <button class="search-btn" type="button"><i class="fas fa-search"></i></button>
-            </div>
+            <!-- Search Bar -->
+            @include('components.searchbar')
             <p class="mb-4">We provide comprehensive cement and mortar testing equipment to ensure quality control in construction materials. Our equipment meets international standards for testing cement properties and mortar performance.</p>
 
             <!-- Matest Products Section -->

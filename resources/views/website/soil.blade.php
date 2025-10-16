@@ -82,11 +82,8 @@
     <!-- Products Section -->
     <section class="blogs-section">
         <div class="container">
-            <!-- Search Bar -->
-            <div class="products-search">
-                <input type="search" placeholder="Search products, services..." class="search-input" autocomplete="off">
-                <button class="search-btn" type="button"><i class="fas fa-search"></i></button>
-            </div>
+       <!-- Search Bar -->
+            @include('components.searchbar')
 
             <p class="mb-4">We provide comprehensive soil testing equipment for geotechnical investigation, foundation design, and construction projects. Our equipment meets international standards for soil analysis and testing procedures.</p>
 
@@ -458,7 +455,6 @@
 
 @push('scripts')
 <script src="{{ asset('website/script.js') }}?v={{ filemtime(public_path('website/script.js')) }}"></script>
-<script src="{{ asset('website/search.js') }}?v={{ filemtime(public_path('website/search.js')) }}"></script>
 <script>
 // Matest modal open helpers
 function openS172Modal(){
@@ -556,8 +552,6 @@ function openS276Modal(){
 
 @push('scripts')
 <script src="{{ asset('website/script.js') }}?v={{ filemtime(public_path('website/script.js')) }}"></script>
-<script src="{{ asset('website/search.js') }}?v={{ filemtime(public_path('website/search.js')) }}"></script>
-<script>
 // Soil product modal open helpers
 
         code: 'S172-01N',

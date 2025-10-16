@@ -78,11 +78,8 @@
     <!-- Products Section -->
     <section class="blogs-section">
         <div class="container">
-            <!-- Search Bar -->
-            <div class="products-search">
-                <input type="search" placeholder="Search products, services..." class="search-input" autocomplete="off">
-                <button class="search-btn" type="button"><i class="fas fa-search"></i></button>
-            </div>
+             <!-- Search Bar -->
+            @include('components.searchbar')
 
             <p class="mb-4">We offer a full range of pavement testing equipment designed for accurate analysis of road surfaces, ensuring that your pavement construction projects meet the highest standards. Our machines provide precise measurements for load testing, surface roughness, and core sampling, helping you assess the quality and durability of your pavement.</p>
 

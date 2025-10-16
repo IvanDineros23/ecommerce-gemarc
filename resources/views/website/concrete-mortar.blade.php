@@ -169,10 +169,7 @@
     <section class="blogs-section">
         <div class="container">
             <!-- Search Bar -->
-            <div class="products-search">
-                <input type="search" placeholder="Search products, services..." class="search-input" autocomplete="off">
-                <button class="search-btn" type="button"><i class="fas fa-search"></i></button>
-            </div>
+            @include('components.searchbar')
             
             <p class="mb-4">We provide comprehensive concrete and mortar testing equipment and services to ensure quality and durability of construction materials. Our range includes equipment for testing various properties of concrete used in construction projects.</p>
                 

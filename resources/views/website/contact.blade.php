@@ -12,14 +12,14 @@
 }
 .contact-hero{
   position:relative; min-height:52vh; padding:5rem 0 6rem; color:#fff; overflow:hidden;
-  display:flex; align-items:center; justify-content:center; /* full center */
+  display:flex; align-items:center; justify-content:center;
 }
 .contact-hero .hero-content{
-  position:relative; z-index:2; text-align:center; max-width:900px; margin:0 auto; /* ensure centered block */
+  position:relative; z-index:2; text-align:center; max-width:900px; margin:0 auto;
 }
 .contact-hero .hero-content h1{
   font-size:clamp(2.2rem,6vw,3.5rem);
-  font-weight:700; /* was 800 */
+  font-weight:700;
   letter-spacing:.5px; margin:0 0 1rem;
 }
 .contact-hero .hero-content p{
@@ -33,22 +33,6 @@
 /* ===== Content wrapper ===== */
 .contact-section{background:#fff; padding:2.5rem 0 2rem;}
 
-/* Scoped search bar */
-.contact-section .products-search{
-  max-width:720px; margin:1rem auto 2rem; display:flex; align-items:center; gap:.75rem;
-  background:#fff; border:1px solid #e5e7eb; border-radius:9999px; padding:.5rem .75rem;
-  box-shadow:0 6px 20px -8px rgba(0,0,0,.12);
-}
-.contact-section .products-search .search-input{flex:1; height:46px; padding:0 1rem; border:0; outline:0; background:transparent;}
-.contact-section .products-search .search-btn{
-  width:46px; height:46px; border:0; border-radius:9999px; background:#16a34a; color:#fff; display:inline-flex; align-items:center; justify-content:center;
-}
-@media (max-width:480px){
-  .contact-section .products-search{padding:.35rem .5rem;}
-  .contact-section .products-search .search-input{height:40px;}
-  .contact-section .products-search .search-btn{width:40px; height:40px;}
-}
-
 /* ===== Two-column layout ===== */
 .contact-content{ max-width:1100px; margin:0 auto; display:grid; grid-template-columns:1.1fr .9fr; gap:1.5rem; }
 @media (max-width:900px){ .contact-content{grid-template-columns:1fr;} }
@@ -57,8 +41,8 @@
   background:#fff; border:1px solid #e5e7eb; border-radius:16px; padding:1.25rem 1.25rem 1.5rem;
   box-shadow:0 8px 24px -12px rgba(0,0,0,.12);
 }
-.contact-info h2, .contact-form h2{font-weight:600; color:#111; margin:.25rem 0 1rem;} /* normal weight */
-.contact-info p{color:#374151; font-weight:400;} /* normal */
+.contact-info h2, .contact-form h2{font-weight:600; color:#111; margin:.25rem 0 1rem;}
+.contact-info p{color:#374151; font-weight:400;}
 
 /* Contact methods */
 .contact-methods{display:grid; grid-template-columns:1fr; gap:12px; margin-top:.75rem;}
@@ -74,12 +58,12 @@
   font-family:"Font Awesome 6 Free","Font Awesome 5 Free",sans-serif;
   font-weight:900; font-size:18px; color:#16a34a; line-height:1;
 }
-.contact-details h4{margin:0 0 .25rem; font-weight:600; color:#111;} /* normal/medium */
+.contact-details h4{margin:0 0 .25rem; font-weight:600; color:#111;}
 .contact-details p{margin:0; color:#374151; font-weight:400;}
 
 /* Form */
 .form-group{display:flex; flex-direction:column; gap:.35rem; margin-bottom:.75rem;}
-.form-group label{font-weight:500; color:#374151;} /* normal */
+.form-group label{font-weight:500; color:#374151;}
 .form-group input, .form-group select, .form-group textarea{
   border:1px solid #e5e7eb; border-radius:10px; padding:.7rem .85rem; outline:0; background:#fff; font-weight:400;
 }
@@ -91,13 +75,23 @@
 
 /* Map */
 .map-section{background:#f8fafc; padding:2.25rem 0;}
-.map-section h2{max-width:1100px; margin:0 auto 1rem; font-weight:600; color:#111;} /* normal */
+.map-section h2{max-width:1100px; margin:0 auto 1rem; font-weight:600; color:#111;}
 .map-container{max-width:1100px; margin:0 auto; border-radius:16px; overflow:hidden; background:#fff; border:1px solid #e5e7eb;}
 .google-maps{width:100%; height:420px; border:0; display:block;}
 .map-address{padding:12px 14px; color:#374151}
 
 /* Ensure FA icons show even if kit defaults to regular */
 .contact-details i, .submit-btn i{font-family:"Font Awesome 6 Free","Font Awesome 5 Free"; font-weight:900;}
+
+/* ---- Search suggestions alignment fix (make same as other pages) ---- */
+.search-suggestions,
+.search-suggestions .section-title,
+.search-suggestions .item,
+.search-suggestions .item .meta,
+.search-suggestions .item .meta .name,
+.search-suggestions .item .meta .type{
+  text-align:left !important;
+}
 </style>
 @endpush
 
@@ -124,11 +118,8 @@
   <section class="contact-section">
     <div class="container">
 
-      {{-- Search Bar --}}
-      <div class="products-search">
-        <input type="search" placeholder="Search products, services..." class="search-input" autocomplete="off" aria-label="Search products and services">
-        <button class="search-btn" type="button" aria-label="Search"><i class="fas fa-search"></i></button>
-      </div>
+      <!-- Search Bar (shared component) -->
+      @include('components.searchbar')
 
       <div class="contact-content">
         {{-- LEFT: Company info --}}
@@ -265,7 +256,7 @@
 document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById('contactForm');
   const statusDiv = document.getElementById('form-status');
-  if (!form) return;
+  if (!form || !statusDiv) return;
 
   form.addEventListener('submit', function () {
     statusDiv.style.display = 'block';

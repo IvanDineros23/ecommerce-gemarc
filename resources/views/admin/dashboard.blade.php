@@ -8,6 +8,7 @@
     <a href="{{ route('admin.products') }}" class="px-4 py-2 rounded bg-green-700 text-white font-semibold shadow hover:bg-green-800 transition">Manage Products</a>
     <a href="{{ route('admin.user_management') }}" class="px-4 py-2 rounded bg-gray-800 text-white font-semibold shadow hover:bg-gray-900 transition">User Management</a>
     <a href="{{ route('admin.audit') }}" class="px-4 py-2 rounded bg-yellow-600 text-white font-semibold shadow hover:bg-yellow-700 transition">Audit Log</a>
+    <a href="{{ route('admin.chats') }}" class="px-4 py-2 rounded bg-gray-600 text-white font-semibold shadow hover:bg-gray-700 transition">Chats</a>
 </div>
 
 <!-- Enhanced analytics and info grid -->

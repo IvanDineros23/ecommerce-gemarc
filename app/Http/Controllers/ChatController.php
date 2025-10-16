@@ -19,12 +19,14 @@ class ChatController extends Controller
             abort(404);
         }
 
-        // If employee, fetch messages with selected user
+
+        // If employee, fetch messages with selected user and department context
         if ($user->isEmployee() && $withUserId) {
-            // Mark all messages from user to employee as read
+            $context = $user->department ?? 'undefined';
             DB::table('chat_messages')
                 ->where('sender_id', $withUserId)
                 ->where('receiver_id', $user->id)
+                ->where('context', $context)
                 ->whereNull('read_at')
                 ->update(['read_at' => now()]);
 
@@ -36,19 +38,25 @@ class ChatController extends Controller
                         $q2->where('sender_id', $withUserId)->where('receiver_id', $user->id);
                     });
                 })
+                ->where('context', $context)
                 ->orderBy('created_at', 'desc')
                 ->limit(50)
                 ->get();
             return response()->json($messages->reverse()->values());
         }
 
-        // If user, fetch messages with any employee
-        if ($user->isUser()) {
+        // If user, fetch messages with selected employee and department context
+        if ($user->isUser() && $withUserId) {
+            $context = $request->input('context');
             $messages = DB::table('chat_messages')
-                ->where(function($q) use ($user) {
-                    $q->where('sender_id', $user->id)
-                      ->orWhere('receiver_id', $user->id);
+                ->where(function($q) use ($user, $withUserId) {
+                    $q->where(function($q2) use ($user, $withUserId) {
+                        $q2->where('sender_id', $user->id)->where('receiver_id', $withUserId);
+                    })->orWhere(function($q2) use ($user, $withUserId) {
+                        $q2->where('sender_id', $withUserId)->where('receiver_id', $user->id);
+                    });
                 })
+                ->where('context', $context)
                 ->orderBy('created_at', 'desc')
                 ->limit(50)
                 ->get();
@@ -79,10 +87,12 @@ class ChatController extends Controller
         if ($user->isEmployee() && $senderId == $receiverId) {
             return response()->json(['success' => false, 'error' => 'Cannot send message to self'], 403);
         }
+        $context = $request->input('context');
         $msg = DB::table('chat_messages')->insertGetId([
             'sender_id' => $senderId,
             'receiver_id' => $receiverId,
             'message' => $request->message,
+            'context' => $context,
             'created_at' => now(),
         ]);
         // Log to audit trail
@@ -136,8 +146,8 @@ class ChatController extends Controller
                 'technical' => 'Technical',
             ];
             $employees = DB::table('users')
-                ->select('id', 'name', 'email', 'department')
-                ->where('role', 'employee')
+                ->select('id', 'name', 'email', 'department', 'role')
+                ->whereIn('role', ['employee', 'admin'])
                 ->get();
             $grouped = [];
             foreach ($departments as $key => $label) {
@@ -151,7 +161,8 @@ class ChatController extends Controller
                 'employees' => []
             ];
             foreach ($employees as $emp) {
-                $dept = $emp->department ?? 'undefined';
+                // Place admin in IT (undefined) department
+                $dept = ($emp->role === 'admin') ? 'undefined' : ($emp->department ?? 'undefined');
                 if (!isset($grouped[$dept])) {
                     $dept = 'undefined';
                 }
@@ -169,7 +180,7 @@ class ChatController extends Controller
                     ->count();
                 $grouped[$dept]['employees'][] = [
                     'id' => $emp->id,
-                    'name' => $emp->name,
+                    'name' => $emp->name . ($emp->role === 'admin' ? ' (Admin)' : ''),
                     'email' => $emp->email,
                     'last_message_at' => $lastMsg ? $lastMsg->created_at : null,
                     'unread_count' => $unread,

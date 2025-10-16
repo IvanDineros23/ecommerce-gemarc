@@ -338,6 +338,46 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::get('/audit/filter', [\App\Http\Controllers\Admin\AuditLogAjaxController::class, 'filter'])->name('admin.audit.filter');
     // Export all logs for printing/exporting
     Route::get('/audit/export/all', [\App\Http\Controllers\Admin\AuditLogExportController::class, 'all'])->name('admin.audit.export.all');
+
+    // Admin Chats Section
+    Route::view('/chats', 'admin.chats')->name('admin.chats');
+    Route::get('/chat/users', function() {
+        // Admin can chat with all users and employees
+        $users = \App\Models\User::where('id', '!=', auth()->id())->get(['id','name','email']);
+        return response()->json($users);
+    });
+    Route::get('/chat/fetch', function(\Illuminate\Http\Request $request) {
+        $admin = auth()->user();
+        $withUserId = $request->input('with_user_id');
+        $context = $request->input('context');
+        $messages = \DB::table('chat_messages')
+            ->where(function($q) use ($admin, $withUserId) {
+                $q->where('sender_id', $admin->id)->where('receiver_id', $withUserId)
+                  ->orWhere('sender_id', $withUserId)->where('receiver_id', $admin->id);
+            })
+            ->where('context', $context)
+            ->orderBy('created_at')
+            ->get();
+        return response()->json($messages);
+    });
+    Route::post('/chat/send', function(\Illuminate\Http\Request $request) {
+        $request->validate([
+            'message' => 'required|string|max:1000',
+            'to_user_id' => 'required|integer|exists:users,id',
+            'context' => 'required|string',
+        ]);
+        $admin = auth()->user();
+        $receiverId = $request->to_user_id;
+        $context = $request->context;
+        \DB::table('chat_messages')->insert([
+            'sender_id' => $admin->id,
+            'receiver_id' => $receiverId,
+            'message' => $request->message,
+            'context' => $context,
+            'created_at' => now(),
+        ]);
+        return response()->json(['success' => true]);
+    });
 });
 
 /*

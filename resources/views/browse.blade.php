@@ -166,9 +166,8 @@
 <section class="browse-wrapper">
     <div class="container mx-auto px-4">
         <div class="browse-search">
-            <div class="new-search-bar">
-                <input type="text" id="productSearch" class="new-search-input" placeholder="Search products..." />
-                <i class="fas fa-search search-icon"></i>
+            <div style="max-width:760px;margin:0 auto 2.5rem;">
+                @include('components.searchbar', ['mode' => 'browse'])
             </div>
         </div>
                                                 <div id="productGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
@@ -275,29 +274,25 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeBrowseModal()
 
 // Real-time search functionality
 document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('productSearch');
+    const searchInput = document.getElementById('productSearch') || document.getElementById('product-search-input');
     const productCards = document.querySelectorAll('.product-card');
     const noResults = document.getElementById('noResults');
     const productGrid = document.getElementById('productGrid');
+
+    if (!searchInput) return;
 
     searchInput.addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase().trim();
         let visibleCount = 0;
 
         productCards.forEach(card => {
-            const searchTerms = card.getAttribute('data-search-terms');
-            const isMatch = searchTerm === '' || searchTerms.includes(searchTerm);
-            
-            if (isMatch) {
-                card.style.display = 'flex';
-                visibleCount++;
-            } else {
-                card.style.display = 'none';
-            }
+            const terms = (card.getAttribute('data-search-terms') || '').toLowerCase();
+            const isMatch = !searchTerm || terms.includes(searchTerm);
+            card.style.display = isMatch ? 'flex' : 'none';
+            if (isMatch) visibleCount++;
         });
 
-        // Show/hide no results message
-        if (visibleCount === 0 && searchTerm !== '') {
+        if (visibleCount === 0 && searchTerm) {
             noResults.style.display = 'block';
             productGrid.style.display = 'none';
         } else {

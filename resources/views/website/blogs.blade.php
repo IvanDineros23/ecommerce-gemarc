@@ -62,10 +62,9 @@
     <!-- Blogs Section -->
     <section class="blogs-section">
         <div class="container">
-            <!-- Search Bar -->
-            <div class="products-search">
-                <input type="search" placeholder="Search products, services..." class="search-input" autocomplete="off">
-                <button class="search-btn" type="button"><i class="fas fa-search"></i></button>
+            <!-- Unified Search Bar Component -->
+            <div style="max-width:760px;margin:0 auto 2.5rem;">
+                @include('components.searchbar')
             </div>
             
             <div class="blogs-grid">

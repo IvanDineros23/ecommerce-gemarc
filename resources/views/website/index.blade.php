@@ -213,14 +213,7 @@ window.homeHero = (function(){
     <section class="material-testing-highlights no-js" data-aos="fade-up">
             <div class="highlights-background"></div>
             <div class="container">
-                <div class="products-search" id="products-search">
-                    <div style="position:relative;flex:1;">
-                        <input id="product-search-input" type="search" class="search-input" placeholder="Search products..." aria-label="Search products" autocomplete="off" />
-                        <div id="product-search-suggestions" class="search-suggestions" role="listbox" aria-label="Search suggestions" hidden></div>
-                    </div>
-                    <button id="product-search-clear" type="button" title="Clear search" aria-label="Clear search" style="display:none;width:44px;height:44px;border-radius:50%;border:none;background:#ffffffcc;color:#0f172a;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.08);z-index:70;margin-left:-18px;">×</button>
-                    <button id="product-search-btn" class="search-btn" type="button" aria-label="Search" style="margin-left:0;z-index:60"><i class="fas fa-search"></i></button>
-                </div>
+                @include('components.searchbar')
                 <div class="highlights-container">
                     <div class="hero-carousel">
                         <div class="hero-track">
@@ -425,123 +418,6 @@ window.homeHero = (function(){
             if(nextBtn) {
                 nextBtn.addEventListener('click', () => scrollToSlide(currentIndex + 1));
             }
-        });
-        </script>
-        <script>
-        // Live product search suggestions for landing page
-        (function(){
-            const input = document.getElementById('product-search-input');
-            const suggestionsBox = document.getElementById('product-search-suggestions');
-            const btn = document.getElementById('product-search-btn');
-            if(!input || !suggestionsBox) return;
-
-            // style injection for suggestions (scoped)
-            const style = document.createElement('style');
-            style.innerHTML = `
-            .search-suggestions{position:absolute;left:0;right:0;top:calc(100% + 12px);background:#fff;border-radius:10px;box-shadow:0 14px 40px rgba(2,6,23,.12);z-index:160;max-height:360px;overflow:auto;padding:6px;border:1px solid rgba(15,23,42,.06)}
-            .search-suggestions .item{display:flex;gap:.75rem;align-items:center;padding:.5rem;border-radius:6px;cursor:pointer}
-            .search-suggestions .item:hover,.search-suggestions .item.active{background:linear-gradient(90deg,rgba(16,185,129,.06),rgba(16,185,129,.02));}
-            .search-suggestions .item img{width:46px;height:46px;object-fit:cover;border-radius:6px}
-            .search-suggestions .item .meta{flex:1}
-            .search-suggestions .item .meta .name{font-weight:600;color:#0f172a}
-            .search-suggestions .item .meta .price{font-size:.9rem;color:#059669}
-            `;
-            document.head.appendChild(style);
-
-            let controller = null; // for aborting previous fetch
-            let activeIndex = -1;
-            let items = [];
-
-            function clearSuggestions(){ suggestionsBox.innerHTML=''; suggestionsBox.hidden=true; items=[]; activeIndex=-1; }
-
-            function render(itemsList){
-                suggestionsBox.innerHTML = '';
-                if(!itemsList.length){ clearSuggestions(); return; }
-                itemsList.forEach((p, idx)=>{
-                    const div = document.createElement('div');
-                    div.className = 'item';
-                    div.setAttribute('role','option');
-                    div.dataset.index = idx;
-                    div.innerHTML = `<img src="${p.image_url}" alt="${p.name}"> <div class='meta'><div class='name'>${p.name}</div><div class='price'>${p.price>0 ? '₱'+Number(p.price).toLocaleString() : ''}</div></div>`;
-                    div.addEventListener('click', ()=>{ window.location.href = '/browse?q='+encodeURIComponent(p.name); });
-                    suggestionsBox.appendChild(div);
-                });
-                suggestionsBox.hidden = false;
-                items = Array.from(suggestionsBox.querySelectorAll('.item'));
-            }
-
-            function setActive(idx){
-                items.forEach((it,i)=> it.classList.toggle('active', i===idx));
-                activeIndex = idx;
-                if(idx>=0 && items[idx]){
-                    items[idx].scrollIntoView({block:'nearest'});
-                }
-            }
-
-            // debounce helper
-            function debounce(fn, t = 250){ let timeout; return (...args)=>{ clearTimeout(timeout); timeout = setTimeout(()=> fn(...args), t); }; }
-
-            async function fetchSuggestions(q){
-                // if no query provided, request default/popular suggestions (server should handle empty q)
-                if(q == null) q = '';
-                if(q.trim().length < 1){
-                    // allow server to return defaults on empty q, but still show suggestions
-                }
-                if(controller) controller.abort();
-                controller = new AbortController();
-                try{
-                    const res = await fetch('/landing-search?q='+encodeURIComponent(q), { signal: controller.signal });
-                    if(!res.ok) { clearSuggestions(); return; }
-                    const data = await res.json();
-                    render(data);
-                }catch(e){ if(e.name === 'AbortError') return; clearSuggestions(); }
-            }
-
-            const debounced = debounce(fetchSuggestions, 180);
-
-            input.addEventListener('input', (e)=> debounced(e.target.value));
-            input.addEventListener('focus', (e)=> { const q = e.target.value; if(q) debounced(q); else fetchSuggestions(''); });
-            input.addEventListener('blur', ()=> setTimeout(()=> clearSuggestions(), 180));
-
-            input.addEventListener('keydown', (e)=>{
-                if(!items.length) return;
-                if(e.key === 'ArrowDown'){ e.preventDefault(); setActive(Math.min(activeIndex+1, items.length-1)); }
-                else if(e.key === 'ArrowUp'){ e.preventDefault(); setActive(Math.max(activeIndex-1, 0)); }
-                else if(e.key === 'Enter'){ e.preventDefault(); if(activeIndex>=0 && items[activeIndex]) items[activeIndex].click(); else if(input.value.trim()) window.location.href = '/shop?q='+encodeURIComponent(input.value.trim()); }
-                else if(e.key === 'Escape'){ clearSuggestions(); }
-            });
-
-            btn.addEventListener('click', ()=>{
-                const q = input.value.trim();
-                if(!q) return; window.location.href = '/browse?q='+encodeURIComponent(q);
-            });
-
-            // Clear button behavior
-            const clearBtn = document.getElementById('product-search-clear');
-            function updateClearVisibility(){ if(input.value && input.value.trim().length>0) clearBtn.style.display='flex'; else clearBtn.style.display='none'; }
-            input.addEventListener('input', updateClearVisibility);
-            updateClearVisibility();
-            clearBtn.addEventListener('click', ()=>{ input.value=''; input.focus(); updateClearVisibility(); fetchSuggestions(''); });
-
-            // When user clicks a suggestion, redirect to /shop?q=PRODUCT_NAME
-            // Adjust render to set click behavior
-            const originalRender = render;
-            render = function(itemsList){
-                suggestionsBox.innerHTML = '';
-                if(!itemsList.length){ clearSuggestions(); return; }
-                itemsList.forEach((p, idx)=>{
-                    const div = document.createElement('div');
-                    div.className = 'item';
-                    div.setAttribute('role','option');
-                    div.dataset.index = idx;
-                    div.innerHTML = `<img src="${p.image_url}" alt="${p.name}"> <div class='meta'><div class='name'>${p.name}</div><div class='price'>${p.price>0 ? '₱'+Number(p.price).toLocaleString() : ''}</div></div>`;
-                    div.addEventListener('click', ()=>{ window.location.href = '/browse?q='+encodeURIComponent(p.name); });
-                    suggestionsBox.appendChild(div);
-                });
-                suggestionsBox.hidden = false;
-                items = Array.from(suggestionsBox.querySelectorAll('.item'));
-            };
-        })();
         </script>
         @endpush
         @endif

@@ -220,6 +220,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Employee contact submissions page (outside closure)
     Route::get('/employee/contact-submissions', [\App\Http\Controllers\EmployeeContactSubmissionController::class, 'index'])->name('employee.contact_submissions');
+    Route::post('/employee/contact-submissions/clear', [\App\Http\Controllers\EmployeeContactSubmissionController::class, 'clear'])->name('employee.contact_submissions.clear');
 
     // Employee: Inventory / Products / Orders / Quotes
     Route::prefix('employee')->name('employee.')->group(function () {

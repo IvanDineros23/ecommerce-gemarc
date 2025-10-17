@@ -26,36 +26,58 @@
         
         <!-- Custom Styles for better homepage appearance -->
         <style>
-            /* Hide scrollbar for product carousel */
-            .no-scrollbar::-webkit-scrollbar {
-                display: none;
-            }
-            .no-scrollbar {
-                -ms-overflow-style: none;
-                scrollbar-width: none;
-            }
-            
-            /* Custom styling for hero section */
-            .hero-section {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                min-height: 70vh;
-            }
-            
-            /* Product card hover effects */
-            .product-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            }
-            
-            /* Feature grid styling */
-            .feature-card {
-                transition: all 0.3s ease;
-            }
-            
-            .feature-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            }
+          /* Hide scrollbar for product carousel */
+          .no-scrollbar::-webkit-scrollbar { display: none; }
+          .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+          .hero-section { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 70vh; }
+          .product-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+          .feature-card { transition: all 0.3s ease; }
+          .feature-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+
+          /* ============ ACTION BUTTONS (MATCHED STYLES) ============ */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  padding: .65rem 1.4rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  color: #fff;
+  border: none;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.quote-btn {
+  background-color: #16a34a;
+}
+.quote-btn:hover {
+  background-color: #15803d;
+  transform: translateY(-1px);
+}
+.ecommerce-btn {
+  background-color: #f59e0b;
+}
+.ecommerce-btn:hover {
+  background-color: #d97706;
+  transform: translateY(-1px);
+}
+.mobile-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 1rem;
+}
+.mobile-actions .action-btn {
+  flex: 1;
+  text-align: center;
+}
         </style>
         {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
         @stack('styles')
@@ -159,23 +181,23 @@
                         
                         <!-- Quick Actions (mobile only) -->
                         <div class="mobile-actions">
-                            <a href="{{ route('auth.welcome') }}" class="action-btn quote-btn">
-                                <i class="fas fa-calculator"></i> Get Quote
+                            <a href="/contact" class="action-btn quote-btn">
+                                <i class="fas fa-file-invoice"></i> Get Quote
                             </a>
-                            <a href="tel:+639090879416" class="action-btn call-btn">
-                                <i class="fas fa-phone"></i> Call Now
+                            <a href="{{ route('auth.welcome') }}" class="action-btn ecommerce-btn">
+                                <i class="fas fa-store"></i> Ecommerce
                             </a>
                         </div>
                     </div>
                     
                     <!-- Action Buttons -->
                     <div class="nav-actions">
-                        <a href="{{ route('auth.welcome') }}" class="action-btn quote-btn">
-                            <i class="fas fa-file-invoice"></i>Get Quote
-                        </a>
-                        <a href="tel:+639090879416" class="action-btn call-btn">
-                            <i class="fas fa-phone"></i> Call Now
-                        </a>
+                      <a href="/contact" class="action-btn quote-btn">
+                        <i class="fas fa-file-invoice"></i> Get Quote
+                      </a>
+                      <a href="{{ route('auth.welcome') }}" class="action-btn ecommerce-btn">
+                        <i class="fas fa-store"></i> Ecommerce
+                      </a>
                     </div>
                     
                     <div class="hamburger" id="hamburger">

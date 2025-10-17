@@ -11,4 +11,10 @@ class EmployeeContactSubmissionController extends Controller
         $submissions = ContactSubmission::orderByDesc('created_at')->get();
         return view('dashboard.employee_contact_submissions', compact('submissions'));
     }
+
+    public function clear(Request $request)
+    {
+        ContactSubmission::truncate();
+        return redirect()->route('employee.contact_submissions')->with('success', 'All contact submissions have been cleared.');
+    }
 }

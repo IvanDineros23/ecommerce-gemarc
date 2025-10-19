@@ -5,6 +5,44 @@
 @section('content')
 @push('styles')
 <style>
+
+/* --- Subtle stagger para mas fluid pag activate ng slide --- */
+.hero-slide .highlights-text,
+.hero-slide .highlights-images { will-change: transform, opacity; }
+
+.hero-track > .hero-slide.active .highlights-text{
+    animation: heroFadeUp .65s cubic-bezier(.22,.61,.36,1) both .05s;
+}
+.hero-track > .hero-slide.active .highlights-images{
+    animation: heroSlideIn .7s cubic-bezier(.22,.61,.36,1) both .12s;
+}
+
+@keyframes heroFadeUp { 
+    from{opacity:0; transform:translateY(12px)} 
+    to{opacity:1; transform:translateY(0)} 
+}
+@keyframes heroSlideIn { 
+    from{opacity:0; transform:translateX(28px) scale(.985)} 
+    to{opacity:1; transform:translateX(0) scale(1)} 
+}
+
+/* optional: very light Ken-Burns on machine images for life */
+.hero-slide.active .machine-image{
+    animation: kbZoom 5s ease-out both;
+}
+@keyframes kbZoom{
+    from{transform:scale(1)}
+    to{transform:scale(1.035)}
+}
+
+/* Pause animations if user prefers reduced motion */
+@media (prefers-reduced-motion: reduce){
+    .highlights-progress .bar::after,
+    .hero-track > .hero-slide.active .highlights-text,
+    .hero-track > .hero-slide.active .highlights-images,
+    .hero-slide.active .machine-image{ animation:none !important; }
+}
+
 /* Hide native browser search clear buttons and restyle our custom clear button */
 .products-search .search-input{ -webkit-appearance:none; appearance:none; }
 .products-search .search-input::-webkit-search-decoration,
@@ -101,13 +139,40 @@
 /* Fade style slider (isolated hero variant) */
 .hero-carousel{position:relative;width:100%;min-height:440px;}
 .hero-track{position:relative;width:100%;height:100%;min-height:440px;}
-/* Ensure only one slide is visible at a time */
-.hero-track > .hero-slide{position:absolute;inset:0;display:none !important;transform:translateX(60px) scale(.98);transition:opacity .9s ease,transform 1s cubic-bezier(.77,0,.18,1),filter 1s;filter:blur(2px);} 
-.hero-slide.preparing{display:none !important;transform:translateX(60px) scale(.98);} 
-.hero-slide.leaving{display:none !important;transform:translateX(-60px) scale(.98);filter:blur(4px);} 
-.hero-track > .hero-slide.active{display:flex !important;transform:translateX(0) scale(1);filter:blur(0);pointer-events:auto;opacity:1;z-index:2;} 
-.no-js .hero-slide{display:none;}
-.no-js .hero-slide:first-child{display:flex;opacity:1;}
+/* Ensure only one slide is visible at a time, with smooth fade/slide animation */
+.hero-track > .hero-slide {
+    position: absolute; inset: 0;
+    display: none !important;
+    opacity: 0;
+    transform: translateX(60px) scale(.98);
+    transition: opacity 0.5s cubic-bezier(.77,0,.18,1), transform 0.7s cubic-bezier(.77,0,.18,1), filter 0.7s;
+    filter: blur(2px);
+    z-index: 1;
+}
+.hero-slide.preparing {
+    display: flex !important;
+    opacity: 0;
+    transform: translateX(60px) scale(.98);
+    filter: blur(2px);
+    z-index: 2;
+}
+.hero-slide.leaving {
+    display: flex !important;
+    opacity: 0;
+    transform: translateX(-60px) scale(.98);
+    filter: blur(4px);
+    z-index: 1;
+}
+.hero-track > .hero-slide.active {
+    display: flex !important;
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: blur(0);
+    pointer-events: auto;
+    z-index: 3;
+}
+.no-js .hero-slide { display: none; }
+.no-js .hero-slide:first-child { display: flex; opacity: 1; }
 .hero-slide .hero-highlights-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:3rem;align-items:center;min-height:430px;width:100%;}
 .highlights-text .highlights-title{font-size:clamp(2.5rem,6vw,4.5rem);line-height:1.05;font-weight:800;letter-spacing:.5px;margin:0 0 1.25rem;}
 .highlights-text .highlights-description{font-size:1.1rem;line-height:1.6;max-width:40ch;color:#f1f5f9;margin:0 0 2rem;font-weight:400;}
@@ -152,57 +217,153 @@
 @endpush
 @push('scripts')
 <script>
-// Home hero slider (scoped and namespaced to avoid global collisions)
+// Home hero slider (with smooth 5s autoplay + progress sync)
 window.homeHero = (function(){
-    let current = 0; let timer; let slides = []; let dots = []; let animating=false; let initialized=false;
-    function setActive(idx){
-        if(animating || idx===current) return;
-        const prev=current; current=idx; animating=true;
+    const AUTOPLAY_MS = 5000; // <-- 5 seconds
+    let current = 0, timer, slides = [], dots = [], animating = false, initialized = false;
+    let progressEl, running = false;
+
+    function setActive(idx) {
+        if (animating || idx === current) return;
+        const prev = current;
+        current = idx;
+        animating = true;
+
         const prevSlide = slides[prev];
         const nextSlide = slides[idx];
-        prevSlide?.classList.remove('active');
-        prevSlide?.classList.add('leaving');
+
+        // Prepare next slide for animation
         nextSlide?.classList.add('preparing');
-        requestAnimationFrame(()=>{
+        nextSlide?.classList.remove('leaving','active');
+        prevSlide?.classList.remove('preparing');
+        prevSlide?.classList.add('leaving');
+
+        // Let CSS apply .preparing before switching to .active
+        setTimeout(() => {
+            prevSlide?.classList.remove('active');
             nextSlide?.classList.remove('preparing');
             nextSlide?.classList.add('active');
-            dots.forEach((d,i)=> d.classList.toggle('active', i===current));
-        });
-        setTimeout(()=>{ prevSlide?.classList.remove('leaving'); animating=false; },900);
+            dots.forEach((d, i) => d.classList.toggle('active', i === current));
+        }, 30);
+
+        // Finish cycle
+        setTimeout(() => {
+            prevSlide?.classList.remove('leaving');
+            animating = false;
+        }, 700); // slight bump to match the stagger durations
     }
-    function show(i){
-        if(!slides.length) return;
-        const target=((i%slides.length)+slides.length)%slides.length;
-        if(target!==current){ setActive(target); restart(); }
+
+    function show(i) {
+        if (!slides.length) return;
+        let target = i;
+        if (i < 0) target = slides.length - 1;
+        else if (i >= slides.length) target = 0;
+
+        if (target !== current) {
+            setActive(target);
+            restart(); // restart autoplay + progress
+        }
     }
-    function next(){ show(current+1); }
-    function start(){ stop(); timer=setInterval(next,8000); }
-    function stop(){ if(timer) clearInterval(timer); }
-    function restart(){ start(); }
-    function init(){
-        if(initialized) return;
-        const hero=document.querySelector('.material-testing-highlights');
-        if(!hero) return;
+    const next = () => show(current + 1);
+    const prev = () => show(current - 1);
+
+    function start() {
+        stop();
+        running = true;
+        timer = setInterval(next, AUTOPLAY_MS);
+        startProgress();
+    }
+    function stop() {
+        running = false;
+        if (timer) clearInterval(timer);
+        pauseProgress();
+    }
+    function restart() {
+        start();
+    }
+
+    // ---- Progress bar control ----
+    function setupProgress(){
+        progressEl = document.querySelector('.highlights-progress .bar');
+        if (progressEl){
+            // set duration via CSS var so it stays in sync
+            progressEl.style.setProperty('--ap-dur', AUTOPLAY_MS+'ms');
+        }
+    }
+    function startProgress(){
+        if (!progressEl) return;
+        // reset animation
+        progressEl.classList.remove('playing');
+        // force reflow to restart animation reliably
+        void progressEl.offsetWidth;
+        progressEl.classList.add('playing');
+        // apply animation to ::after via inline style trick
+        progressEl.style.setProperty('animation','none');
+        void progressEl.offsetWidth;
+        progressEl.style.removeProperty('animation'); // allow ::after animation to run
+        // also toggle aria for a11y (optional)
+        progressEl.setAttribute('aria-valuemin','0');
+        progressEl.setAttribute('aria-valuemax','100');
+    }
+    function pauseProgress(){
+        if (!progressEl) return;
+        // pause by setting animation-play-state on bar pseudo-container
+        progressEl.style.setProperty('animation-play-state','paused');
+        // Pause pseudo by adding a class on root and using computed style
+        progressEl.parentElement?.style.setProperty('animation-play-state','paused');
+        // Use document-level toggle via CSS? We’ll do a simple hack:
+        progressEl.classList.add('paused');
+    }
+    function resumeProgress(){
+        if (!progressEl) return;
+        progressEl.style.removeProperty('animation-play-state');
+        progressEl.parentElement?.style.removeProperty('animation-play-state');
+        progressEl.classList.remove('paused');
+    }
+
+    function init() {
+        if (initialized) return;
+        const hero = document.querySelector('.material-testing-highlights');
+        if (!hero) return;
         hero.classList.remove('no-js');
-        slides=[...hero.querySelectorAll('.hero-slide')];
-        dots=[...document.querySelectorAll('.highlights-navigation .nav-dot')];
-        if(slides.length){
-            slides.forEach((s,i)=>{ if(i===0){ s.classList.add('active'); } else { s.classList.remove('active','leaving','preparing'); }});
+
+        slides = [...hero.querySelectorAll('.hero-slide')];
+        dots   = [...document.querySelectorAll('.highlights-navigation .nav-dot')];
+        setupProgress();
+
+        if (slides.length) {
+            slides.forEach((s, i) => {
+                if (i === 0) { s.classList.add('active'); }
+                else { s.classList.remove('active','leaving','preparing'); }
+            });
             dots[0]?.classList.add('active');
         }
-        // attach dot handlers to avoid inline globals if present
-        dots.forEach((d,i)=> d.addEventListener('click',()=> show(i)));
+
+        // dot handlers
+        dots.forEach((d, i) => d.addEventListener('click', () => show(i)));
+
+        // autoplay + hover pause + tab visibility pause
         start();
-        hero.addEventListener('pointerenter',stop);
-        hero.addEventListener('pointerleave',start);
-        document.addEventListener('visibilitychange',()=>{ document.hidden ? stop() : start(); });
-        hero.querySelectorAll('.hero-slide img').forEach(img=>{
-            img.addEventListener('error',()=>{ if(!img.dataset.fallback){ img.dataset.fallback='1'; img.src='{{ asset('images/gemarclogo.png') }}'; }});
+        hero.addEventListener('pointerenter', () => { stop(); });
+        hero.addEventListener('pointerleave', () => { start(); });
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) { stop(); }
+            else { start(); }
         });
-        initialized=true;
+
+        // image fallback
+        hero.querySelectorAll('.hero-slide img').forEach(img => {
+            img.addEventListener('error', () => {
+                if (!img.dataset.fallback) { img.dataset.fallback = '1'; img.src = '{{ asset('images/gemarclogo.png') }}'; }
+            });
+        });
+
+        initialized = true;
     }
-    document.addEventListener('DOMContentLoaded',init);
-    return { show, next, start, stop };
+
+    document.addEventListener('DOMContentLoaded', init);
+    return { show, next, prev, start, stop };
 })();
 </script>
 @endpush
@@ -310,11 +471,11 @@ window.homeHero = (function(){
                         </div>
                     </div>
                     <div class="highlights-navigation">
-                        <button class="nav-dot" data-index="0" type="button"></button>
-                        <button class="nav-dot" data-index="1" type="button"></button>
-                        <button class="nav-dot" data-index="2" type="button"></button>
-                        <button class="nav-dot" data-index="3" type="button"></button>
-                        <button class="nav-dot" data-index="4" type="button"></button>
+                                                                        <button class="nav-dot" data-index="0" type="button"></button>
+                                                                        <button class="nav-dot" data-index="1" type="button"></button>
+                                                                        <button class="nav-dot" data-index="2" type="button"></button>
+                                                                        <button class="nav-dot" data-index="3" type="button"></button>
+                                                                        <button class="nav-dot" data-index="4" type="button"></button>
                     </div>
                 </div>
             </div>

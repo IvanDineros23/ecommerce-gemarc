@@ -48,6 +48,58 @@
         .blogs-section .blog-post .blog-content h3.blog-title{font-size:1.22rem!important;}
     }
 </style>
+<style>
+/* BLOG slideshow — extra smooth crossfade + gentle zoom */
+.slideshow-container{
+    position:relative; overflow:hidden; border-radius:1.25rem; background:#f8fafc;
+}
+.slideshow-container .slideshow-layer{
+    position:absolute; inset:0; object-fit:cover; width:100%; height:260px;
+    opacity:0; transform:scale(1); will-change:opacity, transform;
+    transition: opacity 1.15s cubic-bezier(.22,.61,.36,1), transform 8s cubic-bezier(.22,.61,.36,1);
+    display:block;
+    border-radius:1.25rem;
+}
+@media (min-width:1024px){ .slideshow-container .slideshow-layer{ height:300px; } }
+.slideshow-container .slideshow-layer.active{ opacity:1; transform:scale(1.045); }
+.slideshow-container .slideshow-layer.outgoing{ opacity:0; transform:scale(1.01); }
+
+/* Dots: center pill, no overlap, click-through outside the dots */
+.slideshow-dots{
+    position:absolute;
+    bottom:10px;
+    left:50%;
+    transform:translateX(-50%);     /* true center */
+    display:flex;
+    gap:.45rem;
+    padding:.25rem .5rem;            /* small pill padding */
+    border-radius:999px;
+    z-index:10;
+
+    /* Important: wag ma-block ang ibang UI sa lapad ng image */
+    pointer-events:none;             /* container is click-through */
+    width:auto;                      /* no full-width overlay */
+    max-width:calc(100% - 24px);     /* keep inside rounded corners */
+}
+.slideshow-dots .dot{
+    width:10px; height:10px; border-radius:999px;
+    background:#ffffff;              /* inactive */
+    box-shadow:0 1px 4px rgba(0,0,0,.13);
+    transition:transform .18s ease, background .18s ease, box-shadow .18s ease;
+
+    /* Only the dots themselves are clickable */
+    pointer-events:auto;
+}
+.slideshow-dots .dot.active{
+    background:#16a34a;              /* active emerald */
+    transform:scale(1.25);
+    box-shadow:0 0 0 4px rgba(22,163,74,.18);
+}
+
+@media (prefers-reduced-motion: reduce){
+    .slideshow-container .slideshow-layer{ transition:none !important; }
+}
+</style>
 @endpush
 
 @section('content')
@@ -191,29 +243,84 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const slideshows = document.querySelectorAll('.slideshow-container');
-    slideshows.forEach(slideshow => {
-        let images;
-        try { images = JSON.parse(slideshow.dataset.images); } catch { images = []; }
-        if (!images || images.length <= 1) return;
-        let currentIndex = 0;
-        const img = slideshow.querySelector('.slideshow-img');
-        const dotsContainer = slideshow.querySelector('.slideshow-dots');
-        if (dotsContainer) {
-            images.forEach((_, i) => {
-                const dot = document.createElement('div');
-                dot.className = 'dot' + (i === 0 ? ' active' : '');
-                dot.addEventListener('click', () => { currentIndex = i; update(); });
-                dotsContainer.appendChild(dot);
+document.addEventListener('DOMContentLoaded', function () {
+    const wraps = document.querySelectorAll('.slideshow-container');
+
+    wraps.forEach((wrap) => {
+        // Read image list
+        let imgs;
+        try { imgs = JSON.parse(wrap.dataset.images); } catch { imgs = []; }
+        if (!imgs || imgs.length <= 1) return;
+
+        // Reuse the existing <img> as layer A, clone for layer B
+        const firstImg = wrap.querySelector('.slideshow-img');
+        firstImg.classList.add('slideshow-layer');
+        const layerA = firstImg;                 // top in DOM
+        const layerB = firstImg.cloneNode(true); // second buffer
+        wrap.appendChild(layerB);
+
+        // State
+        let i = 0, onA = true, timer = null, hover = false;
+
+        // Dots
+        const dotsWrap = wrap.querySelector('.slideshow-dots');
+        let dots = [];
+        if (dotsWrap){
+            dotsWrap.innerHTML = '';
+            imgs.forEach((_, idx) => {
+                const d = document.createElement('div');
+                d.className = 'dot' + (idx === 0 ? ' active' : '');
+                d.addEventListener('click', () => jumpTo(idx));
+                dotsWrap.appendChild(d);
             });
+            dots = [...dotsWrap.children];
         }
-        function update() {
-            img.src = images[currentIndex];
-            if (dotsContainer) [...dotsContainer.children].forEach((d,i)=>d.classList.toggle('active', i===currentIndex));
+        const setDots = () => dots.forEach((d,idx)=>d.classList.toggle('active', idx===i));
+
+        // Swap logic (crossfade)
+        function swapTo(next){
+            const incoming = onA ? layerB : layerA;
+            const outgoing = onA ? layerA : layerB;
+
+            incoming.src = imgs[next];
+            incoming.classList.add('active');
+            outgoing.classList.add('outgoing');
+            outgoing.classList.remove('active');
+
+            setTimeout(() => {
+                outgoing.classList.remove('outgoing');
+                onA = !onA;
+                i = next;
+                setDots();
+            }, 1200); // match longer fade for extra smoothness
         }
-        const delay = parseInt(slideshow.dataset.delay) || 3000;
-        setInterval(() => { currentIndex = (currentIndex + 1) % images.length; update(); }, delay + 3000);
+
+        function next(){ if(!hover) swapTo((i + 1) % imgs.length); }
+        function jumpTo(idx){ if(idx !== i){ stop(); swapTo(idx); start(); } }
+
+        // Init first frame
+        layerA.src = imgs[0];
+        layerA.classList.add('active');
+        setDots();
+
+        // Autoplay (little jitter so multiple cards aren’t perfectly in sync)
+        function start(){
+            const base = parseInt(wrap.dataset.delay) || 3000;
+            const jitter = Math.floor(Math.random()*250);
+            timer = setInterval(next, base + 2200 + jitter);
+        }
+        function stop(){ if(timer){ clearInterval(timer); timer = null; } }
+
+        // Pause on hover (feels nicer)
+        wrap.addEventListener('pointerenter', ()=> hover = true);
+        wrap.addEventListener('pointerleave', ()=> hover = false);
+
+        // Fallback on load error
+        [layerA, layerB].forEach(img=>{
+            img.addEventListener('error', ()=> { img.src = '{{ asset('images/gemarclogo.png') }}'; });
+        });
+
+        start();
     });
 });
 </script>

@@ -110,7 +110,14 @@ document.addEventListener('DOMContentLoaded', function () {
   document.head.appendChild(style);
 
   let controller = null, activeIndex = -1, items = [];
-  function clearSuggestions(){ if(!suggestionsBox) return; suggestionsBox.innerHTML=''; suggestionsBox.hidden=true; items=[]; activeIndex=-1; }
+  function clearSuggestions(){
+    if(!suggestionsBox) return;
+    suggestionsBox.innerHTML='';
+    suggestionsBox.classList.remove('open');
+    suggestionsBox.setAttribute('aria-hidden','true');
+    suggestionsBox.hidden=true;
+    items=[]; activeIndex=-1;
+  }
   function setActive(idx){ items.forEach((it,i)=> it.classList.toggle('active', i===idx)); activeIndex = idx; if(idx>=0 && items[idx]) items[idx].scrollIntoView({block:'nearest'}); }
 
   function render(productList, pageList){
@@ -144,7 +151,15 @@ document.addEventListener('DOMContentLoaded', function () {
       suggestionsBox.appendChild(section);
     }
 
-    suggestionsBox.hidden = count === 0;
+    if(count > 0){
+      suggestionsBox.classList.add('open');
+      suggestionsBox.setAttribute('aria-hidden','false');
+      suggestionsBox.hidden = false;
+    } else {
+      suggestionsBox.classList.remove('open');
+      suggestionsBox.setAttribute('aria-hidden','true');
+      suggestionsBox.hidden = true;
+    }
     items = Array.from(suggestionsBox.querySelectorAll('.item'));
   }
 
@@ -182,6 +197,11 @@ document.addEventListener('DOMContentLoaded', function () {
   input.addEventListener('input', e=> debounced(e.target.value));
   input.addEventListener('focus', ()=>{ showSuggestions(input.value); });
   input.addEventListener('blur', ()=> setTimeout(()=> clearSuggestions(), 180));
+  // Hide suggestions on Escape or click outside
+  input.addEventListener('keydown', e => { if(e.key==='Escape') clearSuggestions(); });
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.products-search')) clearSuggestions();
+  });
 
   input.addEventListener('keydown', (e)=>{
     if(!items.length) return;

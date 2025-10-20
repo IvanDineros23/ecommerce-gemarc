@@ -532,19 +532,19 @@ window.homeHero = (function(){
                         <div id="fp-track" class="relative overflow-x-auto no-scrollbar">
                             <div class="flex gap-6 snap-x snap-mandatory scroll-pl-6" style="scroll-behavior:smooth;">
                                 @foreach($carouselProducts as $i => $p)
-                            <article id="fp-{{ $i }}" class="product-card min-w-[75%] sm:min-w-[45%] md:min-w-[35%] lg:min-w-[28%] snap-start rounded-2xl shadow-lg p-6 flex flex-col items-center text-center">
-                                <div class="w-40 h-40 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center mb-4 overflow-hidden">
-                                    <img src="{{ $p['image_url'] }}" alt="{{ $p['name'] }}" class="w-full h-full object-contain" />
+                            <article id="fp-{{ $i }}" class="product-card min-w-[95%] sm:min-w-[60%] md:min-w-[45%] lg:min-w-[32%] snap-start rounded-3xl shadow-2xl p-10 flex flex-col items-center text-center h-[480px]">
+                                <div class="w-56 h-56 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center mb-6 overflow-hidden">
+                                    <img src="{{ $p['image_url'] }}" alt="{{ $p['name'] }}" class="w-full h-full object-contain" style="max-width:210px;max-height:210px;" />
                                 </div>
-                                <h3 class="font-bold text-lg mb-2 text-gray-800 line-clamp-1">{{ $p['name'] }}</h3>
+                                <h3 class="font-bold text-2xl mb-3 text-gray-800 line-clamp-1">{{ $p['name'] }}</h3>
                                 @php $desc = trim($p['description']); @endphp
-                                <p class="text-sm text-gray-600 mb-3 leading-relaxed line-clamp-2">
+                                <p class="text-base text-gray-600 mb-4 leading-relaxed line-clamp-2">
                                     {{ $desc ? Str::limit($desc, 80) : 'Premium construction equipment' }}
                                 </p>
                                 @if($p['price'] > 0)
-                                    <div class="text-lg font-bold text-green-600 mb-3">₱{{ number_format($p['price'], 2) }}</div>
+                                    <div class="text-xl font-bold text-green-600 mb-4">₱{{ number_format($p['price'], 2) }}</div>
                                 @endif
-                                <a href="{{ route('auth.welcome') }}" class="mt-auto w-full px-5 py-3 rounded-lg bg-green-600 hover:bg-green-700 text-white font-medium transition duration-300 shadow hover:shadow-lg">
+                                <a href="{{ route('auth.welcome') }}" class="mt-auto w-full px-7 py-4 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold transition duration-300 shadow hover:shadow-xl text-lg">
                                     <i class="fas fa-shopping-cart mr-2"></i>Shop Now
                                 </a>
                             </article>

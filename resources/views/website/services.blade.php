@@ -1,7 +1,7 @@
 ﻿
 @extends('layouts.app')
 @section('content')
-@section('title', 'Services | Gemar Enterprises Incorporated')
+@section('title', 'Services | Gemarc Enterprises Incorporated')
 @push('styles')
 <style>
 .svc-hero-bg {
@@ -102,6 +102,37 @@
             <div class="sg-item"><img src="{{ asset('images/highlights/Pictures/494814749_1916317242538175_7655088993599564921_n.jpg') }}" alt="demo"></div>
             <div class="sg-item"><img src="{{ asset('images/highlights/Pictures/476458768_540083412423925_7677882325727688935_n.jpg') }}" alt="demo"></div>
         </div>
+
+        <!-- Modal for image preview with animation -->
+        <style>
+        #svcModal {
+            display:none;position:fixed;z-index:99999;top:0;left:0;width:100vw;height:100vh;
+            background:rgba(20,20,20,0.92);align-items:center;justify-content:center;
+            transition:background 0.25s cubic-bezier(.4,0,.2,1);
+        }
+        #svcModal.show {
+            display:flex;
+            animation: fadeInBg 0.25s cubic-bezier(.4,0,.2,1);
+        }
+        @keyframes fadeInBg {
+            from { background:rgba(20,20,20,0); }
+            to   { background:rgba(20,20,20,0.92); }
+        }
+        #svcModalImg {
+            opacity:0;
+            transform: scale(0.96);
+            transition: opacity 0.25s cubic-bezier(.4,0,.2,1), transform 0.25s cubic-bezier(.4,0,.2,1);
+            max-width:90vw;max-height:80vh;border-radius:1.2rem;box-shadow:0 8px 32px -12px #000;z-index:1000;
+        }
+        #svcModalImg.visible {
+            opacity:1;
+            transform: scale(1);
+        }
+        </style>
+        <div id="svcModal">
+            <span id="svcModalClose" style="position:absolute;top:30px;right:40px;font-size:2.5rem;color:#fff;cursor:pointer;z-index:1001;">&times;</span>
+            <img id="svcModalImg" src="" alt="Preview">
+        </div>
     </div>
 </section>
 
@@ -110,6 +141,7 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Dropdown for gallery
     var header = document.getElementById('svcDropdownHeader');
     var gallery = document.getElementById('svcGallery');
     var chev = header.querySelector('.chev i');
@@ -117,6 +149,89 @@ document.addEventListener('DOMContentLoaded', function() {
         gallery.classList.toggle('collapsed');
         chev.classList.toggle('fa-chevron-down');
         chev.classList.toggle('fa-chevron-up');
+    });
+
+    // Modal logic with animation
+    var modal = document.getElementById('svcModal');
+    var modalImg = document.getElementById('svcModalImg');
+    var closeBtn = document.getElementById('svcModalClose');
+    var imgNodes = Array.from(gallery.querySelectorAll('img'));
+    var currentIdx = -1;
+    var animating = false;
+
+    function showModalBg() {
+        modal.classList.add('show');
+    }
+    function hideModalBg() {
+        modal.classList.remove('show');
+        setTimeout(function(){ modal.style.display = 'none'; }, 250);
+    }
+
+    function animateImgIn() {
+        modalImg.classList.remove('visible');
+        setTimeout(function(){ modalImg.classList.add('visible'); }, 10);
+    }
+
+    function openModal(idx) {
+        if(idx < 0 || idx >= imgNodes.length) return;
+        currentIdx = idx;
+        modalImg.classList.remove('visible');
+        // Animate background
+        modal.style.display = 'flex';
+        setTimeout(showModalBg, 10);
+        // Animate image
+        setTimeout(function() {
+            modalImg.src = imgNodes[idx].src;
+            animateImgIn();
+        }, 50);
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+        modalImg.classList.remove('visible');
+        hideModalBg();
+        setTimeout(function(){
+            modalImg.src = '';
+            document.body.style.overflow = '';
+        }, 250);
+    }
+    function showPrev() {
+        if(currentIdx > 0) transitionTo(currentIdx - 1, -1);
+    }
+    function showNext() {
+        if(currentIdx < imgNodes.length - 1) transitionTo(currentIdx + 1, 1);
+    }
+
+    // Animate image transition
+    function transitionTo(newIdx, dir) {
+        if(animating || newIdx < 0 || newIdx >= imgNodes.length) return;
+        animating = true;
+        modalImg.classList.remove('visible');
+        setTimeout(function() {
+            modalImg.src = imgNodes[newIdx].src;
+            animateImgIn();
+            currentIdx = newIdx;
+            setTimeout(function(){ animating = false; }, 250);
+        }, 250);
+    }
+
+    imgNodes.forEach(function(img, idx) {
+        img.style.cursor = 'pointer';
+        img.addEventListener('click', function(e) {
+            e.stopPropagation();
+            openModal(idx);
+        });
+    });
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', function(e) {
+        if(e.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if(modal.classList.contains('show')) {
+            if(e.key === 'Escape') closeModal();
+            else if(e.key === 'ArrowLeft') showPrev();
+            else if(e.key === 'ArrowRight') showNext();
+        }
     });
 });
 </script>

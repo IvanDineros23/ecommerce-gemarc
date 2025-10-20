@@ -1,6 +1,6 @@
 ﻿@extends('layouts.app')
 @section('content')
-@section('title', 'Calibration | Gemar Enterprises Incorporated')
+@section('title', 'Calibration | Gemarc Enterprises Incorporated')
 @push('styles')
 <style>
 .calib-hero-bg {
@@ -113,23 +113,54 @@
             <span class="chev"><i class="fas fa-chevron-down"></i></span>
         </header>
         <div class="calib-gallery collapsed" id="calibGallery">
-            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/viber_image_2025-09-04_08-39-34-126.jpg') }}" alt=""></div>
-            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/viber_image_2025-09-04_08-39-34-214.jpg') }}" alt=""></div>
-            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/viber_image_2025-09-04_08-39-34-308.jpg') }}" alt=""></div>
-            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/viber_image_2025-09-04_08-39-34-718.jpg') }}" alt=""></div>
-            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/viber_image_2025-09-04_08-39-34-788.jpg') }}" alt=""></div>
-            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/viber_image_2025-09-04_08-39-34-898.jpg') }}" alt=""></div>
-            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/viber_image_2025-09-04_08-39-35-027.jpg') }}" alt=""></div>
-            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/viber_image_2025-09-10_11-40-05-229.jpg') }}" alt=""></div>
-            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/viber_image_2025-09-10_11-40-06-130.jpg') }}" alt=""></div>
-            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/492944049_610384578694078_3648091509823792302_n.jpg') }}" alt=""></div>
-            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/504268189_640204125712123_6277874478571758863_n.jpg') }}" alt=""></div>
-            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/504428235_640204199045449_4608588939321091082_n.jpg') }}" alt=""></div>
-            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/504428926_640204169045452_5758812348746634334_n.jpg') }}" alt=""></div>
-            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/505596594_640204202378782_8321184957891935740_n.jpg') }}" alt=""></div>
-            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/505748620_640204149045454_5713118671588066311_n.jpg') }}" alt=""></div>
-            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/518278555_669110816154787_8607938420397116506_n.jpg') }}" alt=""></div>
-            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/518296567_669110862821449_8469632100392611821_n.jpg') }}" alt=""></div>
+            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/viber_image_2025-09-04_08-39-34-126.jpg') }}" alt="Calibration 1"></div>
+            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/viber_image_2025-09-04_08-39-34-214.jpg') }}" alt="Calibration 2"></div>
+            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/viber_image_2025-09-04_08-39-34-308.jpg') }}" alt="Calibration 3"></div>
+            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/viber_image_2025-09-04_08-39-34-718.jpg') }}" alt="Calibration 4"></div>
+            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/viber_image_2025-09-04_08-39-34-788.jpg') }}" alt="Calibration 5"></div>
+            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/viber_image_2025-09-04_08-39-34-898.jpg') }}" alt="Calibration 6"></div>
+            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/viber_image_2025-09-04_08-39-35-027.jpg') }}" alt="Calibration 7"></div>
+            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/viber_image_2025-09-10_11-40-05-229.jpg') }}" alt="Calibration 8"></div>
+            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/viber_image_2025-09-10_11-40-06-130.jpg') }}" alt="Calibration 9"></div>
+            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/492944049_610384578694078_3648091509823792302_n.jpg') }}" alt="Calibration 10"></div>
+            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/504268189_640204125712123_6277874478571758863_n.jpg') }}" alt="Calibration 11"></div>
+            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/504428235_640204199045449_4608588939321091082_n.jpg') }}" alt="Calibration 12"></div>
+            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/504428926_640204169045452_5758812348746634334_n.jpg') }}" alt="Calibration 13"></div>
+            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/505596594_640204202378782_8321184957891935740_n.jpg') }}" alt="Calibration 14"></div>
+            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/505748620_640204149045454_5713118671588066311_n.jpg') }}" alt="Calibration 15"></div>
+            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/518278555_669110816154787_8607938420397116506_n.jpg') }}" alt="Calibration 16"></div>
+            <div class="cg-item"><img src="{{ asset('images/highlights/calibration/518296567_669110862821449_8469632100392611821_n.jpg') }}" alt="Calibration 17"></div>
+        </div>
+
+        <!-- Modal for image preview with animation -->
+        <style>
+        #calibModal {
+            display:none;position:fixed;z-index:99999;top:0;left:0;width:100vw;height:100vh;
+            background:rgba(20,20,20,0.92);align-items:center;justify-content:center;
+            transition:background 0.25s cubic-bezier(.4,0,.2,1);
+        }
+        #calibModal.show {
+            display:flex;
+            animation: fadeInBg 0.25s cubic-bezier(.4,0,.2,1);
+        }
+        @keyframes fadeInBg {
+            from { background:rgba(20,20,20,0); }
+            to   { background:rgba(20,20,20,0.92); }
+        }
+        #calibModalImg {
+            opacity:0;
+            transform: scale(0.96);
+            transition: opacity 0.25s cubic-bezier(.4,0,.2,1), transform 0.25s cubic-bezier(.4,0,.2,1);
+            max-width:90vw;max-height:80vh;border-radius:1.2rem;box-shadow:0 8px 32px -12px #000;z-index:1000;
+        }
+        #calibModalImg.visible {
+            opacity:1;
+            transform: scale(1);
+        }
+        </style>
+        <div id="calibModal">
+            <span id="calibModalClose" style="position:absolute;top:30px;right:40px;font-size:2.5rem;color:#fff;cursor:pointer;z-index:1001;">&times;</span>
+            <img id="calibModalImg" src="" alt="Preview">
         </div>
     </div>
 </section>
@@ -138,6 +169,7 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Dropdown for gallery
     var header = document.getElementById('calibDropdownHeader');
     var gallery = document.getElementById('calibGallery');
     var chev = header.querySelector('.chev i');
@@ -145,6 +177,89 @@ document.addEventListener('DOMContentLoaded', function() {
         gallery.classList.toggle('collapsed');
         chev.classList.toggle('fa-chevron-down');
         chev.classList.toggle('fa-chevron-up');
+    });
+
+    // Modal logic with animation
+    var modal = document.getElementById('calibModal');
+    var modalImg = document.getElementById('calibModalImg');
+    var closeBtn = document.getElementById('calibModalClose');
+    var imgNodes = Array.from(gallery.querySelectorAll('img'));
+    var currentIdx = -1;
+    var animating = false;
+
+    function showModalBg() {
+        modal.classList.add('show');
+    }
+    function hideModalBg() {
+        modal.classList.remove('show');
+        setTimeout(function(){ modal.style.display = 'none'; }, 250);
+    }
+
+    function animateImgIn() {
+        modalImg.classList.remove('visible');
+        setTimeout(function(){ modalImg.classList.add('visible'); }, 10);
+    }
+
+    function openModal(idx) {
+        if(idx < 0 || idx >= imgNodes.length) return;
+        currentIdx = idx;
+        modalImg.classList.remove('visible');
+        // Animate background
+        modal.style.display = 'flex';
+        setTimeout(showModalBg, 10);
+        // Animate image
+        setTimeout(function() {
+            modalImg.src = imgNodes[idx].src;
+            animateImgIn();
+        }, 50);
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+        modalImg.classList.remove('visible');
+        hideModalBg();
+        setTimeout(function(){
+            modalImg.src = '';
+            document.body.style.overflow = '';
+        }, 250);
+    }
+    function showPrev() {
+        if(currentIdx > 0) transitionTo(currentIdx - 1, -1);
+    }
+    function showNext() {
+        if(currentIdx < imgNodes.length - 1) transitionTo(currentIdx + 1, 1);
+    }
+
+    // Animate image transition
+    function transitionTo(newIdx, dir) {
+        if(animating || newIdx < 0 || newIdx >= imgNodes.length) return;
+        animating = true;
+        modalImg.classList.remove('visible');
+        setTimeout(function() {
+            modalImg.src = imgNodes[newIdx].src;
+            animateImgIn();
+            currentIdx = newIdx;
+            setTimeout(function(){ animating = false; }, 250);
+        }, 250);
+    }
+
+    imgNodes.forEach(function(img, idx) {
+        img.style.cursor = 'pointer';
+        img.addEventListener('click', function(e) {
+            e.stopPropagation();
+            openModal(idx);
+        });
+    });
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', function(e) {
+        if(e.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if(modal.classList.contains('show')) {
+            if(e.key === 'Escape') closeModal();
+            else if(e.key === 'ArrowLeft') showPrev();
+            else if(e.key === 'ArrowRight') showNext();
+        }
     });
 });
 </script>

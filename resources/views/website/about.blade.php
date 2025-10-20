@@ -1,5 +1,5 @@
 ﻿@extends('layouts.app')
-@section('title', 'About Us | Gemar Enterprises Incorporated')
+@section('title', 'About Us | Gemarc Enterprises Incorporated')
 
 @push('styles')
 <style>

@@ -5,6 +5,16 @@
 @section('content')
 @push('styles')
 <style>
+/* Featured Products: make the SCROLLER own the snap */
+#fp-track{
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: 1.5rem;        /* matches your mx-10 spacing */
+    -webkit-overflow-scrolling: touch;
+}
+#fp-track .product-card{
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+}
 
 /* --- Subtle stagger para mas fluid pag activate ng slide --- */
 .hero-slide .highlights-text,
@@ -545,42 +555,92 @@ window.homeHero = (function(){
             </div>
             </div>
         </section>
-        @push('scripts')
-        <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const track = document.getElementById('fp-track');
-            if(!track) return;
-            
-            const slides = track.querySelectorAll('.product-card');
-            const prevBtn = document.getElementById('fp-prev');
-            const nextBtn = document.getElementById('fp-next');
-            let currentIndex = 0;
-            const slideWidth = 286; // width + gap
+                @push('scripts')
+                <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const track   = document.getElementById('fp-track');
+                    if (!track) return;
 
-            // Scroll to slide
-            function scrollToSlide(idx) {
-                if(idx < 0) idx = 0;
-                if(idx >= slides.length) idx = slides.length - 1;
-                
-                currentIndex = idx;
-                
-                // Calculate position
-                const scrollPos = idx * slideWidth;
-                track.scrollTo({
-                    left: scrollPos,
-                    behavior: 'smooth'
+                    const slides  = track.querySelectorAll('.product-card');
+                    const prevBtn = document.getElementById('fp-prev');
+                    const nextBtn = document.getElementById('fp-next');
+
+                    let currentIndex = 0;
+                    let programmatic = false;  // ignore scroll events we triggered
+                    let releaseTimer = null;
+
+                    function updateButtons() {
+                        const atStart = currentIndex <= 0;
+                        const atEnd   = currentIndex >= slides.length - 1;
+                        [prevBtn, nextBtn].forEach(btn => btn && (btn.disabled = false));
+                        if (prevBtn) prevBtn.disabled = atStart;
+                        if (nextBtn) nextBtn.disabled = atEnd;
+                        if (prevBtn) prevBtn.style.opacity = prevBtn.disabled ? '0.5' : '1';
+                        if (nextBtn) nextBtn.style.opacity = nextBtn.disabled ? '0.5' : '1';
+                    }
+
+                    function goTo(idx) {
+                        if (!slides.length) return;
+                        if (idx < 0) idx = 0;
+                        if (idx > slides.length - 1) idx = slides.length - 1;
+                        currentIndex = idx;
+                        updateButtons();
+
+                        programmatic = true;
+                        clearTimeout(releaseTimer);
+                        slides[idx].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+                        // release the programmatic lock shortly after the smooth scroll finishes
+                        releaseTimer = setTimeout(() => { programmatic = false; }, 450);
+                    }
+
+                    // Buttons
+                    prevBtn && prevBtn.addEventListener('click', () => goTo(currentIndex - 1));
+                    nextBtn && nextBtn.addEventListener('click', () => goTo(currentIndex + 1));
+
+                    // Keep currentIndex in sync using visibility (most stable on varying widths)
+                    const io = new IntersectionObserver((entries) => {
+                        if (programmatic) return; // ignore while we’re animating to a target
+                        let bestIdx = currentIndex, bestRatio = 0;
+                        for (const e of entries) {
+                            if (e.isIntersecting && e.intersectionRatio > bestRatio) {
+                                bestRatio = e.intersectionRatio;
+                                bestIdx = [...slides].indexOf(e.target);
+                            }
+                        }
+                        if (bestRatio > 0) {
+                            currentIndex = bestIdx;
+                            updateButtons();
+                        }
+                    }, {
+                        root: track,
+                        threshold: [0.51, 0.75, 0.98] // prefer the card that’s >50% visible
+                    });
+
+                    slides.forEach(el => io.observe(el));
+                    updateButtons();
+
+                    // Fallback: when user stops dragging, nudge to nearest snap to avoid half-cards
+                    let snapTimer;
+                    track.addEventListener('scroll', () => {
+                        if (programmatic) return;
+                        clearTimeout(snapTimer);
+                        snapTimer = setTimeout(() => {
+                            // find nearest card by left offset relative to track
+                            let best = 0, bestDist = Infinity;
+                            const trackLeft = track.getBoundingClientRect().left;
+                            slides.forEach((el, i) => {
+                                const dist = Math.abs(el.getBoundingClientRect().left - trackLeft);
+                                if (dist < bestDist) { bestDist = dist; best = i; }
+                            });
+                            goTo(best);
+                        }, 120);
+                    }, { passive: true });
+
+                    // Re-snap on resize to keep the active card aligned
+                    window.addEventListener('resize', () => goTo(currentIndex));
                 });
-            }
-
-            if(prevBtn) {
-                prevBtn.addEventListener('click', () => scrollToSlide(currentIndex - 1));
-            }
-            
-            if(nextBtn) {
-                nextBtn.addEventListener('click', () => scrollToSlide(currentIndex + 1));
-            }
-        </script>
-        @endpush
+                </script>
+                @endpush
         @endif
 
         {{-- ===================== OUR GLOBAL PARTNERS (SIMPLIFIED SLIDER) ===================== --}}

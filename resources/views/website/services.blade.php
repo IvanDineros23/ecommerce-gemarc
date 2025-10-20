@@ -6,7 +6,7 @@
 <style>
 .svc-hero-bg {
     position: absolute; inset: 0; z-index: 0;
-    background: linear-gradient(rgba(15,23,42,.78),rgba(15,23,42,.78)), url('{{ asset('images/360_F_1589025175_1DxdWO4V6n1gbYRWoVjD0eef0QEi9yq4.jpg') }}') center/cover no-repeat;
+    background: linear-gradient(rgba(0,0,0,.82),rgba(0,0,0,.82)), url('{{ asset('images/360_F_1589025175_1DxdWO4V6n1gbYRWoVjD0eef0QEi9yq4.jpg') }}') center/cover no-repeat;
     opacity: .95;
 }
 .svc-hero-section {

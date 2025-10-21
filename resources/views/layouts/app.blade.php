@@ -218,63 +218,63 @@
 <!-- Footer Styles -->
 <style>
   html, body { height: 100%; margin: 0; }
-  /* wrapper: already meron kang flex/min-h-screen; this just ensures no surprises */
   .site-shell { min-height: 100vh; display: flex; flex-direction: column; }
   main { flex: 1 0 auto; }
 
-  /* FOOTER */
+  /* FOOTER – thin, clean layout */
   .site-footer {
     flex-shrink: 0;
-    background: #2E7D32; /* Dark green background */
-    padding: 0;
-    margin: 0;
+    background: #2E7D32;
+    color: #fff;
     width: 100%;
-    border-top: none;
-    color: white;
   }
   .site-footer__wrap {
-    max-width: 1400px;
+    max-width: 1300px;
     margin: 0 auto;
   }
 
-  /* 4 even columns – pantay gamit grid */
+  /* 3 columns: Address | Numbers | Email */
   .site-footer__grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: 1.2fr 1fr 1.2fr;
     gap: 0;
-    background-color: #2E7D32; /* Dark green */
+    align-items: start;
   }
   .site-footer__item {
-    padding: 30px 20px;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 14px 14px 12px;
+    border-right: 1px solid rgba(255,255,255,0.15);
   }
   .site-footer__item:last-child { border-right: 0; }
 
   .site-footer__title {
     display: flex; align-items: center; gap: 8px;
-    color: white; font-size: 1.05rem; font-weight: 600;
+    color: white; font-size: 1rem; font-weight: 700;
     margin: 0 0 8px 0;
-    white-space: nowrap;
   }
-  .site-footer__title i { color: #FFA000; font-size: 1.2rem; } /* Amber color for icons */
-  .site-footer__text { margin: 0; color: rgba(255, 255, 255, 0.9); line-height: 1.6; }
+  .site-footer__title i { color: #FFA000; font-size: 1.1rem; }
+  .site-footer__text {
+    margin: 0; color: rgba(255,255,255,0.9);
+    line-height: 1.5; font-size: .95rem;
+  }
 
-  /* bottom bar – full width, walang extra space */
+  /* Copyright bar */
   .site-footer__bar {
     text-align: center;
-    padding: 16px 0;
-    color: #fff;
-    background: #1B5E20; /* Darker green for the copyright bar */
-    font-size: 0.95rem; font-weight: 500;
+    padding: 12px 0;
+    background: #1B5E20;
+    font-size: 0.95rem;
+    font-weight: 600;
   }
 
-  /* responsive: stack columns; pantay pa rin via borders */
-  @media (max-width: 900px) {
+  /* Responsiveness */
+  @media (max-width: 768px) {
     .site-footer__grid { grid-template-columns: 1fr; }
-    .site-footer__item { border-right: 0; border-bottom: 1px solid #e5e7eb; }
+    .site-footer__item {
+      border-right: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+      text-align: center;
+    }
     .site-footer__item:last-child { border-bottom: 0; }
-    .site-footer__title { justify-content: center; }
-    .site-footer__text { text-align: center; }
   }
 </style>
 
@@ -282,30 +282,39 @@
 <footer class="site-footer">
   <div class="site-footer__wrap">
     <div class="site-footer__grid">
+
+      <!-- Office Address -->
       <div class="site-footer__item">
         <h4 class="site-footer__title"><i class="fas fa-map-marker-alt"></i> Office Address</h4>
         <p class="site-footer__text">
-          No. 15 Chile St. Ph1 Greenheights Subdivision, Concepcion 1, Marikina City, Philippines 1807
+          No. 15 Chile St. Ph1 Greenheights Subdivision,<br>
+          Concepcion 1, Marikina City, Philippines 1807
         </p>
       </div>
-      <div class="site-footer__item">
-        <h4 class="site-footer__title"><i class="fas fa-phone"></i> Telephone Numbers</h4>
-        <p class="site-footer__text">
-          (632)8-997-7959 &nbsp;|&nbsp; (632)8-584-5572
-        </p>
-      </div>
-      <div class="site-footer__item">
-        <h4 class="site-footer__title"><i class="fas fa-mobile-alt"></i> Mobile Numbers</h4>
-        <p class="site-footer__text">
-          +63 909 087 9416<br>
-          +63 928 395 3532 &nbsp;|&nbsp; +63 918 905 8316
-        </p>
-      </div>
+
+     <!-- Combined Telephone + Mobile Numbers -->
+<div class="site-footer__item">
+  <h4 class="site-footer__title"><i class="fas fa-phone"></i> Contact Numbers</h4>
+  <p class="site-footer__text" style="margin-bottom: 6px;">
+    <strong>Telephone:</strong> (632)8-997-7959
+  </p>
+  <p class="site-footer__text">
+    <strong>Mobile Numbers:</strong><br>
+    +63 909 087 9416 <span style="color:#ffd580;font-size:.9em;">| Marketing Department</span><br>
+    +63 928 395 3532 <span style="color:#ffd580;font-size:.9em;">| Technical Department</span><br>
+    +63 918 905 8316
+  </p>
+</div>
+
+
+      <!-- Email Addresses -->
       <div class="site-footer__item">
         <h4 class="site-footer__title"><i class="fas fa-envelope"></i> Email Address</h4>
         <p class="site-footer__text">
           sales@gemarcph.com<br>
-          technical@gemarcph.com
+          technical@gemarcph.com<br>
+          gemarcent.fo@gmail.com<br>
+          gemarc.fo@gemarcph.com
         </p>
       </div>
     </div>

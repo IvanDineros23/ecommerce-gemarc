@@ -167,7 +167,7 @@
                                             {label:'Air Consumption',value:'10-15 m³/min × 1-1.5 MPa'},
                                             {label:'Dimensions',value:'2190 × 660 × 980 mm; Drive Unit 230 kg'}
                                         ]
-                                    })"><i class=\"fas fa-eye\"></i> View Details</button>
+                                    })"><i class="fas fa-eye"></i> View Details</button>
                                 </div>
                             </div>
                         </article>
@@ -203,7 +203,7 @@
                                             {label:'Power',value:'7.5 kW/4P or 15ps/1800 rpm'},
                                             {label:'Dimensions',value:'1800 × 870 × 1620 mm; 700 kg'}
                                         ]
-                                    })"><i class=\"fas fa-eye\"></i> View Details</button>
+                                    })"><i class="fas fa-eye"></i> View Details</button>
                                 </div>
                             </div>
                         </article>
@@ -238,7 +238,7 @@
                                             {label:'Power',value:'3.4kW/4P or 5ps/1800 rpm'},
                                             {label:'Dimensions',value:'1115 × 570 × 1060 mm; 240 kg'}
                                         ]
-                                    })"><i class=\"fas fa-eye\"></i> View Details</button>
+                                    })"><i class="fas fa-eye"></i> View Details</button>
                                 </div>
                             </div>
                         </article>

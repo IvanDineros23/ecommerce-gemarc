@@ -82,7 +82,7 @@
     <!-- Products Section -->
     <section class="blogs-section">
         <div class="container">
-       <!-- Search Bar -->
+            <!-- Search Bar -->
             @include('components.searchbar')
 
             <p class="mb-4">We provide comprehensive soil testing equipment for geotechnical investigation, foundation design, and construction projects. Our equipment meets international standards for soil analysis and testing procedures.</p>
@@ -333,7 +333,7 @@
                                 <span class="blog-standard">U.S. Sieve Sizes</span>
                             </div>
                             <h3 class="blog-title" onclick="openPSKModal()">Polycarbonate Sieve Kits</h3>
-                            <p>Accurate mechanical sieve kit for grain size analysis with 20 stainless steel screens and five 2" acrylic cylinders.</p>
+                            <p>Accurate mechanical sieve kit for grain size analysis with 20 stainless steel screens and five 2&quot; acrylic cylinders.</p>
                             <div class="blog-actions">
                                 @php $pdfPSK = public_path('downloadable content/PSK-001.pdf'); @endphp
                                 @if (file_exists($pdfPSK))
@@ -456,104 +456,9 @@
 @push('scripts')
 <script src="{{ asset('website/script.js') }}?v={{ filemtime(public_path('website/script.js')) }}"></script>
 <script>
-// Matest modal open helpers
-function openS172Modal(){
+/* -------- Matest modal open helpers -------- */
+window.openS172Modal = function(){
     openProductModal({
-        code: 'S172-01N',
-        name: 'Motorized liquid limit device, NF',
-        standard: 'ASTM D4318 | AASHTO T89 | UNI 10014; comparable: BS 1377-2 | UNE 7377',
-        description: 'Motor operated at 120 drops/min to ensure uniformity and accuracy. Bakelite base and chrome cup.',
-        image: '{{ asset('images/highlights/S172-01.jpg') }}',
-        manufacturer: 'MATEST',
-        specs: [
-            {label:'Operation Type', value:'Motor operated'},
-            {label:'Drop Rate', value:'120 drops/min'},
-            {label:'Base Material', value:'Bakelite'},
-            {label:'Cup Material', value:'Chrome'}
-        ]
-    });
-}
-
-function openS165Modal(){
-    openProductModal({
-        code: 'S165-02',
-        name: 'Semiautomatic cone digital penetrometer',
-        standard: 'Programmable timer; magnetic controller',
-        description: 'Equipped with magnetic controller device and programmable timer that releases the plunger head for free fall during the 5-second test.',
-        image: '{{ asset('images/highlights/S165-02-KIT.jpg') }}',
-        manufacturer: 'MATEST',
-        specs: [
-            {label:'Control', value:'Electronic digital programmable timer'},
-            {label:'Operation', value:'Semiautomatic'}
-        ]
-    });
-}
-
-function openS276Modal(){
-    openProductModal({
-        code: 'S276-01M',
-        name: 'Auto ShearLab - Direct and Residual Shear Testing Machine',
-        standard: 'Direct and Residual Shear Testing',
-        description: 'Automatic shearbox testing machine. Performs consolidation and shearing stages in strain or stress control.',
-        image: '{{ asset('images/highlights/S276-01-150x150.jpg') }}',
-        manufacturer: 'MATEST',
-        specs: [
-            {label:'Testing Modes', value:'Strain and stress controlled'},
-            {label:'Application', value:'Shear tests on soil specimens'}
-        ]
-    });
-}
-
-    // Dual Manufacturing modal helpers
-    function openPSKModal(){
-        openProductModal({
-            code:'PSK-001',
-            name:'Polycarbonate Sieve Kits',
-            standard:'U.S. Standard Sieve Sizes',
-            description:'Mechanical sieve kit for grain size analysis with volumetric indicators on the shaker frame.',
-            image:'{{ asset('images/highlights/0003510_polycarbonate-sieve-kits.jpeg') }}',
-            manufacturer:'Dual Manufacturing Co, Inc',
-            specs:[
-                {label:'Kit Contents', value:'20 stainless steel screens'},
-                {label:'Containers', value:'Five 2\" acrylic cylinders'}
-            ]
-        });
-    }
-    function openMFSModal(){
-        openProductModal({
-            code:'MFS-001',
-            name:'Metric Frame Sieves',
-            standard:'ISO 3310-1 specification',
-            description:'Precision sieves in metric sizes with stainless steel mesh for particle size analysis.',
-            image:'{{ asset('images/highlights/USA-Standard-Sieves-150x150.jpeg') }}',
-            manufacturer:'Dual Manufacturing Co, Inc',
-            specs:[
-                {label:'Heights', value:'Full and half height'},
-                {label:'Mesh', value:'Stainless steel'}
-            ]
-        });
-    }
-    function openMGSModal(){
-        openProductModal({
-            code:'MGS',
-            name:'Market Grade Sieves',
-            standard:'Market Grade',
-            description:'Market grade sieves for consistent, repeatable particle size measurements.',
-            image:'{{ asset('images/highlights/0003520_market-grade-sieves_420.jpeg') }}',
-            manufacturer:'Dual Manufacturing Co, Inc',
-            specs:[
-                {label:'Use', value:'Particle size analysis'},
-                {label:'Mesh Range', value:'Wide range available'}
-            ]
-        });
-    }
-</script>
-@endpush
-
-@push('scripts')
-<script src="{{ asset('website/script.js') }}?v={{ filemtime(public_path('website/script.js')) }}"></script>
-// Soil product modal open helpers
-
         code: 'S172-01N',
         name: 'Motorized liquid limit device, NF',
         standard: 'ASTM D4318 | AASHTO T89 | UNI 10014; comparable: BS 1377-2 | UNE 7377',
@@ -599,20 +504,79 @@ window.openS276Modal = function(){
     });
 };
 
-// Fallback modal controls if global ones aren't loaded
-function closeProductModal(){
+/* -------- Dual Manufacturing modal helpers -------- */
+window.openPSKModal = function(){
+    openProductModal({
+        code:'PSK-001',
+        name:'Polycarbonate Sieve Kits',
+        standard:'U.S. Standard Sieve Sizes',
+        description:'Mechanical sieve kit for grain size analysis with volumetric indicators on the shaker frame.',
+        image:'{{ asset('images/highlights/0003510_polycarbonate-sieve-kits.jpeg') }}',
+        manufacturer:'Dual Manufacturing Co, Inc',
+        specs:[
+            {label:'Kit Contents', value:'20 stainless steel screens'},
+            {label:'Containers', value:'Five 2" acrylic cylinders'}
+        ]
+    });
+};
+
+window.openMFSModal = function(){
+    openProductModal({
+        code:'MFS-001',
+        name:'Metric Frame Sieves',
+        standard:'ISO 3310-1 specification',
+        description:'Precision sieves in metric sizes with stainless steel mesh for particle size analysis.',
+        image:'{{ asset('images/highlights/USA-Standard-Sieves-150x150.jpeg') }}',
+        manufacturer:'Dual Manufacturing Co, Inc',
+        specs:[
+            {label:'Heights', value:'Full and half height'},
+            {label:'Mesh', value:'Stainless steel'}
+        ]
+    });
+};
+
+window.openMGSModal = function(){
+    openProductModal({
+        code:'MGS',
+        name:'Market Grade Sieves',
+        standard:'Market Grade',
+        description:'Market grade sieves for consistent, repeatable particle size measurements.',
+        image:'{{ asset('images/highlights/0003520_market-grade-sieves_420.jpeg') }}',
+        manufacturer:'Dual Manufacturing Co, Inc',
+        specs:[
+            {label:'Use', value:'Particle size analysis'},
+            {label:'Mesh Range', value:'Wide range available'}
+        ]
+    });
+};
+
+/* -------- Local fallback modal controls (if global not loaded) -------- */
+window.closeProductModal = function(){
     const modal=document.getElementById('productModal');
+    if(!modal) return;
     modal.classList.remove('active');
     document.body.style.overflow='';
     const form=document.getElementById('inquiryForm'); if(form) form.style.display='none';
-}
-function showInquiryForm(){
+};
+window.showInquiryForm = function(){
     const form=document.getElementById('inquiryForm');
-    form.style.display = form.style.display==='none' ? 'block' : 'none';
+    if(!form) return;
+    form.style.display = (form.style.display==='none' || !form.style.display) ? 'block' : 'none';
+};
+
+document.getElementById('productModal').addEventListener('click',function(e){
+    if(e.target===this){ closeProductModal(); }
+});
+document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){ closeProductModal(); }
+});
+var _f=document.querySelector('#inquiryForm form');
+if(_f){
+    _f.addEventListener('submit',function(e){
+        e.preventDefault();
+        alert('Thank you for your inquiry. Our team will contact you shortly.');
+        document.getElementById('inquiryForm').style.display='none';
+    });
 }
-document.getElementById('productModal').addEventListener('click',function(e){ if(e.target===this){ closeProductModal(); }});
-document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closeProductModal(); }});
-var _f=document.querySelector('#inquiryForm form'); if(_f){ _f.addEventListener('submit',function(e){ e.preventDefault(); alert('Thank you for your inquiry. Our team will contact you shortly.'); document.getElementById('inquiryForm').style.display='none'; }); }
 </script>
 @endpush
-

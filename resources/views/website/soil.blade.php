@@ -13,6 +13,7 @@
         filter:blur(5px);transform:scale(1.08);
     }
     .page-hero.hero-with-bg.hero-soil .hero-overlay{background:rgba(0,0,0,.45);backdrop-filter:blur(1.5px)}
+
     .blogs-section .blog-post{box-shadow:0 4px 12px rgba(0,0,0,0.05);transition:all .3s ease}
     .blogs-section .blog-post:hover{transform:translateY(-5px);box-shadow:0 10px 20px rgba(0,0,0,0.1)}
     .blog-image{position:relative;height:220px;overflow:hidden;cursor:pointer}
@@ -22,7 +23,8 @@
     .brand-header{margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #e0e0e0}
     .brand-logo{height:64px;width:auto;object-fit:contain}
     .blog-title{cursor:pointer}
-    /* Modal styles (reuse from Aggregates) */
+
+    /* Modal styles (aligned with Drilling page) */
     .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;visibility:hidden;transition:all .3s ease}
     .modal-overlay.active{opacity:1;visibility:visible}
     .modal-content{background:#fff;border-radius:12px;width:90%;max-width:900px;max-height:90vh;overflow:hidden;box-shadow:0 25px 50px -12px rgba(0,0,0,.25);transform:scale(.95);opacity:0;transition:all .3s ease}
@@ -39,14 +41,37 @@
     .modal-specs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}
     .modal-spec-item{background:#f9f9f9;border-radius:6px;padding:.75rem 1rem}
     @media(max-width:768px){.modal-product-info{grid-template-columns:1fr}.modal-specs-grid{grid-template-columns:1fr}}
-    /* Blog actions button styles (match Aggregates) */
+
+    /* Blog actions button styles (match Aggregates/Drilling) */
     .blog-actions{display:flex;margin-top:1rem;gap:.5rem}
     .blog-actions .btn{flex:1;padding:8px 12px;font-size:.9rem;border-radius:6px;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s ease;border:none;cursor:pointer;text-decoration:none}
     .blog-actions .btn-pdf{background:#f5f5f5;color:#333}
     .blog-actions .btn-pdf:hover{background:#e0e0e0}
     .blog-actions .btn-details{background:#2e7d32;color:#fff}
     .blog-actions .btn-details:hover{background:#1b5e20}
-    /* Modern CTA Styles (copied from Aggregates) */
+
+    /* === Inquiry UI (EXACT mirror of Drilling page) === */
+    .modal-contact-section{margin-top:2rem;padding-top:1rem;border-top:1px solid #e0e0e0;display:flex;flex-direction:column;align-items:center}
+    .modal-contact-title{font-size:1.1rem;color:#333;font-weight:600;margin-bottom:1rem;text-align:center}
+    .modal-contact-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;padding:.9rem 1.75rem;border:0;border-radius:12px;font-weight:700;letter-spacing:.2px;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,background .2s ease,filter .2s ease;outline:0}
+    .modal-email-btn{background:linear-gradient(135deg,#2e7d32 0%,#1b5e20 100%);color:#fff;box-shadow:0 10px 20px rgba(46,125,50,.25),inset 0 1px 0 rgba(255,255,255,.15)}
+    .modal-email-btn:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(46,125,50,.28);filter:saturate(1.1)}
+    .modal-email-btn:active{transform:translateY(0);box-shadow:0 8px 16px rgba(46,125,50,.22)}
+    .modal-email-btn:focus-visible{box-shadow:0 0 0 3px rgba(46,125,50,.35),0 10px 20px rgba(46,125,50,.25)}
+    .modal-email-btn i{font-size:1rem;transition:transform .2s ease,opacity .2s ease}
+    .modal-email-btn:hover i{transform:translateX(2px)}
+
+    #inquiryForm form{background:#f7faf8;border:1px solid #e6efe8;border-radius:14px;padding:16px 18px;box-shadow:0 8px 20px rgba(0,0,0,.04)}
+    #inquiryForm .form-label{display:block;font-weight:700;color:#2f3b2f;margin-bottom:.35rem}
+    #inquiryForm .form-control{width:100%;padding:12px 14px;border:1px solid #e3e6e3;border-radius:10px;background:#fff;color:#333;transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}
+    #inquiryForm .form-control:focus{outline:0;border-color:#43a047;box-shadow:0 0 0 3px rgba(67,160,71,.18)}
+    #inquiryForm textarea.form-control{min-height:110px;resize:vertical}
+    #inquiryForm .mb-3{margin-bottom:1rem}
+    #inquiryForm .btn-success.w-100{background:linear-gradient(135deg,#2e7d32,#1b5e20);color:#fff;border:0;border-radius:12px;font-weight:800;letter-spacing:.2px;padding:.85rem 1rem;box-shadow:0 10px 20px rgba(46,125,50,.25);transition:transform .15s ease,box-shadow .15s ease}
+    #inquiryForm .btn-success.w-100:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(46,125,50,.32);color:#fff}
+    #inquiryForm .btn-success.w-100:active{transform:none;box-shadow:0 8px 16px rgba(46,125,50,.22)}
+
+    /* Modern CTA Styles */
     .more-products-cta{margin:3rem 0}
     .cta-card{
         background:linear-gradient(135deg,#1b5e20,#43a047);
@@ -390,7 +415,7 @@
                 </div>
             </div>
 
-            <!-- More Products Section (Modern CTA) - copied from Aggregates -->
+            <!-- More Products Section (Modern CTA) -->
             <div class="more-products-cta">
                 <div class="cta-card">
                     <div class="cta-text">
@@ -456,6 +481,71 @@
 @push('scripts')
 <script src="{{ asset('website/script.js') }}?v={{ filemtime(public_path('website/script.js')) }}"></script>
 <script>
+/* === Mirror Drilling modal helpers (populate badge, manufacturer, specs, and prefill inquiry) === */
+function openProductModal(product){
+    // Image + alt
+    document.getElementById('modalProductImage').src = product.image || '';
+    document.getElementById('modalProductImage').alt = (product.code||'') + ' ' + (product.name||'');
+
+    // Codes / labels
+    const codeBadge = document.getElementById('modalProductCodeBadge');
+    if(codeBadge) codeBadge.textContent = product.code || '';
+    const codeText = document.getElementById('modalProductCode');
+    if(codeText) codeText.textContent = product.code || '';
+
+    // Text fields
+    document.getElementById('modalProductName').textContent = product.name || '';
+    document.getElementById('modalProductStandard').textContent = product.standard || '';
+    document.getElementById('modalProductDescription').textContent = product.description || '';
+    document.getElementById('modalProductManufacturer').textContent = product.manufacturer || 'Gemarc Enterprises Inc.';
+
+    // Prefill inquiry product
+    const inq = document.getElementById('inquiryProduct');
+    if(inq) inq.value = (product.code||'') + ' - ' + (product.name||'');
+
+    // Specs grid
+    const grid = document.getElementById('modalSpecsGrid');
+    grid.innerHTML = '';
+    if (product.specs && product.specs.length){
+        product.specs.forEach(function(s){
+            const d = document.createElement('div');
+            d.className = 'modal-spec-item';
+            d.innerHTML = '<div class="modal-spec-label"><strong>'+s.label+'</strong></div><div class="modal-spec-value">'+s.value+'</div>';
+            grid.appendChild(d);
+        });
+    } else {
+        grid.innerHTML = '<p>No detailed specifications available. Please refer to the PDF or contact us.</p>';
+    }
+
+    // Show modal
+    document.getElementById('productModal').classList.add('active');
+    document.body.style.overflow='hidden';
+}
+function closeProductModal(){
+    document.getElementById('productModal').classList.remove('active');
+    document.body.style.overflow='';
+    const f = document.getElementById('inquiryForm');
+    if(f) f.style.display='none';
+}
+function showInquiryForm(){
+    const f = document.getElementById('inquiryForm');
+    f.style.display = (f.style.display==='none'||!f.style.display) ? 'block' : 'none';
+}
+// backdrop + ESC
+document.getElementById('productModal').addEventListener('click',function(e){ if(e.target===this) closeProductModal() });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeProductModal() });
+// simple submit handler
+(function(){
+    const _f = document.querySelector('#inquiryForm form');
+    if(_f){
+        _f.addEventListener('submit',function(e){
+            e.preventDefault();
+            alert('Thank you for your inquiry. Our team will contact you shortly.');
+            document.getElementById('inquiryForm').style.display='none';
+        });
+    }
+})();
+
 /* -------- Matest modal open helpers -------- */
 window.openS172Modal = function(){
     openProductModal({
@@ -473,7 +563,6 @@ window.openS172Modal = function(){
         ]
     });
 };
-
 window.openS165Modal = function(){
     openProductModal({
         code: 'S165-02',
@@ -488,7 +577,6 @@ window.openS165Modal = function(){
         ]
     });
 };
-
 window.openS276Modal = function(){
     openProductModal({
         code: 'S276-01M',
@@ -504,7 +592,7 @@ window.openS276Modal = function(){
     });
 };
 
-/* -------- Dual Manufacturing modal helpers -------- */
+/* -------- Dual Manufacturing helpers -------- */
 window.openPSKModal = function(){
     openProductModal({
         code:'PSK-001',
@@ -519,7 +607,6 @@ window.openPSKModal = function(){
         ]
     });
 };
-
 window.openMFSModal = function(){
     openProductModal({
         code:'MFS-001',
@@ -534,7 +621,6 @@ window.openMFSModal = function(){
         ]
     });
 };
-
 window.openMGSModal = function(){
     openProductModal({
         code:'MGS',
@@ -549,34 +635,5 @@ window.openMGSModal = function(){
         ]
     });
 };
-
-/* -------- Local fallback modal controls (if global not loaded) -------- */
-window.closeProductModal = function(){
-    const modal=document.getElementById('productModal');
-    if(!modal) return;
-    modal.classList.remove('active');
-    document.body.style.overflow='';
-    const form=document.getElementById('inquiryForm'); if(form) form.style.display='none';
-};
-window.showInquiryForm = function(){
-    const form=document.getElementById('inquiryForm');
-    if(!form) return;
-    form.style.display = (form.style.display==='none' || !form.style.display) ? 'block' : 'none';
-};
-
-document.getElementById('productModal').addEventListener('click',function(e){
-    if(e.target===this){ closeProductModal(); }
-});
-document.addEventListener('keydown',function(e){
-    if(e.key==='Escape'){ closeProductModal(); }
-});
-var _f=document.querySelector('#inquiryForm form');
-if(_f){
-    _f.addEventListener('submit',function(e){
-        e.preventDefault();
-        alert('Thank you for your inquiry. Our team will contact you shortly.');
-        document.getElementById('inquiryForm').style.display='none';
-    });
-}
 </script>
 @endpush

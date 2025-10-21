@@ -63,6 +63,19 @@
     .modal-email-btn{background:linear-gradient(135deg,#2e7d32 0%,#1b5e20 100%);color:#fff;box-shadow:0 10px 20px rgba(46,125,50,.25),inset 0 1px 0 rgba(255,255,255,.15)}
     .modal-email-btn:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(46,125,50,.28);filter:saturate(1.1)}
     @media (max-width:768px){.modal-product-info{grid-template-columns:1fr}.modal-specs-grid{grid-template-columns:1fr}}
+
+    /* === Added to mirror Drilling page inquiry UI === */
+    .modal-contact-section{margin-top:2rem;padding-top:1rem;border-top:1px solid #e0e0e0;display:flex;flex-direction:column;align-items:center}
+    .modal-contact-title{font-size:1.1rem;color:#333;font-weight:600;margin-bottom:1rem;text-align:center}
+    #inquiryForm form{background:#f7faf8;border:1px solid #e6efe8;border-radius:14px;padding:16px 18px;box-shadow:0 8px 20px rgba(0,0,0,.04)}
+    #inquiryForm .form-label{display:block;font-weight:700;color:#2f3b2f;margin-bottom:.35rem}
+    #inquiryForm .form-control{width:100%;padding:12px 14px;border:1px solid #e3e6e3;border-radius:10px;background:#fff;color:#333;transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}
+    #inquiryForm .form-control:focus{outline:0;border-color:#43a047;box-shadow:0 0 0 3px rgba(67,160,71,.18)}
+    #inquiryForm textarea.form-control{min-height:110px;resize:vertical}
+    #inquiryForm .mb-3{margin-bottom:1rem}
+    #inquiryForm .btn-success.w-100{background:linear-gradient(135deg,#2e7d32,#1b5e20);color:#fff;border:0;border-radius:12px;font-weight:800;letter-spacing:.2px;padding:.85rem 1rem;box-shadow:0 10px 20px rgba(46,125,50,.25);transition:transform .15s ease,box-shadow .15s ease}
+    #inquiryForm .btn-success.w-100:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(46,125,50,.32);color:#fff}
+    #inquiryForm .btn-success.w-100:active{transform:none;box-shadow:0 8px 16px rgba(46,125,50,.22)}
 </style>
 @endpush
 
@@ -284,13 +297,32 @@
                     <div id="modalSpecsGrid" class="modal-specs-grid"></div>
                 </div>
 
-                <br>
-                <!-- GEMARC Inline Inquiry (drop-in) -->
-                <div class="gem-inquiry" data-emails="sales@gemarcph.com,technical@gemarcph.com">
-                    <button type="button" class="modal-contact-btn modal-email-btn js-show-inquiry is-full">
+                <div class="modal-contact-section">
+                    <h4 class="modal-contact-title">Need More Information?</h4>
+                    <button type="button" class="modal-contact-btn modal-email-btn" onclick="showInquiryForm()">
                         <i class="fas fa-envelope"></i> Send Inquiry
                     </button>
-                    <div class="inquiry-email-panel js-inquiry-panel" hidden></div>
+                    <div id="inquiryForm" style="display:none;width:100%;max-width:600px;margin-top:20px;">
+                        <form class="p-3 bg-light rounded">
+                            <div class="mb-3">
+                                <label for="inquiryName" class="form-label">Your Name</label>
+                                <input type="text" class="form-control" id="inquiryName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="inquiryEmail" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="inquiryEmail" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="inquiryProduct" class="form-label">Product</label>
+                                <input type="text" class="form-control" id="inquiryProduct" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="inquiryMessage" class="form-label">Message</label>
+                                <textarea class="form-control" id="inquiryMessage" rows="4" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">Submit Inquiry</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -301,3 +333,73 @@
 <script src="{{ asset('website/script.js') }}?v={{ filemtime(public_path('website/script.js')) }}"></script>
 @endpush
 
+@push('scripts')
+<script>
+// Mirrors Drilling page behavior for Industrial page
+
+function openProductModal(product){
+  // image + alt
+  document.getElementById('modalProductImage').src = product.image;
+  document.getElementById('modalProductImage').alt = (product.code||'') + ' ' + (product.name||'');
+
+  // headings/labels (IDs in Industrial modal)
+  var codeEl = document.getElementById('modalProductCode');
+  if(codeEl) codeEl.textContent = product.code || '';
+
+  document.getElementById('modalProductName').textContent = product.name || '';
+  document.getElementById('modalProductStandard').textContent = product.standard || '';
+  document.getElementById('modalProductDescription').textContent = product.description || '';
+
+  // prefill inquiry product
+  var inq = document.getElementById('inquiryProduct');
+  if(inq) inq.value = (product.code||'') + ' - ' + (product.name||'');
+
+  // specs
+  const grid = document.getElementById('modalSpecsGrid');
+  grid.innerHTML = '';
+  if (product.specs && product.specs.length){
+    product.specs.forEach(function(s){
+      const d = document.createElement('div');
+      d.className = 'modal-spec-item';
+      d.innerHTML = '<div class="modal-spec-label"><strong>'+s.label+
+                    '</strong></div><div class="modal-spec-value">'+s.value+'</div>';
+      grid.appendChild(d);
+    });
+  } else {
+    grid.innerHTML = '<p>No detailed specifications available. Please refer to the PDF or contact us.</p>';
+  }
+
+  // show modal
+  document.getElementById('productModal').classList.add('active');
+  document.body.style.overflow='hidden';
+}
+
+function closeProductModal(){
+  document.getElementById('productModal').classList.remove('active');
+  document.body.style.overflow='';
+  var f = document.getElementById('inquiryForm');
+  if(f) f.style.display='none';
+}
+
+function showInquiryForm(){
+  const f = document.getElementById('inquiryForm');
+  f.style.display = (f.style.display==='none'||!f.style.display) ? 'block' : 'none';
+}
+
+// close on backdrop / ESC
+document.getElementById('productModal').addEventListener('click',function(e){ if(e.target===this) closeProductModal() });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeProductModal() });
+
+// simple submit handler
+(function(){
+  var _f = document.querySelector('#inquiryForm form');
+  if(_f){
+    _f.addEventListener('submit',function(e){
+      e.preventDefault();
+      alert('Thank you for your inquiry. Our team will contact you shortly.');
+      document.getElementById('inquiryForm').style.display='none';
+    });
+  }
+})();
+</script>
+@endpush

@@ -140,9 +140,9 @@
               <div class="contact-icon"><i class="fas fa-phone"></i></div>
               <div class="contact-details">
                 <h4>Telephone Numbers</h4>
-                <p>(632)8-997-7959 | (632)8-584-5572</p>
+                <p>(632)8-997-7959</p>
                 <h4 style="margin-top:.5rem">Mobile Numbers</h4>
-                <p>+63 909 087 9416<br>+63 928 395 3532 | +63 918 905 8316</p>
+                <p>+63 909 087 9416 | Marketing Department<br>+63 928 395 3532 | Technical Department<br> +63 918 905 8316</p>
               </div>
             </div>
 
@@ -150,7 +150,7 @@
               <div class="contact-icon"><i class="fas fa-envelope"></i></div>
               <div class="contact-details">
                 <h4>Email Address</h4>
-                <p>sales@gemarcph.com<br>technical@gemarcph.com</p>
+                <p>sales@gemarcph.com<br>technical@gemarcph.com<br>gemarcent.fo@gmail.com<br>gemarc.fo@gemarcph.com</p>
               </div>
             </div>
 

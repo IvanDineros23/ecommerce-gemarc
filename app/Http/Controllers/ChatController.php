@@ -20,34 +20,22 @@ class ChatController extends Controller
         }
 
 
-        // If employee, fetch messages with selected user and department context
-        if ($user->isEmployee() && $withUserId) {
-            $context = $user->department ?? 'undefined';
-            DB::table('chat_messages')
-                ->where('sender_id', $withUserId)
-                ->where('receiver_id', $user->id)
-                ->where('context', $context)
-                ->whereNull('read_at')
-                ->update(['read_at' => now()]);
+        // Always use the employee's department as context for both user and employee
+        if (($user->isEmployee() || $user->isUser()) && $withUserId) {
+            // Find the employee (if current user is employee, use self; if user, use withUserId)
+            $employee = $user->isEmployee() ? $user : \App\Models\User::find($withUserId);
+            $context = $employee && $employee->department ? $employee->department : 'undefined';
 
-            $messages = DB::table('chat_messages')
-                ->where(function($q) use ($user, $withUserId) {
-                    $q->where(function($q2) use ($user, $withUserId) {
-                        $q2->where('sender_id', $user->id)->where('receiver_id', $withUserId);
-                    })->orWhere(function($q2) use ($user, $withUserId) {
-                        $q2->where('sender_id', $withUserId)->where('receiver_id', $user->id);
-                    });
-                })
-                ->where('context', $context)
-                ->orderBy('created_at', 'desc')
-                ->limit(50)
-                ->get();
-            return response()->json($messages->reverse()->values());
-        }
+            // Mark messages as read if employee is viewing
+            if ($user->isEmployee()) {
+                DB::table('chat_messages')
+                    ->where('sender_id', $withUserId)
+                    ->where('receiver_id', $user->id)
+                    ->where('context', $context)
+                    ->whereNull('read_at')
+                    ->update(['read_at' => now()]);
+            }
 
-        // If user, fetch messages with selected employee and department context
-        if ($user->isUser() && $withUserId) {
-            $context = $request->input('context');
             $messages = DB::table('chat_messages')
                 ->where(function($q) use ($user, $withUserId) {
                     $q->where(function($q2) use ($user, $withUserId) {
@@ -84,10 +72,16 @@ class ChatController extends Controller
         $receiverId = $request->to_user_id;
         $user = Auth::user();
         // Prevent employee from sending message to self
-        if ($user->isEmployee() && $senderId == $receiverId) {
+            if ($user->isEmployee() && $senderId === $receiverId) {
             return response()->json(['success' => false, 'error' => 'Cannot send message to self'], 403);
         }
-        $context = $request->input('context');
+            // Derive context on the server:
+            if ($user->isEmployee()) {
+                $context = $user->department ?? 'undefined';
+            } else {
+                $receiver = \App\Models\User::findOrFail($receiverId);
+                $context = $receiver->department ?? 'undefined';
+            }
         $msg = DB::table('chat_messages')->insertGetId([
             'sender_id' => $senderId,
             'receiver_id' => $receiverId,
@@ -120,22 +114,45 @@ class ChatController extends Controller
         $user = Auth::user();
         // If employee, show users who chatted with them
         if ($user->isEmployee()) {
-            $employeeId = $user->id;
-            $users = DB::table('chat_messages')
-                ->select('users.id', 'users.name', 'users.email',
-                    DB::raw('MAX(chat_messages.created_at) as last_message_at'),
-                    DB::raw('SUM(CASE WHEN chat_messages.receiver_id = '.$employeeId.' AND chat_messages.sender_id = users.id AND chat_messages.read_at IS NULL THEN 1 ELSE 0 END) as unread_count')
-                )
-                ->join('users', 'users.id', '=', 'chat_messages.sender_id')
+            $me = $user;
+            $employeeId = $me->id;
+            $context     = $me->department ?? 'undefined';
+
+            // Threads per OTHER user, scoped by context (department)
+            $threads = DB::table('chat_messages')
+                ->where('context', $context)
                 ->where(function($q) use ($employeeId) {
-                    $q->where('chat_messages.receiver_id', $employeeId)
-                      ->orWhere('chat_messages.sender_id', $employeeId);
+                    $q->where('sender_id', $employeeId)
+                      ->orWhere('receiver_id', $employeeId);
                 })
-                ->where('users.id', '!=', $employeeId)
-                ->groupBy('users.id', 'users.name', 'users.email')
+                ->selectRaw('CASE WHEN sender_id = ? THEN receiver_id ELSE sender_id END AS user_id', [$employeeId])
+                ->selectRaw('MAX(created_at) AS last_message_at')
+                // only messages the user sent to the employee WITHIN THIS CONTEXT
+                ->selectRaw('SUM(CASE WHEN receiver_id = ? AND sender_id <> ? THEN 1 ELSE 0 END) AS total_incoming', [$employeeId, $employeeId])
+                ->selectRaw('SUM(CASE WHEN receiver_id = ? AND sender_id <> ? AND read_at IS NULL THEN 1 ELSE 0 END) AS unread_count', [$employeeId, $employeeId])
+                ->groupBy('user_id')
                 ->orderByDesc('last_message_at')
                 ->get();
-            return response()->json($users);
+
+            // Only show threads na may talagang ipinadalang message ang user
+            $userIds = $threads->where('total_incoming', '>', 0)->pluck('user_id')->all();
+
+            if (empty($userIds)) return response()->json([]);
+
+            $users = DB::table('users')->whereIn('id', $userIds)->get()->keyBy('id');
+
+            $out = $threads->filter(fn($t) => $t->total_incoming > 0)->map(function($t) use ($users) {
+                $u = $users[$t->user_id] ?? null;
+                return [
+                    'id'             => (int) $t->user_id,
+                    'name'           => $u ? $u->name : ('User #'.$t->user_id),
+                    'email'          => $u->email ?? null,
+                    'last_message_at'=> $t->last_message_at,
+                    'unread_count'   => (int) $t->unread_count,
+                ];
+            })->values();
+
+            return response()->json($out);
         }
         // If user, show employees grouped by department
         if ($user->isUser()) {

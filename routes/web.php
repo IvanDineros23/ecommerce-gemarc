@@ -263,10 +263,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/quotes',                 [QuoteController::class, 'employeeIndex'])->name('quotes.index');
         Route::get('/quotes/{quote}',         [QuoteController::class, 'employeeShow'])->name('quotes.show');
 
-    // Employee chat page
-    Route::get('/employee/chats', fn() => view('dashboard.employee_chat'))->name('employee.chat.page');
-    // User chat page
-    Route::get('/chats', fn() => view('dashboard.chat'))->name('chat.page');
+    // Employee chat page (correct path: /employee/chats)
+    Route::get('/chats', fn() => view('dashboard.employee_chat'))->name('chat.page');
     });
 
     // Chat: user list for employees

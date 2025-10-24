@@ -1,15 +1,18 @@
 @php
-    // For Marketing charts (avoid [] inside @json)
-    $mkDS = isset($mkDatasets) ? $mkDatasets : new \stdClass(); // {} fallback
+    use App\Models\Order;
 
-    // For Accounting charts (precompute everything to plain variables)
+    // ---- Marketing datasets safe-fallback ({} instead of []) ----
+    $mkDS = isset($mkDatasets) ? $mkDatasets : new \stdClass();
+
+    // ---- Precompute Accounting values into plain arrays ----
     $__months = $months ?? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    $__ar     = array_values($arBuckets     ?? ['0-30'=>0,'31-60'=>0,'61-90'=>0,'90+'=>0]);
-    $__ap     = array_values($apBuckets     ?? ['0-30'=>0,'31-60'=>0,'61-90'=>0,'90+'=>0]);
+    $__ar     = array_values($arBuckets       ?? ['0-30'=>0,'31-60'=>0,'61-90'=>0,'90+'=>0]);
+    $__ap     = array_values($apBuckets       ?? ['0-30'=>0,'31-60'=>0,'61-90'=>0,'90+'=>0]);
     $__in     = $collectionsByMonth ?? array_fill(0,12,0);
     $__out    = $expensesByMonth    ?? array_fill(0,12,0);
     $__top    = $topCustomers       ?? [];
 @endphp
+
 @extends('layouts.ecommerce')
 
 @section('content')
@@ -69,7 +72,7 @@
             </div>
 
         @elseif($isMarketing)
-            {{-- 3 equal cards; icon → title → desc (smaller icons) --}}
+            {{-- 3 equal cards; icon → title → desc --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <a href="{{ route('employee.quotes.management.index') }}"
                    class="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center hover:bg-green-50 transition min-h-[150px]">
@@ -305,7 +308,7 @@
                 ->selectRaw('status, COUNT(*) as cnt')->groupBy('status')->pluck('cnt','status');
             $statusCountsWeekly = $statusCountsMonthly;
             $statusCountsQuarterly = $statusCountsMonthly;
-            $statusCountsYearly = \App\Models<Order::selectRaw('status, COUNT(*) as cnt')->groupBy('status')->pluck('cnt','status');
+            $statusCountsYearly = \App\Models\Order::selectRaw('status, COUNT(*) as cnt')->groupBy('status')->pluck('cnt','status');
 
             $mkDatasets = [
                 'weekly'=>[
@@ -453,96 +456,113 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const IS_PURCHASING = @json($isPurchasing);
-    const IS_MARKETING  = @json($isMarketing);
-    const IS_ACCOUNTING = @json($isAccounting);
+    // prevent double-build if this stack is injected twice
+    if (window.__DASH_BUILT__) return;
+    window.__DASH_BUILT__ = true;
 
-    // Purchasing charts
+    // allow safe re-evaluation without "already declared"
+    var IS_PURCHASING = (typeof IS_PURCHASING !== 'undefined') ? IS_PURCHASING : @json($isPurchasing);
+    var IS_MARKETING  = (typeof IS_MARKETING  !== 'undefined') ? IS_MARKETING  : @json($isMarketing);
+    var IS_ACCOUNTING = (typeof IS_ACCOUNTING !== 'undefined') ? IS_ACCOUNTING : @json($isAccounting);
+
+    const $ = id => document.getElementById(id);
+
+    // ===== Purchasing charts =====
     if (IS_PURCHASING) {
         const stockLabels = @json($stockLabels ?? []);
-        const stockData   = @json($stockData ?? []);
-        const valueData   = @json($valueData ?? []);
+        const stockData   = @json($stockData   ?? []);
+        const valueData   = @json($valueData   ?? []);
         const totalValue  = @json($totalInventoryValue ?? 0);
 
-        new Chart(document.getElementById('stockLevelsChart'), {
-            type: 'bar',
-            data: { labels: stockLabels, datasets: [{ label:'Stock', data: stockData, backgroundColor:'#38bdf8' }] },
-            options: { maintainAspectRatio:false, responsive:true, plugins:{legend:{display:false}}, scales:{ y:{ beginAtZero:true } } }
-        });
+        if ($('stockLevelsChart')) {
+            new Chart($('stockLevelsChart'), {
+                type: 'bar',
+                data: { labels: stockLabels, datasets: [{ label:'Stock', data: stockData, backgroundColor:'#38bdf8' }] },
+                options: { maintainAspectRatio:false, responsive:true, plugins:{legend:{display:false}}, scales:{ y:{ beginAtZero:true } } }
+            });
+        }
 
-        new Chart(document.getElementById('inventoryValueChart'), {
-            type: 'bar',
-            data: { labels: stockLabels, datasets: [{ label:'Value (₱)', data: valueData, backgroundColor:'#22c55e' }] },
-            options: {
-                maintainAspectRatio:false, responsive:true, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>' ₱'+(c.parsed.y||0).toLocaleString() } } },
-                scales:{ y:{ beginAtZero:true, ticks:{ callback:v=>'₱'+Number(v).toLocaleString() } } }
-            }
-        });
+        if ($('inventoryValueChart')) {
+            new Chart($('inventoryValueChart'), {
+                type: 'bar',
+                data: { labels: stockLabels, datasets: [{ label:'Value (₱)', data: valueData, backgroundColor:'#22c55e' }] },
+                options: {
+                    maintainAspectRatio:false, responsive:true,
+                    plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>' ₱'+(c.parsed.y||0).toLocaleString() } } },
+                    scales:{ y:{ beginAtZero:true, ticks:{ callback:v=>'₱'+Number(v).toLocaleString() } } }
+                }
+            });
+        }
 
-        new Chart(document.getElementById('inventoryValueTotalChart'), {
-            type: 'bar',
-            data: { labels:['Total Inventory Value'], datasets:[{ data:[totalValue], backgroundColor:'#16a34a' }] },
-            options: {
-                maintainAspectRatio:false, responsive:true, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>' ₱'+(c.parsed.y||0).toLocaleString() } } },
-                scales:{ x:{ grid:{display:false} }, y:{ beginAtZero:true, ticks:{ callback:v=>'₱'+Number(v).toLocaleString() } } }
-            }
-        });
+        if ($('inventoryValueTotalChart')) {
+            new Chart($('inventoryValueTotalChart'), {
+                type: 'bar',
+                data: { labels:['Total Inventory Value'], datasets:[{ data:[totalValue], backgroundColor:'#16a34a' }] },
+                options: {
+                    maintainAspectRatio:false, responsive:true,
+                    plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>' ₱'+(c.parsed.y||0).toLocaleString() } } },
+                    scales:{ x:{ grid:{display:false} }, y:{ beginAtZero:true, ticks:{ callback:v=>'₱'+Number(v).toLocaleString() } } }
+                }
+            });
+        }
     }
 
-    // Marketing charts
+    // ===== Marketing charts =====
     if (IS_MARKETING) {
         const DS = @json($mkDS);
-        const ctxRev = document.getElementById('mkRevenueChart').getContext('2d');
-        const ctxAov = document.getElementById('mkAovChart').getContext('2d');
-        const ctxSta = document.getElementById('mkStatusChart').getContext('2d');
+        const peso = v => ' ₱' + (v||0).toLocaleString(undefined,{maximumFractionDigits:2});
+        const ctxRev = $('mkRevenueChart')?.getContext('2d');
+        const ctxAov = $('mkAovChart')?.getContext('2d');
+        const ctxSta = $('mkStatusChart')?.getContext('2d');
 
         let revChart, aovChart, staChart;
-        const peso = v => ' ₱' + (v||0).toLocaleString(undefined,{maximumFractionDigits:2});
 
         function buildCharts(tf='monthly'){
             const d = DS[tf] || {labels:[],revenue:[],aov:[],status:{}};
 
-            const revCfg = {
-                type:'line',
-                data:{ labels:d.labels, datasets:[{ label:'Revenue (₱)', data:d.revenue, borderColor:'#16a34a', fill:false, tension:.3 }] },
-                options:{ maintainAspectRatio:false, responsive:true,
-                    plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>peso(c.parsed.y) } } },
-                    scales:{ y:{ beginAtZero:true, ticks:{ callback:v=>'₱'+Number(v).toLocaleString() } } }
-                }
-            };
+            if (ctxRev) {
+                if (revChart) revChart.destroy();
+                revChart = new Chart(ctxRev, {
+                    type:'line',
+                    data:{ labels:d.labels, datasets:[{ label:'Revenue (₱)', data:d.revenue, borderColor:'#16a34a', fill:false, tension:.3 }] },
+                    options:{ maintainAspectRatio:false, responsive:true,
+                        plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>peso(c.parsed.y) } } },
+                        scales:{ y:{ beginAtZero:true, ticks:{ callback:v=>'₱'+Number(v).toLocaleString() } } }
+                    }
+                });
+            }
 
-            const aovCfg = {
-                type:'bar',
-                data:{ labels:d.labels, datasets:[{ label:'AOV (₱)', data:d.aov, backgroundColor:'#10b981' }] },
-                options:{ maintainAspectRatio:false, responsive:true,
-                    plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>peso(c.parsed.y) } } },
-                    scales:{ y:{ beginAtZero:true, ticks:{ callback:v=>'₱'+Number(v).toLocaleString() } } }
-                }
-            };
+            if (ctxAov) {
+                if (aovChart) aovChart.destroy();
+                aovChart = new Chart(ctxAov, {
+                    type:'bar',
+                    data:{ labels:d.labels, datasets:[{ label:'AOV (₱)', data:d.aov, backgroundColor:'#10b981' }] },
+                    options:{ maintainAspectRatio:false, responsive:true,
+                        plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>peso(c.parsed.y) } } },
+                        scales:{ y:{ beginAtZero:true, ticks:{ callback:v=>'₱'+Number(v).toLocaleString() } } }
+                    }
+                });
+            }
 
-            const sLabels = Object.keys(d.status||{});
-            const sValues = Object.values(d.status||{});
-            const staCfg = {
-                type:'doughnut',
-                data:{ labels:sLabels, datasets:[{ data:sValues, backgroundColor:['#22c55e','#f59e0b','#ef4444','#3b82f6','#a855f7','#64748b'] }] },
-                options:{ maintainAspectRatio:false, responsive:true, plugins:{ legend:{ position:'bottom' } } }
-            };
-
-            if (revChart) revChart.destroy();
-            if (aovChart) aovChart.destroy();
-            if (staChart) staChart.destroy();
-            revChart = new Chart(ctxRev, revCfg);
-            aovChart = new Chart(ctxAov, aovCfg);
-            staChart = new Chart(ctxSta, staCfg);
+            if (ctxSta) {
+                if (staChart) staChart.destroy();
+                const sLabels = Object.keys(d.status||{});
+                const sValues = Object.values(d.status||{});
+                staChart = new Chart(ctxSta, {
+                    type:'doughnut',
+                    data:{ labels:sLabels, datasets:[{ data:sValues, backgroundColor:['#22c55e','#f59e0b','#ef4444','#3b82f6','#a855f7','#64748b'] }] },
+                    options:{ maintainAspectRatio:false, responsive:true, plugins:{ legend:{ position:'bottom' } } }
+                });
+            }
         }
 
         buildCharts('monthly');
-        document.getElementById('mkTimeframe').addEventListener('change', function (e) {
-            buildCharts(e.target.value);
-        });
+        if ($('mkTimeframe')) {
+            $('mkTimeframe').addEventListener('change', e => buildCharts(e.target.value));
+        }
     }
 
-    // Accounting charts
+    // ===== Accounting charts =====
     if (IS_ACCOUNTING) {
         const months  = @json($__months);
         const ar      = @json($__ar);
@@ -550,40 +570,53 @@ document.addEventListener('DOMContentLoaded', function () {
         const inflow  = @json($__in);
         const outflow = @json($__out);
         const top     = @json($__top);
-
         const peso = v => ' ₱' + (v||0).toLocaleString();
 
-        new Chart(document.getElementById('arAgingChart'),{
-            type:'bar',
-            data:{ labels:['0-30','31-60','61-90','90+'], datasets:[{ data: ar, backgroundColor:'#22c55e' }] },
-            options:{ maintainAspectRatio:false, plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>peso(c.parsed.y)}}},
-                scales:{ y:{ beginAtZero:true, ticks:{ callback:v=>'₱'+Number(v).toLocaleString() } } }
-        });
+        if ($('arAgingChart')) {
+            new Chart($('arAgingChart'), {
+                type:'bar',
+                data:{ labels:['0-30','31-60','61-90','90+'], datasets:[{ data: ar, backgroundColor:'#22c55e' }] },
+                options:{ maintainAspectRatio:false,
+                    plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>peso(c.parsed.y)}}},
+                    scales:{ y:{ beginAtZero:true, ticks:{ callback:v=>'₱'+Number(v).toLocaleString() } } }
+                }
+            });
+        }
 
-        new Chart(document.getElementById('apAgingChart'),{
-            type:'bar',
-            data:{ labels:['0-30','31-60','61-90','90+'], datasets:[{ data: ap, backgroundColor:'#f59e0b' }] },
-            options:{ maintainAspectRatio:false, plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>peso(c.parsed.y)}}},
-                scales:{ y:{ beginAtZero:true, ticks:{ callback:v=>'₱'+Number(v).toLocaleString() } } }
-        });
+        if ($('apAgingChart')) {
+            new Chart($('apAgingChart'), {
+                type:'bar',
+                data:{ labels:['0-30','31-60','61-90','90+'], datasets:[{ data: ap, backgroundColor:'#f59e0b' }] },
+                options:{ maintainAspectRatio:false,
+                    plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>peso(c.parsed.y)}}},
+                    scales:{ y:{ beginAtZero:true, ticks:{ callback:v=>'₱'+Number(v).toLocaleString() } } }
+                }
+            });
+        }
 
-        new Chart(document.getElementById('cashflowChart'),{
-            type:'line',
-            data:{ labels: months, datasets:[
-                { label:'Collections (₱)', data: inflow,  borderColor:'#16a34a', tension:.3, fill:false },
-                { label:'Expenses (₱)',   data: outflow, borderColor:'#ef4444', tension:.3, fill:false }
-            ]},
-            options:{ maintainAspectRatio:false, plugins:{ tooltip:{ callbacks:{ label:c=>peso(c.parsed.y) } } },
-                scales:{ y:{ beginAtZero:true, ticks:{ callback:v=>'₱'+Number(v).toLocaleString() } } }
-        });
+        if ($('cashflowChart')) {
+            new Chart($('cashflowChart'), {
+                type:'line',
+                data:{ labels: months, datasets:[
+                    { label:'Collections (₱)', data: inflow,  borderColor:'#16a34a', tension:.3, fill:false },
+                    { label:'Expenses (₱)',   data: outflow, borderColor:'#ef4444', tension:.3, fill:false }
+                ]},
+                options:{ maintainAspectRatio:false,
+                    plugins:{ tooltip:{ callbacks:{ label:c=>peso(c.parsed.y) } } },
+                    scales:{ y:{ beginAtZero:true, ticks:{ callback:v=>'₱'+Number(v).toLocaleString() } } }
+                }
+            });
+        }
 
-        const tLabels = top.map(t=>t.name);
-        const tValues = top.map(t=>t.sum);
-        new Chart(document.getElementById('topCustomersChart'),{
-            type:'doughnut',
-            data:{ labels:tLabels, datasets:[{ data:tValues, backgroundColor:['#22c55e','#3b82f6','#a855f7','#f97316','#e11d48'] }] },
-            options:{ maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } }
-        });
+        if ($('topCustomersChart')) {
+            const tLabels = (top||[]).map(t=>t.name);
+            const tValues = (top||[]).map(t=>t.sum);
+            new Chart($('topCustomersChart'), {
+                type:'doughnut',
+                data:{ labels:tLabels, datasets:[{ data:tValues, backgroundColor:['#22c55e','#3b82f6','#a855f7','#f97316','#e11d48'] }] },
+                options:{ maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } }
+            });
+        }
     }
 });
 </script>

@@ -265,6 +265,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Employee chat page (correct path: /employee/chats)
     Route::get('/chats', fn() => view('dashboard.employee_chat'))->name('chat.page');
+
+        // Invoices
+        Route::get('/invoices', [App\Http\Controllers\EmployeeInvoiceController::class, 'index'])->name('invoices.index');
+        // Payments
+        Route::get('/payments', [App\Http\Controllers\EmployeePaymentController::class, 'index'])->name('payments.index');
+        // Bills
+        Route::get('/bills', [App\Http\Controllers\EmployeeBillController::class, 'index'])->name('bills.index');
+        // Expenses
+        Route::get('/expenses', [App\Http\Controllers\EmployeeExpenseController::class, 'index'])->name('expenses.index');
+        // Credits
+        Route::get('/credits', [App\Http\Controllers\EmployeeCreditController::class, 'index'])->name('credits.index');
+        // Tax Reports
+        Route::get('/tax-reports', [App\Http\Controllers\EmployeeTaxReportController::class, 'index'])->name('tax-reports.index');
+        // Statements
+        Route::get('/statements', [App\Http\Controllers\EmployeeStatementController::class, 'index'])->name('statements.index');
     });
 
     // Chat: user list for employees
@@ -277,7 +292,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'verified', 'can:access-admin'])->prefix('admin')->name('admin.')->group(function () {
-    // User Management (redirect /users to /user-management)
+    // User Management (redirect /users to /admin/user-management)
     Route::redirect('/users', '/admin/user-management');
     Route::get('/user-management', [\App\Http\Controllers\Admin\UserManagementController::class, 'index'])->name('user_management');
     Route::get('/user-management/{id}/view', [\App\Http\Controllers\Admin\UserManagementController::class, 'view'])->name('user_management.view');

@@ -1,4 +1,7 @@
 <?php
+// Real-time notification polling route
+Route::get('/notifications/fetch', [\App\Http\Controllers\NotificationController::class, 'fetch'])->middleware('auth');
+
 // Static website page routes
 Route::view('/about', 'website.about');
 Route::view('/contact', 'website.contact')->name('contact');

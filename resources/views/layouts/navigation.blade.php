@@ -59,9 +59,7 @@
                         @php
                             $employeeNotifs = \App\Helpers\EmployeeNotification::all();
                         @endphp
-                        @if(count($employeeNotifs))
-                            <span class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full px-1.5 py-0.5">{{ count($employeeNotifs) }}</span>
-                        @endif
+                        <span data-badge="notif" class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full px-1.5 py-0.5" style="display:none">0</span>
                     </button>
                     <!-- Dropdown: improved position, max height, scroll, and shadow -->
                     <div x-show="open" @click.away="open = false" style="right:0;left:auto;top:2.5rem;" class="absolute w-80 bg-white border border-gray-200 rounded-lg shadow-2xl z-50 max-h-80 transition-all duration-200" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
@@ -93,6 +91,60 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
+    }
+
+
+    // Laravel Echo real-time notifications
+    if (typeof Echo === 'undefined') {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pusher/7.2.2/pusher.min.js';
+        document.head.appendChild(script);
+        script.onload = function() {
+            const echoScript = document.createElement('script');
+            echoScript.src = '/js/echo.js'; // Make sure echo.js is built and available
+            document.head.appendChild(echoScript);
+            echoScript.onload = setupEchoListener;
+        };
+    } else {
+        setupEchoListener();
+    }
+
+    function setupEchoListener() {
+        window.Echo.channel('employee-notifications')
+            .listen('EmployeeNotificationEvent', (e) => {
+                var notifList = document.getElementById('notification-list');
+                var badge = document.querySelector('.absolute.-top-2.-right-2.bg-orange-500');
+                if (notifList && e.notification) {
+                    let notif = e.notification;
+                    let html = '<li class="px-3 py-2 hover:bg-green-50 cursor-pointer text-sm">';
+                    if (notif.type === 'order') {
+                        html += '<div class="font-semibold text-green-700">New Order</div>';
+                        html += '<div class="text-xs text-gray-500">' + notif.data.created_at + '</div>';
+                        html += '<div class="mt-1">Order #' + notif.data.reference + ' by <b>' + notif.data.user + '</b> (₱' + notif.data.total + ')</div>';
+                    } else if (notif.type === 'quote') {
+                        html += '<div class="font-semibold text-blue-700">New Quote Request</div>';
+                        html += '<div class="text-xs text-gray-500">' + notif.data.created_at + '</div>';
+                        html += '<div class="mt-1">Quote #' + notif.data.quote_id + ' by <b>' + notif.data.user + '</b> (₱' + notif.data.total + ')</div>';
+                    } else if (notif.type === 'chat') {
+                        html += '<div class="font-semibold text-purple-700">New Chat Message</div>';
+                        html += '<div class="text-xs text-gray-500">' + notif.data.created_at + '</div>';
+                        html += '<div class="mt-1"><b>' + (notif.data.user || 'User') + '</b>: <span class="truncate block">' + (notif.data.message || '') + '</span></div>';
+                    }
+                    html += '</li>';
+                    notifList.innerHTML = html + notifList.innerHTML;
+                    // Update badge
+                    if (badge) badge.textContent = (parseInt(badge.textContent) || 0) + 1;
+                    else {
+                        let btn = document.querySelector('[aria-label="Notifications"]');
+                        if (btn) {
+                            let span = document.createElement('span');
+                            span.className = 'absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full px-1.5 py-0.5';
+                            span.textContent = '1';
+                            btn.appendChild(span);
+                        }
+                    }
+                }
+            });
     }
 });
 </script>
@@ -159,7 +211,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <!-- Chat/Messages Button -->
                 <div class="relative group flex items-center ml-2">
-                    <a href="{{ route('chat.page') }}" class="relative">
+                    <a href="{{ route('chat.page') }}" class="relative" data-chat-link>
+                        <span data-badge="chat" class="absolute -top-2 -right-2 bg-green-600 text-white text-xs rounded-full px-1.5 py-0.5" style="display:none">0</span>
                         <svg class="w-7 h-7 text-green-700 group-hover:text-orange-600 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4-4.03 7-9 7-1.18 0-2.31-.13-3.36-.38-.37-.09-.77-.08-1.12.07l-2.13.85a1 1 0 01-1.32-1.32l.85-2.13c.15-.35.16-.75.07-1.12A7.96 7.96 0 013 12c0-4 4.03-7 9-7s9 3 9 7z" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
@@ -170,81 +223,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 @endif
                 <!-- User Dropdown: Hide on landing page -->
-                @if (!request()->routeIs('landing'))
-                <x-dropdown align="right" width="56">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user() ? Auth::user()->name : '' }}</div>
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
+                @push('scripts')
+                <script>
+                (function () {
+                    const bell = document.querySelector('[data-badge="notif"]');
+                    const chat = document.querySelector('[data-badge="chat"]');
+                    const chatLinks = document.querySelectorAll('[data-chat-link]');
+                    const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-                    <x-slot name="content">
-                        <div class="py-3 px-2 grid gap-1">
-                            @if(!auth()->user() || !auth()->user()->isEmployee())
-                                <a href="{{ route('orders.index') }}" class="block rounded-md px-5 py-2 text-[15px] font-normal text-gray-700 hover:bg-gray-100 transition">Orders</a>
-                                <a href="{{ route('saved.index') }}" class="block rounded-md px-5 py-2 text-[15px] font-normal text-gray-700 hover:bg-gray-100 transition">Saved Items</a>
-                            @endif
-                            <a href="{{ route('profile.edit') }}" class="block rounded-md px-5 py-2 text-[15px] font-normal text-gray-700 hover:bg-gray-100 transition">Profile</a>
-                            <div class="border-t border-gray-200 my-2"></div>
-                            <!-- Authentication -->
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="w-full text-left rounded-md px-5 py-2 text-[15px] font-normal text-gray-700 hover:bg-gray-100 transition">{{ __('Log Out') }}</button>
-                            </form>
-                        </div>
-                    </x-slot>
-                </x-dropdown>
-                @endif
-            </div>
+                    function setBadge(el, count) {
+                        if (!el) return;
+                        el.style.display = count > 0 ? 'inline-block' : 'none';
+                        if (count > 0) el.textContent = count;
+                    }
 
-            <!-- Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    async function poll() {
+                        try {
+                            const res = await fetch(`{{ route('notifications.feed') }}`, { credentials: 'same-origin' });
+                            if (!res.ok) return;
+                            const data = await res.json();
+                            if (!data.success) return;
+                            setBadge(bell, data.notif_count);
+                            setBadge(chat, data.chat_unread);
+                        } catch (_) {}
+                    }
+
+                    poll();
+                    setInterval(poll, 5000);
+
+                    chatLinks.forEach(a => {
+                        a.addEventListener('click', () => {
+                            fetch(`{{ route('chat.seen') }}`, {
+                                method: 'POST',
+                                headers: { 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest' }
+                            }).then(() => poll());
+                        });
+                    });
+                })();
+                </script>
+                @endpush
                     </svg>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-        </div>
-
-        <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user() ? Auth::user()->name : '' }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user() ? Auth::user()->email : '' }}</div>
-            </div>
-
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
-                </x-responsive-nav-link>
-
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
-                </form>
-            </div>
-        </div>
-    </div>
-</nav>

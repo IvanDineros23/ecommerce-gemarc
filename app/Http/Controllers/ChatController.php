@@ -112,49 +112,33 @@ class ChatController extends Controller
     public function userList()
     {
         $user = Auth::user();
-        // If employee, show users who chatted with them
+        // If employee, show all users (with unread count and last message info)
         if ($user->isEmployee()) {
-            $me = $user;
-            $employeeId = $me->id;
-            $context     = $me->department ?? 'undefined';
-
-            // Threads per OTHER user, scoped by context (department)
-            $threads = DB::table('chat_messages')
-                ->where('context', $context)
-                ->where(function($q) use ($employeeId) {
-                    $q->where('sender_id', $employeeId)
-                      ->orWhere('receiver_id', $employeeId);
-                })
-                ->selectRaw('CASE WHEN sender_id = ? THEN receiver_id ELSE sender_id END AS user_id', [$employeeId])
-                ->selectRaw('MAX(created_at) AS last_message_at')
-                // only messages the user sent to the employee WITHIN THIS CONTEXT
-                ->selectRaw('SUM(CASE WHEN receiver_id = ? AND sender_id <> ? THEN 1 ELSE 0 END) AS total_incoming', [$employeeId, $employeeId])
-                ->selectRaw('SUM(CASE WHEN receiver_id = ? AND sender_id <> ? AND read_at IS NULL THEN 1 ELSE 0 END) AS unread_count', [$employeeId, $employeeId])
-                ->groupBy('user_id')
-                ->orderByDesc('last_message_at')
-                ->get();
-
-            // Only show threads na may talagang ipinadalang message ang user
-            $userIds = $threads->where('total_incoming', '>', 0)->pluck('user_id')->all();
-
-            if (empty($userIds)) return response()->json([]);
-
-            $users = DB::table('users')->whereIn('id', $userIds)->get()->keyBy('id');
-
-            $out = $threads->filter(fn($t) => $t->total_incoming > 0)->map(function($t) use ($users) {
-                $u = $users[$t->user_id] ?? null;
+            $users = DB::table('users')->where('role', 'user')->get();
+            $out = collect($users)->map(function($u) use ($user) {
+                $lastMsg = DB::table('chat_messages')
+                    ->where(function($q) use ($user, $u) {
+                        $q->where('sender_id', $user->id)->where('receiver_id', $u->id)
+                          ->orWhere('sender_id', $u->id)->where('receiver_id', $user->id);
+                    })
+                    ->orderByDesc('created_at')
+                    ->first();
+                $unread = DB::table('chat_messages')
+                    ->where('sender_id', $u->id)
+                    ->where('receiver_id', $user->id)
+                    ->whereNull('read_at')
+                    ->count();
                 return [
-                    'id'             => (int) $t->user_id,
-                    'name'           => $u ? $u->name : ('User #'.$t->user_id),
-                    'email'          => $u->email ?? null,
-                    'last_message_at'=> $t->last_message_at,
-                    'unread_count'   => (int) $t->unread_count,
+                    'id' => $u->id,
+                    'name' => $u->name,
+                    'email' => $u->email,
+                    'last_message_at' => $lastMsg ? $lastMsg->created_at : null,
+                    'unread_count' => $unread,
                 ];
-            })->values();
-
-            return response()->json($out);
+            });
+            return response()->json($out->values());
         }
-        // If user, show employees grouped by department
+        // If user, show all employees grouped by department (regardless of chat history)
         if ($user->isUser()) {
             $departments = [
                 'marketing' => 'Marketing',
@@ -178,7 +162,6 @@ class ChatController extends Controller
                 'employees' => []
             ];
             foreach ($employees as $emp) {
-                // Place admin in IT (undefined) department
                 $dept = ($emp->role === 'admin') ? 'undefined' : ($emp->department ?? 'undefined');
                 if (!isset($grouped[$dept])) {
                     $dept = 'undefined';

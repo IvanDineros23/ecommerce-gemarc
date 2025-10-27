@@ -73,7 +73,7 @@
 
         @elseif($isMarketing)
             {{-- 3 equal cards; icon → title → desc --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <a href="{{ route('employee.quotes.management.index') }}"
                    class="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center hover:bg-green-50 transition min-h-[150px]">
                     <svg class="w-10 h-10 mb-2 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -99,6 +99,15 @@
                     </svg>
                     <div class="font-bold text-blue-600">Chat Management</div>
                     <div class="text-xs text-gray-500 mt-1">View and manage chats</div>
+                </a>
+
+                <a href="{{ route('employee.inquiries.index') }}"
+                   class="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center hover:bg-green-50 transition min-h-[150px]">
+                    <svg class="w-10 h-10 mb-2 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="7" width="18" height="10" rx="2" fill="#fff7ed"/><path d="M3 7V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2" stroke="#f97316"/><circle cx="8" cy="13" r="2" fill="#f97316"/><rect x="12" y="11" width="6" height="4" rx="1" fill="#fed7aa"/>
+                    </svg>
+                    <div class="font-bold text-orange-500">Product Inquiries</div>
+                    <div class="text-xs text-gray-500 mt-1">View and manage product inquiries</div>
                 </a>
             </div>
 

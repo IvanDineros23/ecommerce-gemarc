@@ -130,6 +130,30 @@
       </div>
     </section>
 
+
+
+<!-- Product Modal Popup -->
+<div id="browseModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300" style="opacity:0;">
+  <div class="bg-white rounded-3xl shadow-2xl p-20 max-w-6xl w-full relative" style="transform:scale(.9) translateY(20px); transition:transform .3s; min-width:900px; min-height:420px;">
+  <button onclick="closeBrowseModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl" title="Close modal">&times;</button>
+    <div class="flex flex-row gap-12 items-center">
+      <div class="flex items-center justify-center bg-gray-100 rounded-2xl" style="width:420px; height:420px; min-width:420px; min-height:420px;">
+        <img id="bmImage" src="{{ asset('images/gemarclogo.png') }}" alt="Product Image" class="rounded-xl object-contain" style="width:380px; height:380px;">
+      </div>
+      <div class="flex flex-col justify-center w-full">
+        <h3 id="bmName" class="text-2xl font-bold mb-3">Product</h3>
+  <p id="bmDesc" class="text-gray-700 mb-6 text-lg">No description available.</p>
+  <p class="text-xs text-gray-500 mb-4" style="margin-top:-1rem;">To see view details, you need to sign up in the ecommerce portal.</p>
+        <input type="hidden" id="bmCartProductId" value="">
+        <div class="flex gap-4 mt-2">
+          <a id="bmInquireBtn" href="/contact" class="bg-warning text-white px-5 py-2 rounded font-semibold transition" style="background-color: #ff9800; border: none;" title="Inquire about this product">Inquire This</a>
+          <button id="bmCartBtn" class="bg-green-600 text-white px-5 py-2 rounded font-semibold transition disabled:bg-gray-400 disabled:cursor-not-allowed" title="Add product to cart">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -145,10 +169,12 @@ function openBrowseModal(card){
     document.getElementById('bmImage').src = data.image || '{{ asset('images/gemarclogo.png') }}';
     const cartId = document.getElementById('bmCartProductId');
     if(cartId) cartId.value = data.id;
+  // Remove PDF button logic, nothing needed for 'Inquire This'
     const cartBtn = document.getElementById('bmCartBtn');
     if(cartBtn){
       if(data.stock > 0){ cartBtn.disabled=false; cartBtn.textContent='Add to Cart'; cartBtn.classList.remove('bg-gray-400','cursor-not-allowed'); cartBtn.classList.add('bg-green-600'); }
       else { cartBtn.disabled=true; cartBtn.textContent='Out of Stock'; cartBtn.classList.add('bg-gray-400','cursor-not-allowed'); cartBtn.classList.remove('bg-green-600'); }
+      cartBtn.onclick = function(){ window.location.href = '/auth/welcome'; };
     }
     modal.classList.remove('hidden'); modal.classList.add('flex');
     setTimeout(()=>{ modal.style.opacity='1'; modalContent.style.transform='scale(1) translateY(0)'; },10);

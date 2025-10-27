@@ -1,14 +1,73 @@
 <?php
-// Real-time notification polling route
-Route::get('/notifications/fetch', [\App\Http\Controllers\NotificationController::class, 'fetch'])->middleware('auth');
 
-// Static website page routes
+use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use Carbon\Carbon;
+
+// Models
+use App\Models\Product;
+
+// Public / Site Controllers
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ContactSubmissionController;
+use App\Http\Controllers\InquiryController;
+
+// Employee Controllers
+use App\Http\Controllers\EmployeeInquiryController;
+use App\Http\Controllers\EmployeeContactSubmissionController;
+use App\Http\Controllers\EmployeeInventoryController;
+use App\Http\Controllers\EmployeeProductController;
+use App\Http\Controllers\EmployeeOrderController;
+use App\Http\Controllers\EmployeeQuoteController;
+use App\Http\Controllers\EmployeeInvoiceController;
+use App\Http\Controllers\EmployeePaymentController;
+use App\Http\Controllers\EmployeeBillController;
+use App\Http\Controllers\EmployeeExpenseController;
+use App\Http\Controllers\EmployeeCreditController;
+use App\Http\Controllers\EmployeeTaxReportController;
+use App\Http\Controllers\EmployeeStatementController;
+
+// User Dashboard Controllers
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\SavedListController;
+use App\Http\Controllers\ChatController;
+
+// Admin Controllers
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\Admin\AuditLogAjaxController;
+use App\Http\Controllers\Admin\AuditLogExportController;
+
+/*
+|--------------------------------------------------------------------------
+| Real-time notification polling
+|--------------------------------------------------------------------------
+*/
+Route::get('/notifications/fetch', [NotificationController::class, 'fetch'])->middleware('auth');
+Route::middleware(['auth', 'verified'])->post('/notifications/clear', [NotificationController::class, 'clear'])->name('notifications.clear');
+
+/*
+|--------------------------------------------------------------------------
+| Static Website Pages
+|--------------------------------------------------------------------------
+*/
 Route::view('/about', 'website.about');
 Route::view('/contact', 'website.contact')->name('contact');
-Route::post('/contact/submit', [\App\Http\Controllers\ContactSubmissionController::class, 'submit'])->name('contact.submit');
+Route::post('/contact/submit', [ContactSubmissionController::class, 'submit'])->name('contact.submit');
+
 Route::view('/customerfeedback', 'website.customerfeedback');
+Route::view('/customer-feedback', 'website.customerfeedback'); // alias
+
 Route::view('/news', 'website.news')->name('news');
 Route::view('/blogs', 'website.blogs');
+
 Route::view('/aggregates', 'website.aggregates');
 Route::view('/asphalt-bitumen', 'website.asphalt-bitumen');
 Route::view('/calibration', 'website.calibration');
@@ -19,73 +78,51 @@ Route::view('/industrial-equipment', 'website.industrial-equipment');
 Route::view('/pavetest', 'website.pavetest');
 Route::view('/soil', 'website.soil');
 Route::view('/steel', 'website.steel');
-// Redirect legacy URLs to canonical slugs (SEO-friendly)
-Route::redirect('/soil-testing', '/soil', 301);
-Route::redirect('/steel-testing', '/steel', 301);
-Route::view('/customer-feedback', 'website.customerfeedback');
 Route::view('/services', 'website.services');
 
-// Public inquiry submission (for product/category pages)
-Route::post('/inquiry/submit', [\App\Http\Controllers\InquiryController::class, 'submit'])->name('inquiry.submit');
+// Legacy redirects
+Route::redirect('/soil-testing', '/soil', 301);
+Route::redirect('/steel-testing', '/steel', 301);
 
+// Public inquiry submission
+Route::post('/inquiry/submit', [InquiryController::class, 'submit'])->name('inquiry.submit');
 
-// Static homepage test route
-Route::get('/static', function () {
-    return view('website.index');
-});
+// Static homepage test
+Route::get('/static', fn () => view('website.index'))->name('static');
 
-// AJAX product search for landing page
-Route::get('/landing-search', function (\Illuminate\Http\Request $request) {
+/*
+|--------------------------------------------------------------------------
+| AJAX: Landing search (public)
+|--------------------------------------------------------------------------
+*/
+Route::get('/landing-search', function (Request $request) {
     $q = $request->input('q');
-    $products = \App\Models\Product::where('is_active', 1)
-        ->where(function($query) use ($q) {
-            $query->where('name', 'like', "%$q%")
-                  ->orWhere('description', 'like', "%$q%")
-                  ->orWhere('unit_price', 'like', "%$q%")
-                  ->orWhere('sku', 'like', "%$q%")
-                  ;
+
+    $products = Product::where('is_active', 1)
+        ->where(function ($query) use ($q) {
+            $query->where('name', 'like', "%{$q}%")
+                  ->orWhere('description', 'like', "%{$q}%")
+                  ->orWhere('unit_price', 'like', "%{$q}%")
+                  ->orWhere('sku', 'like', "%{$q}%");
         })
         ->orderByDesc('created_at')
         ->limit(10)
         ->get();
-    $results = $products->map(function($p) {
+
+    $results = $products->map(function ($p) {
         return [
-            'id' => $p->id,
-            'name' => $p->name,
-            'sku' => $p->sku,
-            'price' => $p->unit_price,
-            'image_url' => method_exists($p, 'firstImagePath') && $p->firstImagePath() ? asset('storage/'.$p->firstImagePath()) : asset('images/gemarclogo.png'),
+            'id'        => $p->id,
+            'name'      => $p->name,
+            'sku'       => $p->sku,
+            'price'     => $p->unit_price,
+            'image_url' => (method_exists($p, 'firstImagePath') && $p->firstImagePath())
+                ? asset('storage/' . $p->firstImagePath())
+                : asset('images/gemarclogo.png'),
         ];
     });
+
     return response()->json($results);
 })->name('landing.search');
-
-
-// Employee notification clear route
-Route::middleware(['auth', 'verified'])->post('/notifications/clear', [\App\Http\Controllers\NotificationController::class, 'clear'])->name('notifications.clear');
-
-
-use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
-use Carbon\Carbon;
-
-// Models
-use App\Models\Product;
-
-// Controllers
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\SettingsController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\QuoteController;
-use App\Http\Controllers\SavedListController;
-use App\Http\Controllers\ChatController;
-use App\Http\Controllers\EmployeeInventoryController;
-use App\Http\Controllers\EmployeeProductController;
-use App\Http\Controllers\EmployeeOrderController;
-use App\Http\Controllers\EmployeeQuoteController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -93,27 +130,25 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 |--------------------------------------------------------------------------
 */
 
-// Home page - main website homepage
-Route::get('/', function () {
-    return view('website.index');
-})->name('home');
+// Home
+Route::get('/', fn () => view('website.index'))->name('home');
 
-// Browse listing (simple page)
+// Browse (simple)
 Route::get('/browse', function () {
-    // Public lightweight browse: show only active and in-stock products
     $products = Product::where('is_active', 1)
         ->where('stock', '>', 0)
         ->orderByDesc('created_at')
         ->get();
+
     return view('browse', compact('products'));
 })->name('browse');
 
-// Shop with search/filter
+// Shop with search
 Route::get('/shop', function (Request $request) {
     $q = $request->input('q');
 
     $products = Product::where('is_active', 1)
-        ->when($q, function ($query, $q) {
+        ->when($q, function ($query) use ($q) {
             $query->where(function ($sub) use ($q) {
                 $sub->where('name', 'like', "%{$q}%")
                     ->orWhere('description', 'like', "%{$q}%")
@@ -126,31 +161,17 @@ Route::get('/shop', function (Request $request) {
     return view('shop.index', compact('products', 'q'));
 })->name('shop.index');
 
-// Product details (uses EmployeeProductController@show for now)
-Route::get('/products/{product}', [EmployeeProductController::class, 'show'])
-    ->name('products.show');
+// Product details
+Route::get('/products/{product}', [EmployeeProductController::class, 'show'])->name('products.show');
 
-// Auth welcome splash (optional)
-Route::get('/auth/welcome', fn() => view('auth.welcome'))->name('auth.welcome');
-
-// Newsletter subscribe (demo)
+// Misc demos
+Route::get('/auth/welcome', fn () => view('auth.welcome'))->name('auth.welcome');
 Route::post('/newsletter/subscribe', function (Request $request) {
     $request->validate(['email' => 'required|email']);
     return back()->with('success', 'Thank you for subscribing!');
 })->name('newsletter.subscribe');
-
-// Demo route (real-time date)
-Route::get('/realtime-date', function () {
-    $now = Carbon::now();
-    return 'Current Date and Time: ' . $now->format('F d, Y h:i A');
-});
-
-// Dashboard search (demo)
-Route::get('/dashboard/search', function (Request $request) {
-    $q = $request->input('q');
-    return view('dashboard.search', ['q' => $q]);
-})->name('dashboard.search');
-
+Route::get('/realtime-date', fn () => 'Current Date and Time: ' . Carbon::now()->format('F d, Y h:i A'));
+Route::get('/dashboard/search', fn (Request $request) => view('dashboard.search', ['q' => $request->input('q')]))->name('dashboard.search');
 
 /*
 |--------------------------------------------------------------------------
@@ -159,13 +180,13 @@ Route::get('/dashboard/search', function (Request $request) {
 */
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    // Main dashboard with widgets
+    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Profile
     Route::get('/profile',  [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile',[ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile',[ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Cart / Checkout
     Route::get('/cart',                [CartController::class, 'index'])->name('cart.index');
@@ -178,115 +199,100 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Orders (user)
     Route::get('/orders',              [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}',      [OrderController::class, 'show'])->name('orders.show');
-
-    // ⚠️ Changed to avoid conflict with orders.show
     Route::get('/orders/{order}/receipt', [CartController::class, 'orderReceipt'])->name('orders.receipt');
 
     // Settings
     Route::view('/settings', 'dashboard.settings')->name('settings');
     Route::post('/settings/delivery-address', [SettingsController::class, 'saveDeliveryAddress'])->name('settings.saveDeliveryAddress');
     Route::post('/settings/payment-details',  [SettingsController::class, 'savePaymentDetails'])->name('settings.savePaymentDetails');
-    Route::post('/settings/basic-info', [SettingsController::class, 'saveBasicInfo'])->name('settings.saveBasicInfo');
+    Route::post('/settings/basic-info',       [SettingsController::class, 'saveBasicInfo'])->name('settings.saveBasicInfo');
 
     // Quotes (user flow)
-    Route::get('/quotes/create', [QuoteController::class, 'create'])->name('quotes.create');
-    Route::post('/quotes',       [QuoteController::class, 'store'])->name('quotes.store');
-    Route::get('/quotes/pdf/{quote}', [QuoteController::class, 'pdf'])->name('quotes.pdf');
+    Route::get('/quotes/create',       [QuoteController::class, 'create'])->name('quotes.create');
+    Route::post('/quotes',             [QuoteController::class, 'store'])->name('quotes.store');
+    Route::get('/quotes/pdf/{quote}',  [QuoteController::class, 'pdf'])->name('quotes.pdf');
+    Route::get('/dashboard/quotes',    [QuoteController::class, 'userQuotes'])->name('dashboard.user.quotes');
 
-    // User quotes dashboard
-    Route::get('/dashboard/quotes', [QuoteController::class, 'userQuotes'])->name('dashboard.user.quotes');
-
-    // Saved Items (Wishlist)
+    // Saved (wishlist)
     Route::get('/saved',        [SavedListController::class, 'index'])->name('saved.index');
     Route::post('/saved',       [SavedListController::class, 'store'])->name('saved.store');
     Route::delete('/saved/{id}',[SavedListController::class, 'destroy'])->name('saved.destroy');
 
     // Chat (user)
-    Route::get('/chats', fn() => view('dashboard.chat'))->name('chat.page');
+    Route::get('/chats', fn () => view('dashboard.chat'))->name('chat.page');
     Route::get('/chat/fetch', [ChatController::class, 'fetch']);
     Route::post('/chat/send', [ChatController::class, 'send']);
-    Route::post('/chat/clear',[ChatController::class, 'clear']);
+    Route::post('/chat/clear', [ChatController::class, 'clear']);
 });
 
 /*
 |--------------------------------------------------------------------------
-| Employee area
+| Employee Area
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    // Simple employee home (authorization check inline; consider moving to middleware)
-    Route::get('/employee/dashboard', function () {
-        // ...existing code...
-        return view('dashboard.employee');
-    })->name('employee.dashboard');
+    // Employee dashboard
+    Route::get('/employee/dashboard', fn () => view('dashboard.employee'))->name('employee.dashboard');
 
-    // Employee contact submissions page (outside closure)
-    Route::get('/employee/contact-submissions', [\App\Http\Controllers\EmployeeContactSubmissionController::class, 'index'])->name('employee.contact_submissions');
-    Route::post('/employee/contact-submissions/clear', [\App\Http\Controllers\EmployeeContactSubmissionController::class, 'clear'])->name('employee.contact_submissions.clear');
+    // Product Inquiries page
+    Route::get('/employee/inquiries', [InquiryController::class, 'index'])->name('employee.inquiries.index');
 
-    // Employee: Inventory / Products / Orders / Quotes
-    Route::prefix('employee')->name('employee.')->group(function () {
+    // Clear (DELETE) handlers — used by the "Clear" buttons on the page
+    Route::delete('/employee/inquiries/clear', [EmployeeInquiryController::class, 'clearInquiries'])->name('employee.inquiries.clear');
+    Route::delete('/employee/contacts/clear',  [EmployeeInquiryController::class, 'clearContacts'])->name('employee.contacts.clear');
 
-    // Employee edit quote
-    Route::get('/quotes-management/{quote}/edit', [\App\Http\Controllers\EmployeeQuoteController::class, 'edit'])->name('quotes.edit');
+    // Contact submissions page + clear
+    Route::get('/employee/contact-submissions', [EmployeeContactSubmissionController::class, 'index'])->name('employee.contact_submissions');
+    Route::post('/employee/contact-submissions/clear', [EmployeeContactSubmissionController::class, 'clear'])->name('employee.contact_submissions.clear');
 
-        // Inventory
-        Route::get('/inventory',                 [EmployeeInventoryController::class, 'index'])->name('inventory.index');
-        Route::patch('/inventory/{product}',     [EmployeeInventoryController::class, 'update'])->name('inventory.update');
+    // Inventory
+    Route::get('/employee/inventory',             [EmployeeInventoryController::class, 'index'])->name('employee.inventory.index');
+    Route::patch('/employee/inventory/{product}', [EmployeeInventoryController::class, 'update'])->name('employee.inventory.update');
 
-        // Products
-        Route::get('/products',                  [EmployeeProductController::class, 'index'])->name('products.index');
-        Route::post('/products',                 [EmployeeProductController::class, 'store'])->name('products.store');
-        Route::get('/products/{product}/edit',   [EmployeeProductController::class, 'edit'])->name('products.edit');
-        Route::put('/products/{product}',        [EmployeeProductController::class, 'update'])->name('products.update');
-        Route::delete('/products/{product}',     [EmployeeProductController::class, 'destroy'])->name('products.destroy');
+    // Products
+    Route::get('/employee/products',                [EmployeeProductController::class, 'index'])->name('employee.products.index');
+    Route::post('/employee/products',               [EmployeeProductController::class, 'store'])->name('employee.products.store');
+    Route::get('/employee/products/{product}/edit', [EmployeeProductController::class, 'edit'])->name('employee.products.edit');
+    Route::put('/employee/products/{product}',      [EmployeeProductController::class, 'update'])->name('employee.products.update');
+    Route::delete('/employee/products/{product}',   [EmployeeProductController::class, 'destroy'])->name('employee.products.destroy');
 
-        // Orders
-        Route::get('/orders',                    [EmployeeOrderController::class, 'index'])->name('orders.index');
-        Route::patch('/orders/{order}/done',     [EmployeeOrderController::class, 'markAsDone'])->name('orders.done');
-        Route::post('/orders/{order}/upload',    [EmployeeOrderController::class, 'uploadReceipt'])->name('orders.upload');
-        Route::delete('/orders/{order}',         [EmployeeOrderController::class, 'destroy'])->name('orders.destroy');
+    // Orders
+    Route::get('/employee/orders',                    [EmployeeOrderController::class, 'index'])->name('employee.orders.index');
+    Route::patch('/employee/orders/{order}/done',     [EmployeeOrderController::class, 'markAsDone'])->name('employee.orders.done');
+    Route::post('/employee/orders/{order}/upload',    [EmployeeOrderController::class, 'uploadReceipt'])->name('employee.orders.upload');
+    Route::delete('/employee/orders/{order}',         [EmployeeOrderController::class, 'destroy'])->name('employee.orders.destroy');
 
-    // Employee create quote
-    Route::get('/quotes-management/create', [EmployeeQuoteController::class, 'create'])->name('quotes.create');
-    Route::post('/quotes-management/manual', [EmployeeQuoteController::class, 'manualCreate'])->name('quotes.manual.create');
-    // Manual quote creation form (missing route)
-    Route::get('/quotes-management/manual/create', [EmployeeQuoteController::class, 'manualCreateForm'])->name('quotes.manual.create.form');
-    Route::post('/quotes-management', [EmployeeQuoteController::class, 'store'])->name('quotes.store');
-    Route::put('/quotes-management/{quote}', [EmployeeQuoteController::class, 'update'])->name('quotes.update');
-    // Quotes (employee manages)
-        Route::get('/quotes-management',                 [EmployeeQuoteController::class, 'index'])->name('quotes.management.index');
-        Route::post('/quotes-management/{quote}/upload', [EmployeeQuoteController::class, 'upload'])->name('quotes.upload');
-        Route::patch('/quotes-management/{quote}/done',  [EmployeeQuoteController::class, 'markAsDone'])->name('quotes.management.done');
-        Route::patch('/quotes-management/{quote}/cancel',[EmployeeQuoteController::class, 'cancel'])->name('quotes.management.cancel');
-        Route::delete('/quotes-management/{quote}',      [EmployeeQuoteController::class, 'destroy'])->name('quotes.management.destroy');
+    // Quotes management (employee)
+    Route::get('/employee/quotes-management',                    [EmployeeQuoteController::class, 'index'])->name('employee.quotes.management.index');
+    Route::get('/employee/quotes-management/create',            [EmployeeQuoteController::class, 'create'])->name('employee.quotes.create');
+    Route::post('/employee/quotes-management',                  [EmployeeQuoteController::class, 'store'])->name('employee.quotes.store');
+    Route::get('/employee/quotes-management/{quote}/edit',      [EmployeeQuoteController::class, 'edit'])->name('employee.quotes.edit');
+    Route::put('/employee/quotes-management/{quote}',           [EmployeeQuoteController::class, 'update'])->name('employee.quotes.update');
+    Route::post('/employee/quotes-management/{quote}/upload',   [EmployeeQuoteController::class, 'upload'])->name('employee.quotes.upload');
+    Route::patch('/employee/quotes-management/{quote}/done',    [EmployeeQuoteController::class, 'markAsDone'])->name('employee.quotes.management.done');
+    Route::patch('/employee/quotes-management/{quote}/cancel',  [EmployeeQuoteController::class, 'cancel'])->name('employee.quotes.management.cancel');
+    Route::delete('/employee/quotes-management/{quote}',        [EmployeeQuoteController::class, 'destroy'])->name('employee.quotes.management.destroy');
 
-        // Quotes list/detail for employees
-        Route::get('/quotes',                 [QuoteController::class, 'employeeIndex'])->name('quotes.index');
-        Route::get('/quotes/{quote}',         [QuoteController::class, 'employeeShow'])->name('quotes.show');
+    // Manual quote creation
+    Route::get('/employee/quotes-management/manual/create', [EmployeeQuoteController::class, 'manualCreateForm'])->name('employee.quotes.manual.create.form');
+    Route::post('/employee/quotes-management/manual',       [EmployeeQuoteController::class, 'manualCreate'])->name('employee.quotes.manual.create');
 
-    // Employee chat page (correct path: /employee/chats)
-    Route::get('/chats', fn() => view('dashboard.employee_chat'))->name('chat.page');
+    // Employee list/detail for quotes
+    Route::get('/employee/quotes',        [QuoteController::class, 'employeeIndex'])->name('employee.quotes.index');
+    Route::get('/employee/quotes/{quote}',[QuoteController::class, 'employeeShow'])->name('employee.quotes.show');
 
-        // Invoices
-        Route::get('/invoices', [App\Http\Controllers\EmployeeInvoiceController::class, 'index'])->name('invoices.index');
-        // Payments
-        Route::get('/payments', [App\Http\Controllers\EmployeePaymentController::class, 'index'])->name('payments.index');
-        // Bills
-        Route::get('/bills', [App\Http\Controllers\EmployeeBillController::class, 'index'])->name('bills.index');
-        // Expenses
-        Route::get('/expenses', [App\Http\Controllers\EmployeeExpenseController::class, 'index'])->name('expenses.index');
-        // Credits
-        Route::get('/credits', [App\Http\Controllers\EmployeeCreditController::class, 'index'])->name('credits.index');
-        // Tax Reports
-        Route::get('/tax-reports', [App\Http\Controllers\EmployeeTaxReportController::class, 'index'])->name('tax-reports.index');
-        // Statements
-        Route::get('/statements', [App\Http\Controllers\EmployeeStatementController::class, 'index'])->name('statements.index');
-    });
+    // Employee chat page
+    Route::get('/employee/chats', fn () => view('dashboard.employee_chat'))->name('employee.chat.page');
 
-    // Chat: user list for employees
-    Route::get('/chat/users', [ChatController::class, 'userList'])->name('chat.users');
+    // Finance modules
+    Route::get('/employee/invoices',   [EmployeeInvoiceController::class, 'index'])->name('employee.invoices.index');
+    Route::get('/employee/payments',   [EmployeePaymentController::class,  'index'])->name('employee.payments.index');
+    Route::get('/employee/bills',      [EmployeeBillController::class,     'index'])->name('employee.bills.index');
+    Route::get('/employee/expenses',   [EmployeeExpenseController::class,  'index'])->name('employee.expenses.index');
+    Route::get('/employee/credits',    [EmployeeCreditController::class,   'index'])->name('employee.credits.index');
+    Route::get('/employee/tax-reports',[EmployeeTaxReportController::class,'index'])->name('employee.tax-reports.index');
+    Route::get('/employee/statements', [EmployeeStatementController::class,'index'])->name('employee.statements.index');
 });
 
 /*
@@ -294,112 +300,123 @@ Route::middleware(['auth', 'verified'])->group(function () {
 | Admin
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'verified', 'can:access-admin'])->prefix('admin')->name('admin.')->group(function () {
-    // User Management (redirect /users to /admin/user-management)
-    Route::redirect('/users', '/admin/user-management');
-    Route::get('/user-management', [\App\Http\Controllers\Admin\UserManagementController::class, 'index'])->name('user_management');
-    Route::get('/user-management/{id}/view', [\App\Http\Controllers\Admin\UserManagementController::class, 'view'])->name('user_management.view');
-    Route::get('/user-management/{id}/edit', [\App\Http\Controllers\Admin\UserManagementController::class, 'edit'])->name('user_management.edit');
-    Route::put('/user-management/{id}/edit', [\App\Http\Controllers\Admin\UserManagementController::class, 'update'])->name('user_management.update');
-    Route::delete('/user-management/{id}/delete', [\App\Http\Controllers\Admin\UserManagementController::class, 'delete'])->name('user_management.delete');
-    Route::post('/user-management/add', [\App\Http\Controllers\Admin\UserManagementController::class, 'add'])->name('user_management.add');
-    Route::view('/brands',          'admin.placeholders.brands')->name('brands');
-    Route::view('/business',        'admin.placeholders.business')->name('business');
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    Route::view('/settings',        'admin.placeholders.settings')->name('settings');
-    Route::view('/users',           'admin.placeholders.users')->name('users');
-    Route::get('/orders', function () {
-        $orders = \App\Models\Order::with('user')->orderByDesc('created_at')->paginate(20);
-        return view('admin.orders', compact('orders'));
-    })->name('orders');
+Route::middleware(['auth', 'verified', 'can:access-admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/orders/{order}', function ($orderId) {
-        $order = \App\Models\Order::with(['user', 'items.product'])->findOrFail($orderId);
-        return view('admin.order-view', compact('order'));
-    })->name('orders.view');
-    // Admin Product Management
-    Route::get('/products', [\App\Http\Controllers\Admin\ProductController::class, 'index'])->name('products');
-    Route::post('/products', [\App\Http\Controllers\Admin\ProductController::class, 'store'])->name('products.store');
-    Route::get('/products/{product}/edit', [\App\Http\Controllers\Admin\ProductController::class, 'edit'])->name('products.edit');
-    Route::put('/products/{product}', [\App\Http\Controllers\Admin\ProductController::class, 'update'])->name('products.update');
-    Route::delete('/products/{product}', [\App\Http\Controllers\Admin\ProductController::class, 'destroy'])->name('products.destroy');
-    Route::view('/analytics',       'admin.placeholders.analytics')->name('analytics');
-    Route::get('/quotes', function () {
-        $quotes = \App\Models\Quote::with('user')->orderByDesc('created_at')->paginate(20);
-        return view('admin.quotes', compact('quotes'));
-    })->name('quotes');
+        // Users
+        Route::redirect('/users', '/admin/user-management');
+        Route::get('/user-management',                 [UserManagementController::class, 'index'])->name('user_management');
+        Route::get('/user-management/{id}/view',       [UserManagementController::class, 'view'])->name('user_management.view');
+        Route::get('/user-management/{id}/edit',       [UserManagementController::class, 'edit'])->name('user_management.edit');
+        Route::put('/user-management/{id}/edit',       [UserManagementController::class, 'update'])->name('user_management.update');
+        Route::delete('/user-management/{id}/delete',  [UserManagementController::class, 'delete'])->name('user_management.delete');
+        Route::post('/user-management/add',            [UserManagementController::class, 'add'])->name('user_management.add');
 
-    Route::get('/quotes/{quote}', function ($quoteId) {
-        $quote = \App\Models\Quote::with(['user', 'items.product'])->findOrFail($quoteId);
-        return view('admin.quote-view', compact('quote'));
-    })->name('quotes.view');
-    Route::view('/uploads',         'admin.placeholders.uploads')->name('uploads');
-    Route::view('/approvals',       'admin.placeholders.approvals')->name('approvals');
-    Route::view('/export',          'admin.placeholders.export')->name('export');
-    Route::view('/stock',           'admin.placeholders.stock')->name('stock');
-    Route::view('/pricing',         'admin.placeholders.pricing')->name('pricing');
-    Route::view('/documents',       'admin.placeholders.documents')->name('documents');
-    Route::view('/brands',          'admin.placeholders.brands')->name('brands');
-    Route::view('/roles',           'admin.placeholders.roles')->name('roles');
-    Route::view('/business',        'admin.placeholders.business')->name('business');
-    Route::get('/audit', [\App\Http\Controllers\Admin\AuditLogController::class, 'index'])->name('audit');
-    Route::get('/audit/print-all', [\App\Http\Controllers\Admin\AuditLogController::class, 'printAll'])->name('audit.printAll');
-    Route::get('/audit/save-all', [\App\Http\Controllers\Admin\AuditLogController::class, 'saveAll'])->name('audit.saveAll');
-    Route::post('/audit/clear', [\App\Http\Controllers\Admin\AuditLogController::class, 'clear'])->name('audit.clear');
-    Route::view('/freight',         'admin.placeholders.freight')->name('freight');
-    Route::view('/site-settings',   'admin.placeholders.site_settings')->name('site_settings');
-});
+        // Products (Admin)
+        Route::get('/products',                [AdminProductController::class, 'index'])->name('products');
+        Route::post('/products',               [AdminProductController::class, 'store'])->name('products.store');
+        Route::get('/products/{product}/edit', [AdminProductController::class, 'edit'])->name('products.edit');
+        Route::put('/products/{product}',      [AdminProductController::class, 'update'])->name('products.update');
+        Route::delete('/products/{product}',   [AdminProductController::class, 'destroy'])->name('products.destroy');
 
-// Admin AJAX route for audit log filtering/search
-Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
-    Route::get('/audit/filter', [\App\Http\Controllers\Admin\AuditLogAjaxController::class, 'filter'])->name('admin.audit.filter');
-    // Export all logs for printing/exporting
-    Route::get('/audit/export/all', [\App\Http\Controllers\Admin\AuditLogExportController::class, 'all'])->name('admin.audit.export.all');
+        // Orders (sample)
+        Route::get('/orders', function () {
+            $orders = \App\Models\Order::with('user')->orderByDesc('created_at')->paginate(20);
+            return view('admin.orders', compact('orders'));
+        })->name('orders');
 
-    // Admin Chats Section
-    Route::view('/chats', 'admin.chats')->name('admin.chats');
-    Route::get('/chat/users', function() {
-        // Admin can chat with all users and employees
-        $users = \App\Models\User::where('id', '!=', auth()->id())->get(['id','name','email']);
-        return response()->json($users);
+        Route::get('/orders/{order}', function ($orderId) {
+            $order = \App\Models\Order::with(['user', 'items.product'])->findOrFail($orderId);
+            return view('admin.order-view', compact('order'));
+        })->name('orders.view');
+
+        // Quotes (sample)
+        Route::get('/quotes', function () {
+            $quotes = \App\Models\Quote::with('user')->orderByDesc('created_at')->paginate(20);
+            return view('admin.quotes', compact('quotes'));
+        })->name('quotes');
+
+        Route::get('/quotes/{quote}', function ($quoteId) {
+            $quote = \App\Models\Quote::with(['user', 'items.product'])->findOrFail($quoteId);
+            return view('admin.quote-view', compact('quote'));
+        })->name('quotes.view');
+
+        // Audit
+        Route::get('/audit',            [AuditLogController::class, 'index'])->name('audit');
+        Route::get('/audit/print-all',  [AuditLogController::class, 'printAll'])->name('audit.printAll');
+        Route::get('/audit/save-all',   [AuditLogController::class, 'saveAll'])->name('audit.saveAll');
+        Route::post('/audit/clear',     [AuditLogController::class, 'clear'])->name('audit.clear');
+
+        // AJAX for audit
+        Route::get('/audit/filter',     [AuditLogAjaxController::class, 'filter'])->name('audit.filter');
+        Route::get('/audit/export/all', [AuditLogExportController::class, 'all'])->name('audit.export.all');
+
+        // Simple admin static pages
+        Route::view('/analytics',      'admin.placeholders.analytics')->name('analytics');
+        Route::view('/uploads',        'admin.placeholders.uploads')->name('uploads');
+        Route::view('/approvals',      'admin.placeholders.approvals')->name('approvals');
+        Route::view('/export',         'admin.placeholders.export')->name('export');
+        Route::view('/stock',          'admin.placeholders.stock')->name('stock');
+        Route::view('/pricing',        'admin.placeholders.pricing')->name('pricing');
+        Route::view('/documents',      'admin.placeholders.documents')->name('documents');
+        Route::view('/brands',         'admin.placeholders.brands')->name('brands');
+        Route::view('/roles',          'admin.placeholders.roles')->name('roles');
+        Route::view('/business',       'admin.placeholders.business')->name('business');
+        Route::view('/freight',        'admin.placeholders.freight')->name('freight');
+        Route::view('/site-settings',  'admin.placeholders.site_settings')->name('site_settings');
+
+        // Admin Chats
+        Route::view('/chats', 'admin.chats')->name('chats');
+        Route::get('/chat/users', function () {
+            $users = \App\Models\User::where('id', '!=', auth()->id())->get(['id','name','email']);
+            return response()->json($users);
+        });
+        Route::get('/chat/fetch', function (Request $request) {
+            $admin      = auth()->user();
+            $withUserId = $request->input('with_user_id');
+            $context    = $request->input('context');
+
+            $messages = \DB::table('chat_messages')
+                ->where(function ($q) use ($admin, $withUserId) {
+                    $q->where('sender_id', $admin->id)->where('receiver_id', $withUserId)
+                      ->orWhere('sender_id', $withUserId)->where('receiver_id', $admin->id);
+                })
+                ->where('context', $context)
+                ->orderBy('created_at')
+                ->get();
+
+            return response()->json($messages);
+        });
+        Route::post('/chat/send', function (Request $request) {
+            $request->validate([
+                'message'    => 'required|string|max:1000',
+                'to_user_id' => 'required|integer|exists:users,id',
+                'context'    => 'required|string',
+            ]);
+
+            $admin      = auth()->user();
+            $receiverId = $request->to_user_id;
+            $context    = $request->context;
+
+            \DB::table('chat_messages')->insert([
+                'sender_id'   => $admin->id,
+                'receiver_id' => $receiverId,
+                'message'     => $request->message,
+                'context'     => $context,
+                'created_at'  => now(),
+            ]);
+
+            return response()->json(['success' => true]);
+        });
     });
-    Route::get('/chat/fetch', function(\Illuminate\Http\Request $request) {
-        $admin = auth()->user();
-        $withUserId = $request->input('with_user_id');
-        $context = $request->input('context');
-        $messages = \DB::table('chat_messages')
-            ->where(function($q) use ($admin, $withUserId) {
-                $q->where('sender_id', $admin->id)->where('receiver_id', $withUserId)
-                  ->orWhere('sender_id', $withUserId)->where('receiver_id', $admin->id);
-            })
-            ->where('context', $context)
-            ->orderBy('created_at')
-            ->get();
-        return response()->json($messages);
-    });
-    Route::post('/chat/send', function(\Illuminate\Http\Request $request) {
-        $request->validate([
-            'message' => 'required|string|max:1000',
-            'to_user_id' => 'required|integer|exists:users,id',
-            'context' => 'required|string',
-        ]);
-        $admin = auth()->user();
-        $receiverId = $request->to_user_id;
-        $context = $request->context;
-        \DB::table('chat_messages')->insert([
-            'sender_id' => $admin->id,
-            'receiver_id' => $receiverId,
-            'message' => $request->message,
-            'context' => $context,
-            'created_at' => now(),
-        ]);
-        return response()->json(['success' => true]);
-    });
-});
 
 /*
 |--------------------------------------------------------------------------
-| Auth scaffolding (Breeze/Fortify/etc.)
+| Auth scaffolding
 |--------------------------------------------------------------------------
 */
 require __DIR__ . '/auth.php';

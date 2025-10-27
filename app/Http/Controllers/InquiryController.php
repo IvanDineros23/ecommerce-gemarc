@@ -10,6 +10,15 @@ use Illuminate\Support\Facades\Validator;
 class InquiryController extends Controller
 {
     /**
+     * Show all product inquiries to marketing employees.
+     */
+    public function index()
+    {
+        $inquiries = \App\Models\Inquiry::orderByDesc('created_at')->get();
+        $contacts = \App\Models\ContactSubmission::orderByDesc('created_at')->get();
+        return view('dashboard.employee_inquiries', compact('inquiries', 'contacts'));
+    }
+    /**
      * Handle public inquiry submissions from product/category pages.
      */
     public function submit(Request $request)
@@ -26,12 +35,14 @@ class InquiryController extends Controller
         ]);
 
         if ($validator->fails()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['error' => 'Validation failed', 'messages' => $validator->errors()], 422);
+            }
             return back()->withErrors($validator)->withInput();
         }
 
         $payload = $validator->validated();
 
-        // Log to application log for visibility
         Log::info('Website Inquiry Received', [
             'name'     => $payload['name'] ?? null,
             'email'    => $payload['email'] ?? null,
@@ -40,7 +51,13 @@ class InquiryController extends Controller
             'category' => $payload['category'] ?? null,
         ]);
 
-        // Optional: Push a lightweight employee notification if helper exists
+        \App\Models\Inquiry::create([
+            'name'    => $payload['name'],
+            'email'   => $payload['email'],
+            'product' => $payload['product'] ?? '',
+            'message' => $payload['message'] ?? '',
+        ]);
+
         try {
             if (class_exists(\App\Helpers\EmployeeNotification::class)) {
                 \App\Helpers\EmployeeNotification::push('inquiry', [
@@ -54,8 +71,9 @@ class InquiryController extends Controller
             Log::warning('Failed to push employee notification for inquiry', ['error' => $e->getMessage()]);
         }
 
-        // TODO: You can wire up a Mailable here if SMTP is configured.
-        // For now, we just flash success and return back.
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => 'Thanks! Your inquiry has been sent. We\'ll get back to you soon.']);
+        }
         return back()->with('success', 'Thanks! Your inquiry has been sent. We\'ll get back to you soon.');
     }
 }

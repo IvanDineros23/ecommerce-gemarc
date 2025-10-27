@@ -744,7 +744,7 @@ window.homeHero = (function(){
             <div class="container mx-auto px-4">
                 <div class="max-w-4xl mx-auto text-center">
                     <h2 class="text-3xl font-bold text-gray-800 mb-8">Download Our Digital Brochure</h2>
-                    <a href="{{ asset('GEI 2025 brochure (1).pdf') }}" download="Gemarc-Enterprises-Brochure-2025.pdf" 
+                    <a href="{{ asset('GEMARC 2026 brochurePDF.pdf') }}" download="Gemarc-Enterprises-Brochure-2026.pdf" 
                         class="inline-flex items-center px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl transition-all duration-300 hover:shadow-lg">
                         <i class="fas fa-download mr-2"></i>Download
                     </a>

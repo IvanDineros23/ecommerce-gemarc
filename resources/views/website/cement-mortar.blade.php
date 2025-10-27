@@ -15,9 +15,7 @@
     /* Cards + brand header */
     .blogs-section .blog-post{box-shadow:0 4px 12px rgba(0,0,0,.05);transition:all .3s ease}
     .blogs-section .blog-post:hover{transform:translateY(-5px);box-shadow:0 10px 20px rgba(0,0,0,.1)}
-    /* Match Aggregates page title weight/size */
     .blogs-section .blog-post .blog-content h3{font-weight:700!important;font-size:1.15rem!important;letter-spacing:-.3px!important}
-    /* Blog meta styling to match Aggregates */
     .blog-meta{display:flex;flex-wrap:wrap;align-items:center;margin-bottom:.5rem}
     .blog-category{display:inline-block;padding:3px 10px;background:#e8f5e9;color:#2e7d32;border-radius:4px;font-size:.8rem;font-weight:500}
     .blog-standard{margin-left:auto;font-size:.8rem;color:#666}
@@ -28,14 +26,14 @@
     .brand-header{margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #e0e0e0}
     .brand-logo{height:64px;max-height:64px;width:auto;object-fit:contain}
     .brand-title{display:none!important}
-    /* Product action buttons */
     .blog-actions{display:flex;margin-top:1rem;gap:.5rem}
     .blog-actions .btn{flex:1;padding:8px 12px;font-size:.9rem;border-radius:6px;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s ease}
     .blog-actions .btn-pdf{background:#f5f5f5;color:#333}
     .blog-actions .btn-pdf:hover{background:#e0e0e0}
     .blog-actions .btn-details{background:#2e7d32;color:#fff}
     .blog-actions .btn-details:hover{background:#1b5e20}
-    /* Modal + form (reused) */
+
+    /* Modal + form (same styling as Aggregates) */
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;visibility:hidden;transition:all .3s ease}
     .modal-overlay.active{opacity:1;visibility:visible}
     .modal-content{background:#fff;border-radius:12px;width:90%;max-width:900px;max-height:90vh;overflow:hidden;box-shadow:0 25px 50px -12px rgba(0,0,0,.25);transform:scale(.95);opacity:0;transition:all .3s ease}
@@ -58,7 +56,6 @@
     .modal-spec-value{color:#555}
     .modal-contact-section{margin-top:2rem;padding-top:1rem;border-top:1px solid #e0e0e0;display:flex;flex-direction:column;align-items:center}
     .modal-contact-title{font-size:1.1rem;color:#333;font-weight:600;margin-bottom:1rem;text-align:center}
-    /* Modern primary action button, match Aggregates */
     .modal-contact-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;padding:.9rem 1.75rem;border:0;border-radius:12px;font-weight:700;letter-spacing:.2px;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,background .2s ease,filter .2s ease;outline:0}
     .modal-email-btn{background:linear-gradient(135deg,#2e7d32 0%,#1b5e20 100%);color:#fff;box-shadow:0 10px 20px rgba(46,125,50,.25),inset 0 1px 0 rgba(255,255,255,.15)}
     .modal-email-btn:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(46,125,50,.28);filter:saturate(1.1)}
@@ -66,7 +63,6 @@
     .modal-email-btn:focus-visible{box-shadow:0 0 0 3px rgba(46,125,50,.35),0 10px 20px rgba(46,125,50,.25)}
     .modal-email-btn i{font-size:1rem;transition:transform .2s ease,opacity .2s ease}
     .modal-email-btn:hover i{transform:translateX(2px)}
-    /* Inquiry form styles */
     #inquiryForm form{background:#f7faf8;border:1px solid #e6efe8;border-radius:14px;padding:16px 18px;box-shadow:0 8px 20px rgba(0,0,0,.04)}
     #inquiryForm .form-label{display:block;font-weight:700;color:#2f3b2f;margin-bottom:.35rem}
     #inquiryForm .form-control{width:100%;padding:12px 14px;border:1px solid #e3e6e3;border-radius:10px;background:#fff;color:#333;transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}
@@ -76,7 +72,6 @@
     #inquiryForm .btn-success.w-100{background:linear-gradient(135deg,#2e7d32,#1b5e20);color:#fff;border:0;border-radius:12px;font-weight:800;letter-spacing:.2px;padding:.85rem 1rem;box-shadow:0 10px 20px rgba(46,125,50,.25);transition:transform .15s ease,box-shadow .15s ease}
     #inquiryForm .btn-success.w-100:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(46,125,50,.32);color:#fff}
     #inquiryForm .btn-success.w-100:active{transform:none;box-shadow:0 8px 16px rgba(46,125,50,.22)}
-    /* CTA */
     .more-products-cta{margin:3rem 0}
     .cta-card{background:linear-gradient(135deg,#1b5e20,#43a047);color:#fff;border-radius:14px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 10px 30px rgba(27,94,32,.25)}
     .cta-text h3{margin:0 0 6px;font-size:1.4rem;font-weight:800}
@@ -88,6 +83,17 @@
 @endpush
 
 @section('content')
+
+    <!-- Success Alert Notification (same as Aggregates) -->
+    @if(session('success'))
+        <div x-data="{ show: true }" x-show="show" x-transition.opacity.duration.600ms
+             x-init="setTimeout(() => show = false, 3000)"
+             style="position:fixed;top:32px;left:50%;transform:translateX(-50%);z-index:9999;"
+             class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg font-semibold text-lg">
+            {{ session('success') }}
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    @endif
 
     <!-- Cement & Mortar Hero -->
     <section class="page-hero hero-with-bg hero-aggregates">
@@ -102,7 +108,6 @@
     <!-- Products Section -->
     <section class="blogs-section">
         <div class="container">
-            <!-- Search Bar -->
             @include('components.searchbar')
             <p class="mb-4">We provide comprehensive cement and mortar testing equipment to ensure quality control in construction materials. Our equipment meets international standards for testing cement properties and mortar performance.</p>
 
@@ -257,30 +262,35 @@
                         <div class="modal-manufacturer mt-3"><strong>Manufacturer:</strong> <span id="modalProductManufacturer"></span></div>
                     </div>
                 </div>
+
                 <div class="modal-specs-section">
                     <h4 class="modal-specs-title">Technical Specifications</h4>
                     <div id="modalSpecsGrid" class="modal-specs-grid"></div>
                 </div>
+
                 <div class="modal-contact-section">
                     <h4 class="modal-contact-title">Need More Information?</h4>
                     <button type="button" class="modal-contact-btn modal-email-btn" onclick="showInquiryForm()"><i class="fas fa-envelope"></i> Send Inquiry</button>
+
+                    <!-- MATCHED: real POST to inquiry.submit -->
                     <div id="inquiryForm" style="display:none;width:100%;max-width:600px;margin-top:20px;">
-                        <form class="p-3 bg-light rounded">
+                        <form class="p-3 bg-light rounded" method="POST" action="{{ route('inquiry.submit') }}">
+                            @csrf
                             <div class="mb-3">
                                 <label for="inquiryName" class="form-label">Your Name</label>
-                                <input type="text" class="form-control" id="inquiryName" required>
+                                <input type="text" class="form-control" id="inquiryName" name="name" required>
                             </div>
                             <div class="mb-3">
                                 <label for="inquiryEmail" class="form-label">Email Address</label>
-                                <input type="email" class="form-control" id="inquiryEmail" required>
+                                <input type="email" class="form-control" id="inquiryEmail" name="email" required>
                             </div>
                             <div class="mb-3">
                                 <label for="inquiryProduct" class="form-label">Product</label>
-                                <input type="text" class="form-control" id="inquiryProduct" readonly>
+                                <input type="text" class="form-control" id="inquiryProduct" name="product" readonly>
                             </div>
                             <div class="mb-3">
                                 <label for="inquiryMessage" class="form-label">Message</label>
-                                <textarea class="form-control" id="inquiryMessage" rows="4" required></textarea>
+                                <textarea class="form-control" id="inquiryMessage" name="message" rows="4" required></textarea>
                             </div>
                             <button type="submit" class="btn btn-success w-100">Submit Inquiry</button>
                         </form>
@@ -292,6 +302,7 @@
 
     <script src="{{ asset('website/script.js') }}"></script>
     <script>
+    // Modal logic (kept same as Aggregates)
     function openProductModal(product){
         document.getElementById('modalProductImage').src = product.image;
         document.getElementById('modalProductImage').alt = product.code + ' ' + product.name;
@@ -300,20 +311,40 @@
         document.getElementById('modalProductStandard').textContent = product.standard || '';
         document.getElementById('modalProductDescription').textContent = product.description || '';
         document.getElementById('modalProductManufacturer').textContent = product.manufacturer || 'Gemarc Enterprises Inc.';
-        var inq = document.getElementById('inquiryProduct'); if(inq) inq.value = product.code + ' - ' + product.name;
+
+        // set inquiry product
+        var inq = document.getElementById('inquiryProduct');
+        if(inq) inq.value = product.code + ' - ' + product.name;
+
+        // specs
         const grid = document.getElementById('modalSpecsGrid'); grid.innerHTML='';
         if(product.specs && product.specs.length){
-            product.specs.forEach(s=>{const d=document.createElement('div');d.className='modal-spec-item';d.innerHTML=`<div class="modal-spec-label"><strong>${s.label}</strong></div><div class="modal-spec-value">${s.value}</div>`;grid.appendChild(d)});
-        }else{grid.innerHTML='<p>No detailed specifications available. Please refer to the PDF or contact us.</p>'}
-        document.getElementById('productModal').classList.add('active');document.body.style.overflow='hidden';
+            product.specs.forEach(s=>{
+                const d=document.createElement('div');
+                d.className='modal-spec-item';
+                d.innerHTML=`<div class="modal-spec-label"><strong>${s.label}</strong></div><div class="modal-spec-value">${s.value}</div>`;
+                grid.appendChild(d);
+            });
+        }else{
+            grid.innerHTML='<p>No detailed specifications available. Please refer to the PDF or contact us.</p>';
+        }
+
+        document.getElementById('productModal').classList.add('active');
+        document.body.style.overflow='hidden';
     }
-    function closeProductModal(){document.getElementById('productModal').classList.remove('active');document.body.style.overflow='';document.getElementById('inquiryForm').style.display='none'}
-    function showInquiryForm(){const f=document.getElementById('inquiryForm');f.style.display=(f.style.display==='none'||!f.style.display)?'block':'none'}
+    function closeProductModal(){
+        document.getElementById('productModal').classList.remove('active');
+        document.body.style.overflow='';
+        document.getElementById('inquiryForm').style.display='none';
+    }
+    function showInquiryForm(){
+        const f=document.getElementById('inquiryForm');
+        f.style.display=(f.style.display==='none'||!f.style.display)?'block':'none';
+    }
     document.getElementById('productModal').addEventListener('click',function(e){if(e.target===this) closeProductModal()});
     document.addEventListener('keydown',function(e){if(e.key==='Escape') closeProductModal()});
-    (function(){var _f=document.querySelector('#inquiryForm form'); if(_f){_f.addEventListener('submit',function(e){e.preventDefault(); alert('Thank you for your inquiry. Our team will contact you shortly.'); document.getElementById('inquiryForm').style.display='none';});}})();
 
-    // Openers
+    // Product openers
     window.openE070Modal = function(){
         openProductModal({
             code:'E070', name:'Autoclave', standard:'ASTM C151, AASHTO T107',
@@ -393,4 +424,3 @@
     }
     </script>
 @endsection
-

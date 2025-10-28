@@ -254,7 +254,8 @@
 
                     <!-- Chat -->
                     <li class="nav-item position-relative me-3">
-                        <a class="nav-link" href="{{ route('chat.page') }}" title="Chat">
+                        @php $user = auth()->user(); @endphp
+                        <a class="nav-link" href="{{ $user && $user->role === 'employee' ? route('employee.chat.page') : route('chat.page') }}" title="Chat">
                             <i class="fas fa-comment-dots"></i>
                             <span class="chat-badge cart-badge">2</span>
                         </a>

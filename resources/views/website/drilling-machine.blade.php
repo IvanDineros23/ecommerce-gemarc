@@ -46,10 +46,11 @@
     .blog-actions .btn-details:hover{background:#1b5e20}
 
     /* Modal + form (EXACT same pattern as cement-mortar) */
-    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;visibility:hidden;transition:all .3s ease}
-    .modal-overlay.active{opacity:1;visibility:visible}
-    .modal-content{background:#fff;border-radius:12px;width:90%;max-width:900px;max-height:90vh;overflow:hidden;box-shadow:0 25px 50px -12px rgba(0,0,0,.25);transform:scale(.95);opacity:0;transition:all .3s ease}
-    .modal-overlay.active .modal-content{transform:scale(1);opacity:1}
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;visibility:hidden;transition:all .3s ease;}
+    .modal-overlay.active{opacity:1;visibility:visible;}
+    .modal-content{background:#fff;border-radius:12px;width:90%;max-width:900px;max-height:90vh;overflow:hidden;box-shadow:0 25px 50px -12px rgba(0,0,0,.25);transform:scale(.95);opacity:0;transition:all .3s ease;position:relative;z-index:10000;}
+    .modal-overlay.active .modal-content{transform:scale(1);opacity:1;}
+    .modal-body{padding:1.5rem;overflow-y:auto;max-height:calc(90vh - 70px);position:relative;z-index:10001;}
     .modal-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;border-bottom:1px solid #e0e0e0}
     .modal-title{margin:0;font-size:1.5rem;color:#2e7d32;font-weight:700}
     .modal-close{background:none;border:none;font-size:1.75rem;color:#666;cursor:pointer;transition:color .2s ease}
@@ -715,22 +716,24 @@
                         <i class="fas fa-envelope"></i> Send Inquiry
                     </button>
                     <div id="inquiryForm" style="display:none;width:100%;max-width:600px;margin-top:20px;">
-                        <form class="p-3 bg-light rounded">
+                        <form method="POST" action="{{ route('inquiry.submit') }}" class="p-3 bg-light rounded">
+                            @csrf
+                            <input type="hidden" name="product" id="inquiryProduct" value="">
                             <div class="mb-3">
                                 <label for="inquiryName" class="form-label">Your Name</label>
-                                <input type="text" class="form-control" id="inquiryName" required>
+                                <input type="text" class="form-control" id="inquiryName" name="name" required>
                             </div>
                             <div class="mb-3">
                                 <label for="inquiryEmail" class="form-label">Email Address</label>
-                                <input type="email" class="form-control" id="inquiryEmail" required>
+                                <input type="email" class="form-control" id="inquiryEmail" name="email" required>
                             </div>
                             <div class="mb-3">
-                                <label for="inquiryProduct" class="form-label">Product</label>
-                                <input type="text" class="form-control" id="inquiryProduct" readonly>
+                                <label for="inquiryProductDisplay" class="form-label">Product</label>
+                                <input type="text" class="form-control" id="inquiryProductDisplay" readonly>
                             </div>
                             <div class="mb-3">
                                 <label for="inquiryMessage" class="form-label">Message</label>
-                                <textarea class="form-control" id="inquiryMessage" rows="4" required></textarea>
+                                <textarea class="form-control" id="inquiryMessage" name="message" rows="4" required></textarea>
                             </div>
                             <button type="submit" class="btn btn-success w-100">Submit Inquiry</button>
                         </form>
@@ -740,7 +743,16 @@
         </div>
     </div>
 
-@endsection
+    <!-- Success Alert Notification -->
+    @if(session('success'))
+        <div x-data="{ show: true }" x-show="show" x-transition.opacity.duration.600ms
+            x-init="setTimeout(() => show = false, 3000)"
+            style="position:fixed;top:32px;left:50%;transform:translateX(-50%);z-index:9999;"
+            class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg font-semibold text-lg">
+            {{ session('success') }}
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    @endif
 
 @push('scripts')
 <script src="{{ asset('website/script.js') }}"></script>
@@ -756,7 +768,9 @@ function openProductModal(product){
     document.getElementById('modalProductManufacturer').textContent = product.manufacturer || 'Gemarc Enterprises Inc.';
 
     var inq = document.getElementById('inquiryProduct');
-    if(inq) inq.value = (product.code||'') + ' - ' + (product.name||'');
+    if(inq) inq.value = product.code + ' - ' + product.name;
+    var inqDisplay = document.getElementById('inquiryProductDisplay');
+    if(inqDisplay) inqDisplay.value = product.code + ' - ' + product.name;
 
     const grid = document.getElementById('modalSpecsGrid');
     grid.innerHTML = '';
@@ -787,15 +801,9 @@ function showInquiryForm(){
 document.getElementById('productModal').addEventListener('click',function(e){ if(e.target===this) closeProductModal() });
 document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeProductModal() });
 
-(function(){
-    var _f = document.querySelector('#inquiryForm form');
-    if(_f){
-        _f.addEventListener('submit',function(e){
-            e.preventDefault();
-            alert('Thank you for your inquiry. Our team will contact you shortly.');
-            document.getElementById('inquiryForm').style.display='none';
-        });
-    }
-})();
+// No JS submit handler: let the form POST to backend and show Alpine.js success notification
 </script>
+
 @endpush
+
+@endsection

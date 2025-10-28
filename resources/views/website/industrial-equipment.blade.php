@@ -1,5 +1,4 @@
 ﻿@extends('layouts.app')
-
 @section('title', 'Industrial Equipment | Gemarc Enterprises Inc.')
 
 @push('styles')
@@ -43,7 +42,7 @@
     .cta-actions .cta-btn{display:inline-flex;align-items:center;gap:10px;background:#ffffff;color:#1b5e20;padding:12px 18px;border-radius:10px;font-weight:700;text-decoration:none;transition:transform .15s ease,box-shadow .15s ease;box-shadow:0 6px 18px rgba(0,0,0,.15)}
     .cta-actions .cta-btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.2)}
     @media (max-width:768px){.cta-card{flex-direction:column;align-items:flex-start;gap:14px}}
-    /* Modal quick styles (IDs align with website/script.js) */
+    /* Modal styles (EXACT like Aggregates) */
     .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;visibility:hidden;transition:all .3s ease}
     .modal-overlay.active{opacity:1;visibility:visible}
     .modal-content{background:#fff;border-radius:12px;width:90%;max-width:900px;max-height:90vh;overflow:hidden;box-shadow:0 25px 50px -12px rgba(0,0,0,.25);transform:scale(.95);opacity:0;transition:all .3s ease}
@@ -56,17 +55,26 @@
     .modal-product-info{display:grid;grid-template-columns:1fr 1.5fr;gap:2rem}
     .modal-product-image{background:#f5f5f5;border-radius:8px;padding:1rem;display:flex;align-items:center;justify-content:center}
     .modal-product-img{max-width:100%;max-height:300px;object-fit:contain}
+    .modal-product-code{font-size:.9rem;color:#666;margin-bottom:.5rem}
+    .modal-product-name{font-size:1.5rem;color:#1b5e20;font-weight:700;margin:.5rem 0 1rem}
+    .modal-product-standard,.modal-product-description{margin-bottom:1rem}
+    .modal-specs-section{margin-top:2rem}
+    .modal-specs-title{font-size:1.25rem;color:#2e7d32;font-weight:600;padding-bottom:.5rem;border-bottom:1px solid #e0e0e0;margin-bottom:1rem}
     .modal-specs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}
     .modal-spec-item{background:#f9f9f9;border-radius:6px;padding:.75rem 1rem}
-    .modal-spec-label{font-weight:600;margin-right:.35rem}
+    .modal-spec-label{font-weight:600;margin-bottom:.25rem}
+    .modal-spec-value{color:#555}
+    .modal-contact-section{margin-top:2rem;padding-top:1rem;border-top:1px solid #e0e0e0;display:flex;flex-direction:column;align-items:center}
+    .modal-contact-title{font-size:1.1rem;color:#333;font-weight:600;margin-bottom:1rem;text-align:center}
     .modal-contact-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;padding:.9rem 1.75rem;border:0;border-radius:12px;font-weight:700;letter-spacing:.2px;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,background .2s ease,filter .2s ease;outline:0}
     .modal-email-btn{background:linear-gradient(135deg,#2e7d32 0%,#1b5e20 100%);color:#fff;box-shadow:0 10px 20px rgba(46,125,50,.25),inset 0 1px 0 rgba(255,255,255,.15)}
     .modal-email-btn:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(46,125,50,.28);filter:saturate(1.1)}
-    @media (max-width:768px){.modal-product-info{grid-template-columns:1fr}.modal-specs-grid{grid-template-columns:1fr}}
-
-    /* === Added to mirror Drilling page inquiry UI === */
-    .modal-contact-section{margin-top:2rem;padding-top:1rem;border-top:1px solid #e0e0e0;display:flex;flex-direction:column;align-items:center}
-    .modal-contact-title{font-size:1.1rem;color:#333;font-weight:600;margin-bottom:1rem;text-align:center}
+    .modal-email-btn:active{transform:translateY(0);box-shadow:0 8px 16px rgba(46,125,50,.22)}
+    .modal-email-btn:focus-visible{box-shadow:0 0 0 3px rgba(46,125,50,.35),0 10px 20px rgba(46,125,50,.25)}
+    .modal-email-btn i{font-size:1rem;transition:transform .2s ease,opacity .2s ease}
+    .modal-email-btn:hover i{transform:translateX(2px)}
+    @media(max-width:768px){.modal-product-info{grid-template-columns:1fr}.modal-specs-grid{grid-template-columns:1fr}}
+    /* Inquiry form visuals (same as Aggregates) */
     #inquiryForm form{background:#f7faf8;border:1px solid #e6efe8;border-radius:14px;padding:16px 18px;box-shadow:0 8px 20px rgba(0,0,0,.04)}
     #inquiryForm .form-label{display:block;font-weight:700;color:#2f3b2f;margin-bottom:.35rem}
     #inquiryForm .form-control{width:100%;padding:12px 14px;border:1px solid #e3e6e3;border-radius:10px;background:#fff;color:#333;transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}
@@ -94,7 +102,7 @@
     <!-- Products Section -->
     <section class="blogs-section">
         <div class="container">
-         <!-- Search Bar -->
+            <!-- Search Bar -->
             @include('components.searchbar')
 
             <p class="mb-4">We provide comprehensive industrial equipment solutions for construction, manufacturing, and testing applications. Our range includes high-quality equipment designed for demanding industrial environments.</p>
@@ -264,7 +272,18 @@
         </div>
     </section>
 
-    <!-- Product Modal (IDs must match website/script.js) -->
+    <!-- Success toast (optional, same as Aggregates) -->
+    @if(session('success'))
+        <div x-data="{ show: true }" x-show="show" x-transition.opacity.duration.600ms
+            x-init="setTimeout(() => show = false, 3000)"
+            style="position:fixed;top:32px;left:50%;transform:translateX(-50%);z-index:9999;"
+            class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg font-semibold text-lg">
+            {{ session('success') }}
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    @endif
+
+    <!-- Product Modal (EXACT as Aggregates) -->
     <div id="productModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -278,17 +297,12 @@
                     </div>
                     <div class="modal-product-details">
                         <div class="modal-product-code">
-                            <strong>Product Code:</strong> <span id="modalProductCode"></span>
-                            <span id="modalProductCodeSub" style="display:none;"></span>
+                            <span id="modalProductCodeBadge" class="product-code-badge" style="position:static;display:inline-block;margin-bottom:8px;"></span>
                         </div>
                         <h3 class="modal-product-name" id="modalProductName"></h3>
-                        <div class="modal-product-standard">
-                            <strong>Standard:</strong> <span id="modalProductStandard"></span>
-                        </div>
-                        <div class="modal-product-description">
-                            <strong>Description:</strong>
-                            <p id="modalProductDescription"></p>
-                        </div>
+                        <div class="modal-product-standard"><strong>Standard:</strong> <span id="modalProductStandard"></span></div>
+                        <div class="modal-product-description"><strong>Description:</strong><p id="modalProductDescription"></p></div>
+                        <div class="modal-manufacturer mt-3"><strong>Manufacturer:</strong> <span id="modalProductManufacturer"></span></div>
                     </div>
                 </div>
 
@@ -303,22 +317,23 @@
                         <i class="fas fa-envelope"></i> Send Inquiry
                     </button>
                     <div id="inquiryForm" style="display:none;width:100%;max-width:600px;margin-top:20px;">
-                        <form class="p-3 bg-light rounded">
+                        <form class="p-3 bg-light rounded" method="POST" action="{{ route('inquiry.submit') }}">
+                            @csrf
                             <div class="mb-3">
                                 <label for="inquiryName" class="form-label">Your Name</label>
-                                <input type="text" class="form-control" id="inquiryName" required>
+                                <input type="text" class="form-control" id="inquiryName" name="name" required>
                             </div>
                             <div class="mb-3">
                                 <label for="inquiryEmail" class="form-label">Email Address</label>
-                                <input type="email" class="form-control" id="inquiryEmail" required>
+                                <input type="email" class="form-control" id="inquiryEmail" name="email" required>
                             </div>
                             <div class="mb-3">
                                 <label for="inquiryProduct" class="form-label">Product</label>
-                                <input type="text" class="form-control" id="inquiryProduct" readonly>
+                                <input type="text" class="form-control" id="inquiryProduct" name="product" readonly>
                             </div>
                             <div class="mb-3">
                                 <label for="inquiryMessage" class="form-label">Message</label>
-                                <textarea class="form-control" id="inquiryMessage" rows="4" required></textarea>
+                                <textarea class="form-control" id="inquiryMessage" name="message" rows="4" required></textarea>
                             </div>
                             <button type="submit" class="btn btn-success w-100">Submit Inquiry</button>
                         </form>
@@ -335,71 +350,52 @@
 
 @push('scripts')
 <script>
-// Mirrors Drilling page behavior for Industrial page
-
+/* EXACT same helpers as Aggregates */
 function openProductModal(product){
-  // image + alt
-  document.getElementById('modalProductImage').src = product.image;
-  document.getElementById('modalProductImage').alt = (product.code||'') + ' ' + (product.name||'');
-
-  // headings/labels (IDs in Industrial modal)
-  var codeEl = document.getElementById('modalProductCode');
-  if(codeEl) codeEl.textContent = product.code || '';
-
+  document.getElementById('modalProductImage').src = product.image || '';
+  document.getElementById('modalProductImage').alt = ((product.code||'')+' '+(product.name||'')).trim();
+  document.getElementById('modalProductCodeBadge').textContent = product.code || '';
   document.getElementById('modalProductName').textContent = product.name || '';
   document.getElementById('modalProductStandard').textContent = product.standard || '';
   document.getElementById('modalProductDescription').textContent = product.description || '';
+  document.getElementById('modalProductManufacturer').textContent = product.manufacturer || 'Gemarc Enterprises Inc.';
 
-  // prefill inquiry product
   var inq = document.getElementById('inquiryProduct');
   if(inq) inq.value = (product.code||'') + ' - ' + (product.name||'');
 
-  // specs
   const grid = document.getElementById('modalSpecsGrid');
   grid.innerHTML = '';
   if (product.specs && product.specs.length){
     product.specs.forEach(function(s){
       const d = document.createElement('div');
       d.className = 'modal-spec-item';
-      d.innerHTML = '<div class="modal-spec-label"><strong>'+s.label+
-                    '</strong></div><div class="modal-spec-value">'+s.value+'</div>';
+      d.innerHTML = '<div class="modal-spec-label"><strong>'+s.label+'</strong></div><div class="modal-spec-value">'+s.value+'</div>';
       grid.appendChild(d);
     });
-  } else {
+  }else{
     grid.innerHTML = '<p>No detailed specifications available. Please refer to the PDF or contact us.</p>';
   }
 
-  // show modal
   document.getElementById('productModal').classList.add('active');
   document.body.style.overflow='hidden';
 }
-
 function closeProductModal(){
   document.getElementById('productModal').classList.remove('active');
   document.body.style.overflow='';
   var f = document.getElementById('inquiryForm');
   if(f) f.style.display='none';
 }
-
 function showInquiryForm(){
   const f = document.getElementById('inquiryForm');
   f.style.display = (f.style.display==='none'||!f.style.display) ? 'block' : 'none';
 }
-
-// close on backdrop / ESC
-document.getElementById('productModal').addEventListener('click',function(e){ if(e.target===this) closeProductModal() });
-document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeProductModal() });
-
-// simple submit handler
-(function(){
-  var _f = document.querySelector('#inquiryForm form');
-  if(_f){
-    _f.addEventListener('submit',function(e){
-      e.preventDefault();
-      alert('Thank you for your inquiry. Our team will contact you shortly.');
-      document.getElementById('inquiryForm').style.display='none';
-    });
+document.addEventListener('DOMContentLoaded', function(){
+  var modal = document.getElementById('productModal');
+  if(modal){
+    modal.addEventListener('click',function(e){ if(e.target===this) closeProductModal() });
   }
-})();
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeProductModal() });
+});
+// NOTE: No e.preventDefault() here — let the form POST to backend like Aggregates.
 </script>
 @endpush

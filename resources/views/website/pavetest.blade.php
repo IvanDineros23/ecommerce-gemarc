@@ -188,6 +188,17 @@
         </div>
     </section>
 
+    <!-- Success Alert Notification (same behavior as Aggregates) -->
+    @if(session('success'))
+        <div x-data="{ show: true }" x-show="show" x-transition.opacity.duration.600ms
+             x-init="setTimeout(() => show = false, 3000)"
+             style="position:fixed;top:32px;left:50%;transform:translateX(-50%);z-index:9999;"
+             class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg font-semibold text-lg">
+            {{ session('success') }}
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    @endif
+
     <!-- Product Modal -->
     <div id="productModal" class="modal-overlay">
         <div class="modal-content">
@@ -222,11 +233,24 @@
                         <i class="fas fa-envelope"></i> Send Inquiry
                     </button>
                     <div id="inquiryForm" style="display:none;width:100%;max-width:600px;margin-top:20px;">
-                        <form class="p-3 bg-light rounded">
-                            <div class="mb-3"><label for="inquiryName" class="form-label">Your Name</label><input type="text" class="form-control" id="inquiryName" required></div>
-                            <div class="mb-3"><label for="inquiryEmail" class="form-label">Email Address</label><input type="email" class="form-control" id="inquiryEmail" required></div>
-                            <div class="mb-3"><label for="inquiryProduct" class="form-label">Product</label><input type="text" class="form-control" id="inquiryProduct" readonly></div>
-                            <div class="mb-3"><label for="inquiryMessage" class="form-label">Message</label><textarea class="form-control" id="inquiryMessage" rows="4" required></textarea></div>
+                        <form class="p-3 bg-light rounded" method="POST" action="{{ route('inquiry.submit') }}">
+                            @csrf
+                            <div class="mb-3">
+                                <label for="inquiryName" class="form-label">Your Name</label>
+                                <input type="text" class="form-control" id="inquiryName" name="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="inquiryEmail" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="inquiryEmail" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="inquiryProduct" class="form-label">Product</label>
+                                <input type="text" class="form-control" id="inquiryProduct" name="product" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="inquiryMessage" class="form-label">Message</label>
+                                <textarea class="form-control" id="inquiryMessage" name="message" rows="4" required></textarea>
+                            </div>
                             <button type="submit" class="btn btn-success w-100">Submit Inquiry</button>
                         </form>
                     </div>
@@ -279,14 +303,7 @@ function showInquiryForm(){
 document.getElementById('productModal').addEventListener('click',function(e){if(e.target===this){closeProductModal();}});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeProductModal();}});
 
-var _inq=document.querySelector('#inquiryForm form');
-if(_inq){
-    _inq.addEventListener('submit',function(e){
-        e.preventDefault();
-        alert('Thank you for your inquiry. Our team will contact you shortly.');
-        document.getElementById('inquiryForm').style.display='none';
-    });
-}
+// NOTE: Removed the JS that prevented form submission to allow real POST (like Aggregates)
 
 // Page-specific openers
 window.openB210Modal=function(){openProductModal({

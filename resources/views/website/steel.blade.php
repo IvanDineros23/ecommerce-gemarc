@@ -32,7 +32,8 @@
     .brand-header{margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #e0e0e0}
     .brand-logo{height:64px;max-height:64px;width:auto;object-fit:contain}
     .brand-title{display:none!important}
-    /* Modern CTA Styles (copied from Aggregates) */
+
+    /* Modern CTA Styles (same as Aggregates) */
     .more-products-cta{margin:3rem 0}
     .cta-card{background:linear-gradient(135deg,#1b5e20,#43a047);color:#fff;border-radius:14px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 10px 30px rgba(27,94,32,.25)}
     .cta-text h3{margin:0 0 6px;font-size:1.4rem;font-weight:800;letter-spacing:-.2px}
@@ -40,7 +41,8 @@
     .cta-actions .cta-btn{display:inline-flex;align-items:center;gap:10px;background:#ffffff;color:#1b5e20;padding:12px 18px;border-radius:10px;font-weight:700;text-decoration:none;transition:transform .15s ease,box-shadow .15s ease;box-shadow:0 6px 18px rgba(0,0,0,.15)}
     .cta-actions .cta-btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.2)}
     @media (max-width:768px){.cta-card{flex-direction:column;align-items:flex-start;gap:14px}}
-    /* Modal styling (same pattern as aggregates) */
+
+    /* Modal styling (same pattern as Aggregates) */
     .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;visibility:hidden;transition:all .3s ease}
     .modal-overlay.active{opacity:1;visibility:visible}
     .modal-content{background:#fff;border-radius:12px;width:90%;max-width:900px;max-height:90vh;overflow:hidden;box-shadow:0 25px 50px -12px rgba(0,0,0,.25);transform:scale(.95);opacity:0;transition:all .3s ease}
@@ -66,12 +68,11 @@
     .modal-email-btn{background:linear-gradient(135deg,#2e7d32 0%,#1b5e20 100%);color:#fff;box-shadow:0 10px 20px rgba(46,125,50,.25),inset 0 1px 0 rgba(255,255,255,.15)}
     .modal-email-btn:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(46,125,50,.28);filter:saturate(1.1)}
     .modal-email-btn:active{transform:translateY(0);box-shadow:0 8px 16px rgba(46,125,50,.22)}
-    /* === Added to fully mirror Drilling page button behavior === */
     .modal-email-btn:focus-visible{box-shadow:0 0 0 3px rgba(46,125,50,.35),0 10px 20px rgba(46,125,50,.25)}
     .modal-email-btn i{font-size:1rem;transition:transform .2s ease,opacity .2s ease}
     .modal-email-btn:hover i{transform:translateX(2px)}
 
-    /* === Added Inquiry form styles to match Drilling page === */
+    /* Inquiry form styles (match Aggregates) */
     #inquiryForm form{background:#f7faf8;border:1px solid #e6efe8;border-radius:14px;padding:16px 18px;box-shadow:0 8px 20px rgba(0,0,0,.04)}
     #inquiryForm .form-label{display:block;font-weight:700;color:#2f3b2f;margin-bottom:.35rem}
     #inquiryForm .form-control{width:100%;padding:12px 14px;border:1px solid #e3e6e3;border-radius:10px;background:#fff;color:#333;transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}
@@ -82,7 +83,10 @@
     #inquiryForm .btn-success.w-100:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(46,125,50,.32);color:#fff}
     #inquiryForm .btn-success.w-100:active{transform:none;box-shadow:0 8px 16px rgba(46,125,50,.22)}
 
-    @media (max-width:768px){.modal-product-info{grid-template-columns:1fr}.modal-specs-grid{grid-template-columns:1fr}}
+    @media (max-width:768px){
+        .modal-product-info{grid-template-columns:1fr}
+        .modal-specs-grid{grid-template-columns:1fr}
+    }
 </style>
 @endpush
 
@@ -101,7 +105,7 @@
     <!-- Products Section -->
     <section class="blogs-section">
         <div class="container">
-         <!-- Search Bar -->
+            <!-- Search Bar -->
             @include('components.searchbar')
 
             <p class="mb-4">We provide comprehensive steel testing equipment for quality control and material characterization in construction and manufacturing industries. Our equipment meets international standards for steel testing and analysis.</p>
@@ -188,6 +192,17 @@
         </div>
     </section>
 
+    {{-- Success Alert Notification (same as Aggregates) --}}
+    @if(session('success'))
+        <div x-data="{ show: true }" x-show="show" x-transition.opacity.duration.600ms
+             x-init="setTimeout(() => show = false, 3000)"
+             style="position:fixed;top:32px;left:50%;transform:translateX(-50%);z-index:9999;"
+             class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg font-semibold text-lg">
+            {{ session('success') }}
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    @endif
+
     <!-- Unified Product Modal -->
     <div id="productModal" class="modal-overlay">
         <div class="modal-content">
@@ -230,22 +245,23 @@
                     </button>
 
                     <div id="inquiryForm" style="display:none;width:100%;max-width:600px;margin-top:20px;">
-                        <form class="p-3 bg-light rounded">
+                        <form class="p-3 bg-light rounded" method="POST" action="{{ route('inquiry.submit') }}">
+                            @csrf
                             <div class="mb-3">
                                 <label for="inquiryName" class="form-label">Your Name</label>
-                                <input type="text" class="form-control" id="inquiryName" required>
+                                <input type="text" class="form-control" id="inquiryName" name="name" required>
                             </div>
                             <div class="mb-3">
                                 <label for="inquiryEmail" class="form-label">Email Address</label>
-                                <input type="email" class="form-control" id="inquiryEmail" required>
+                                <input type="email" class="form-control" id="inquiryEmail" name="email" required>
                             </div>
                             <div class="mb-3">
                                 <label for="inquiryProduct" class="form-label">Product</label>
-                                <input type="text" class="form-control" id="inquiryProduct" readonly>
+                                <input type="text" class="form-control" id="inquiryProduct" name="product" readonly>
                             </div>
                             <div class="mb-3">
                                 <label for="inquiryMessage" class="form-label">Message</label>
-                                <textarea class="form-control" id="inquiryMessage" rows="4" required></textarea>
+                                <textarea class="form-control" id="inquiryMessage" name="message" rows="4" required></textarea>
                             </div>
                             <button type="submit" class="btn btn-success w-100">Submit Inquiry</button>
                         </form>
@@ -266,10 +282,11 @@ function openProductModal(product) {
     document.getElementById('modalProductImage').alt = product.code + ' ' + product.name;
     document.getElementById('modalProductCodeBadge').textContent = product.code;
     document.getElementById('modalProductName').textContent = product.name;
-    document.getElementById('modalProductStandard').textContent = product.standard;
-    document.getElementById('modalProductDescription').textContent = product.description;
+    document.getElementById('modalProductStandard').textContent = product.standard || '';
+    document.getElementById('modalProductDescription').textContent = product.description || '';
     document.getElementById('modalProductManufacturer').textContent = product.manufacturer || 'Gemarc Enterprises Inc.';
     document.getElementById('inquiryProduct').value = product.code + ' - ' + product.name;
+
     const specsGrid = document.getElementById('modalSpecsGrid');
     specsGrid.innerHTML = '';
     if (product.specs && product.specs.length) {
@@ -295,27 +312,19 @@ function closeProductModal(){
 }
 function showInquiryForm(){
     const form = document.getElementById('inquiryForm');
-    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    form.style.display = (form.style.display === 'none' || !form.style.display) ? 'block' : 'none';
 }
 document.getElementById('productModal').addEventListener('click', function(e){ if(e.target === this){ closeProductModal(); }});
 document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ closeProductModal(); }});
-var _inquiryForm = document.querySelector('#inquiryForm form');
-if (_inquiryForm) {
-    _inquiryForm.addEventListener('submit', function(e){
-        e.preventDefault();
-        alert('Thank you for your inquiry. Our team will contact you shortly.');
-        document.getElementById('inquiryForm').style.display = 'none';
-    });
-}
 
-// Page-specific openers
+// --- Page-specific openers ---
 window.openAI7000LAUModal = function(){
     openProductModal({
         code: 'AI-7000-LAU',
         name: 'Servo Control System Universal Testing Machine',
         standard: 'EN 10002, EN 10080, EN 15630-1, EN 15630-3 | EN ISO 6892-1, 7500-1 | ASTM A370, ASTM E8',
         description: 'Featuring an advanced servo control system and high-capacity measurement capability, the AI-7000-LAU is a heavy-duty universal testing machine designed for various materials testing.',
-        image: '{{ asset('images/highlights/UN-7001-LAS.jpg') }}',
+        image: "{{ asset('images/highlights/UN-7001-LAS.jpg') }}",
         manufacturer: 'GOTECH',
         manufacturerUrl: 'https://www.gotech.biz/',
         pdf: 'downloadable content/AI-7000-LAU.pdf',
@@ -341,7 +350,7 @@ window.openWASeriesModal = function(){
         name: 'Universal Testing Machine with PC & Servo Control',
         standard: 'EN 10002, EN ISO 6892-1, ASTM A370',
         description: 'Hydraulic loading with electronic force measurement for tensile, compression, and bending tests. Data can be saved/printed; overload protection.',
-        image: '{{ asset('images/highlights/TBTUTM-1000A.jpg') }}',
+        image: "{{ asset('images/highlights/TBTUTM-1000A.jpg') }}",
         manufacturer: 'TBT Nanjing',
         manufacturerUrl: 'https://www.tbt-scietech.com/',
         pdf: 'downloadable content/WA-100C_WA-300C_WA-600C_WA-1000C.pdf',

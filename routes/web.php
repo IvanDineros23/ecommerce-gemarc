@@ -220,9 +220,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Chat (user)
     Route::get('/chats', fn () => view('dashboard.chat'))->name('chat.page');
-    Route::get('/chat/fetch', [ChatController::class, 'fetch']);
-    Route::post('/chat/send', [ChatController::class, 'send']);
-    Route::post('/chat/clear', [ChatController::class, 'clear']);
+    Route::get('/chat/users', [ChatController::class, 'users'])->name('chat.users');
+    Route::get('/chat/fetch', [ChatController::class, 'fetch'])->name('chat.fetch');
+    Route::post('/chat/send', [ChatController::class, 'send'])->name('chat.send');
+    Route::post('/chat/clear', [ChatController::class, 'clear'])->name('chat.clear');
 });
 
 /*

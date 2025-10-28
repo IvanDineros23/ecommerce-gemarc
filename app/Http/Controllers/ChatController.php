@@ -28,42 +28,74 @@ class ChatController extends Controller
 
         $allowed = array_keys(self::DEPARTMENTS);
 
-        // Include both employees AND admins; limit to the 5 depts
-        $employees = User::query()
-            ->whereIn('role', ['employee', 'admin'])
-            ->where(function ($q) use ($allowed) {
-                $q->whereIn('department', $allowed)
-                  // allow null/empty dept so we can default admins to IT
-                  ->orWhereNull('department')
-                  ->orWhere('department', '');
-            })
-            ->where('id', '<>', Auth::id()) // don't list yourself
-            ->select('id', 'name', 'department', 'role')
-            ->orderBy('name')
-            ->get();
+        $currentUser = Auth::user();
 
-        foreach ($employees as $emp) {
-            // If an admin has no dept, default to IT
-            $deptKey = strtolower($emp->department ?: ($emp->role === 'admin' ? 'it' : ''));
+        // If employee, show only users who have sent a message to them
+        if ($currentUser->role === 'employee') {
+            $senderIds = ChatMessage::where('receiver_id', $currentUser->id)
+                ->distinct()->pluck('sender_id')->toArray();
 
-            // Safety: skip anything outside the 5
-            if (!array_key_exists($deptKey, self::DEPARTMENTS)) {
-                continue;
-            }
-
-            $unread = ChatMessage::where('sender_id', $emp->id)
-                ->where('receiver_id', Auth::id())
-                ->whereNull('read_at')
-                ->count();
-
-            $groups[$deptKey]['employees'][] = [
-                'id'           => $emp->id,
-                'name'         => $emp->name,
-                'unread_count' => $unread,
-            ];
+            $employees = User::query()
+                ->whereIn('id', $senderIds)
+                ->where(function ($q) use ($allowed) {
+                    $q->whereIn('department', $allowed)
+                      ->orWhereNull('department')
+                      ->orWhere('department', '');
+                })
+                ->select('id', 'name', 'department', 'role')
+                ->orderBy('name')
+                ->get();
+        } else {
+            // For user/admin, show all employees/admins
+            $employees = User::query()
+                ->whereIn('role', ['employee', 'admin'])
+                ->where(function ($q) use ($allowed) {
+                    $q->whereIn('department', $allowed)
+                      ->orWhereNull('department')
+                      ->orWhere('department', '');
+                })
+                ->where('id', '<>', $currentUser->id)
+                ->select('id', 'name', 'department', 'role')
+                ->orderBy('name')
+                ->get();
         }
 
-        return response()->json($groups);
+        // For employee, return a flat array of users who messaged them
+        if ($currentUser->role === 'employee') {
+            $users = [];
+            foreach ($employees as $emp) {
+                $unread = ChatMessage::where('sender_id', $emp->id)
+                    ->where('receiver_id', $currentUser->id)
+                    ->whereNull('read_at')
+                    ->count();
+                $users[] = [
+                    'id'           => $emp->id,
+                    'name'         => $emp->name,
+                    'unread_count' => $unread,
+                ];
+            }
+            return response()->json($users);
+        } else {
+            foreach ($employees as $emp) {
+                $deptKey = strtolower($emp->department ?: ($emp->role === 'admin' ? 'it' : 'unknown'));
+                if (!array_key_exists($deptKey, self::DEPARTMENTS)) {
+                    if (!array_key_exists('unknown', $groups)) {
+                        $groups['unknown'] = ['label' => 'Unknown', 'employees' => []];
+                    }
+                }
+                $groupKey = array_key_exists($deptKey, $groups) ? $deptKey : 'unknown';
+                $unread = ChatMessage::where('sender_id', $emp->id)
+                    ->where('receiver_id', $currentUser->id)
+                    ->whereNull('read_at')
+                    ->count();
+                $groups[$groupKey]['employees'][] = [
+                    'id'           => $emp->id,
+                    'name'         => $emp->name,
+                    'unread_count' => $unread,
+                ];
+            }
+            return response()->json($groups);
+        }
     }
 
     public function fetch(Request $request)

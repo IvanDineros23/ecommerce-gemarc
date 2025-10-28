@@ -16,4 +16,11 @@ class ChatMessage extends Model
     protected $casts = [
         'read_at' => 'datetime',
     ];
+        /**
+         * Get the sender of the chat message.
+         */
+        public function sender()
+        {
+            return $this->belongsTo(User::class, 'sender_id');
+        }
 }

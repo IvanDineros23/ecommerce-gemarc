@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -33,10 +32,7 @@
         color: #222 !important;
         text-decoration: none;
     }
-    .navbar-brand img {
-        height: 40px;
-        width: auto;
-    }
+    .navbar-brand img { height: 40px; width: auto; }
     .navbar-nav .nav-link {
         color: #333 !important;
         font-weight: 500;
@@ -86,166 +82,52 @@
         border: 1.5px solid white;
         animation: pulse 2s infinite;
     }
-    
-    /* Different badge colors */
-    .notification-badge {
-        background: #f59e0b;
-    }
-    
-    .chat-badge {
-        background: #3b82f6;
-    }
+    .notification-badge { background: #f59e0b; }
+    .chat-badge { background: #3b82f6; }
     @keyframes pulse {
-        0% {
-            transform: scale(1);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        50% {
-            transform: scale(1.05);
-            box-shadow: 0 2px 8px rgba(239,68,68,0.5);
-        }
-        100% {
-            transform: scale(1);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
+        0% { transform: scale(1); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        50% { transform: scale(1.05); box-shadow: 0 2px 8px rgba(239,68,68,0.5); }
+        100% { transform: scale(1); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
     }
-    .nav-user-info {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        color: #333;
-        font-weight: 500;
+    .nav-user-info { display:flex; align-items:center; gap:.75rem; color:#333; font-weight:500; }
+    .nav-user-avatar{
+        width:38px;height:38px;background:linear-gradient(135deg,#22c55e,#16a34a);
+        border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;
+        font-weight:600;font-size:.875rem;box-shadow:0 2px 8px rgba(0,0,0,0.1);border:2px solid #fff;
     }
-    .nav-user-avatar {
-        width: 38px;
-        height: 38px;
-        background: linear-gradient(135deg, #22c55e, #16a34a);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: 600;
-        font-size: 0.875rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        border: 2px solid #ffffff;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-    
-    /* Improved icon styling */
-    .navbar .nav-link i {
-        font-size: 1.1rem;
-        transition: transform 0.2s ease;
-    }
-    
-    .navbar .nav-link:hover i {
-        transform: translateY(-2px);
-    }
-    
-    /* Unread notification indicator */
-    .unread-notification {
-        background-color: rgba(34, 197, 94, 0.04);
-        position: relative;
-    }
-    
-    .unread-indicator {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #16a34a;
-        position: absolute;
-        right: 15px;
-        top: 15px;
-    }
-    
-    .notification-icon {
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .notification-time {
-        color: #999;
-        font-size: 0.75rem;
-        display: block;
-        margin-top: 3px;
-    }
-    
-    /* Page Structure */
-    html, body {
-        height: 100%;
-        margin: 0;
-    }
-    
-    body {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
-    
-    main {
-        flex: 1 0 auto;
-        min-height: 60vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-    
-    /* Footer Styles */
-    .site-footer {
-        background: #2E7D32; /* Dark green background */
-        padding: 0;
-        width: 100%;
-        border-top: none;
-        color: white;
-        flex-shrink: 0;
-        margin-top: auto;
-    }
-    .site-footer__wrap {
-        max-width: 1400px;
-        margin: 0 auto;
-    }
+    .navbar .nav-link i{ font-size:1.1rem; transition: transform .2s; }
+    .navbar .nav-link:hover i{ transform: translateY(-2px); }
+    .unread-notification{ background-color: rgba(34,197,94,0.04); position: relative; }
+    .unread-indicator{ width:8px;height:8px;border-radius:50%;background:#16a34a; position:absolute; right:15px; top:15px; }
+    .notification-icon{ width:36px;height:36px; display:flex; align-items:center; justify-content:center; }
+    .notification-time{ color:#999; font-size:.75rem; display:block; margin-top:3px; }
 
-    /* 4 even columns grid */
+    /* Layout bones so footer sits at bottom */
+    html, body { height:100%; margin:0; }
+    body { display:flex; flex-direction:column; min-height:100vh; }
+    main { flex: 1 0 auto; min-height: 60vh; display:flex; flex-direction:column; }
+
+    /* ===== FOOTER (copied/adapted from app.blade.php) ===== */
+    .site-footer { background:#2E7D32; padding:0; width:100%; color:#fff; flex-shrink:0; margin-top:auto; }
+    .site-footer__wrap { max-width:1400px; margin:0 auto; }
     .site-footer__grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 0;
-        background-color: #2E7D32; /* Dark green */
+        display:grid; grid-template-columns: 1.2fr 1fr 1.2fr; gap:0; background:#2E7D32;
     }
-    .site-footer__item {
-        padding: 30px 20px;
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    .site-footer__item { padding:14px 14px 12px; border-right:1px solid rgba(255,255,255,0.1); }
+    .site-footer__item:last-child { border-right:0; }
+    .site-footer__title{
+        display:flex; align-items:center; gap:8px; color:#fff; font-size:1rem; font-weight:700; margin:0 0 8px 0;
     }
-    .site-footer__item:last-child { border-right: 0; }
+    .site-footer__title i{ color:#FFA000; font-size:1.1rem; }
+    .site-footer__text{ margin:0; color:rgba(255,255,255,0.9); line-height:1.5; font-size:.95rem; }
+    .site-footer__bar{ text-align:center; padding:12px 0; color:#fff; background:#1B5E20; font-size:.95rem; font-weight:600; }
 
-    .site-footer__title {
-        display: flex; align-items: center; gap: 8px;
-        color: white; font-size: 1.05rem; font-weight: 600;
-        margin: 0 0 8px 0;
-        white-space: nowrap;
-    }
-    .site-footer__title i { color: #FFA000; font-size: 1.2rem; } /* Amber color for icons */
-    .site-footer__text { margin: 0; color: rgba(255, 255, 255, 0.9); line-height: 1.6; }
-
-    /* bottom bar */
-    .site-footer__bar {
-        text-align: center;
-        padding: 16px 0;
-        color: #fff;
-        background: #1B5E20; /* Darker green for the copyright bar */
-        font-size: 0.95rem; font-weight: 500;
-    }
-
-    /* responsive footer */
     @media (max-width: 900px) {
-        .site-footer__grid { grid-template-columns: 1fr; }
-        .site-footer__item { border-right: 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-        .site-footer__item:last-child { border-bottom: 0; }
-        .site-footer__title { justify-content: center; }
-        .site-footer__text { text-align: center; }
+        .site-footer__grid { grid-template-columns:1fr; }
+        .site-footer__item { border-right:0; border-bottom:1px solid rgba(255,255,255,0.1); text-align:center; }
+        .site-footer__item:last-child { border-bottom:0; }
+        .site-footer__title { justify-content:center; }
+        .site-footer__text { text-align:center; }
     }
     </style>
 </head>
@@ -263,6 +145,7 @@
             }
         }
     @endphp
+
     <!-- Ecommerce Navigation -->
     <nav class="navbar navbar-expand-lg ecommerce-navbar">
         <div class="container-fluid px-4">
@@ -306,7 +189,6 @@
 
                 <!-- Quick Icons + User Menu -->
                 <ul class="navbar-nav align-items-center gap-2">
-                    <!-- Cart Icon -->
                     @if(!(auth()->check() && auth()->user()->isEmployee()))
                     <li class="nav-item position-relative me-2">
                         <a class="nav-link" href="{{ route('cart.index') }}" title="Cart">
@@ -318,7 +200,7 @@
                     </li>
                     @endif
                     
-                    <!-- Notifications Icon with Dropdown -->
+                    <!-- Notifications -->
                     <li class="nav-item dropdown position-relative me-2">
                         <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
                             <i class="fas fa-bell"></i>
@@ -330,7 +212,6 @@
                                 <a href="#" class="text-decoration-none small">Mark all as read</a>
                             </div>
                             <div class="notifications-list">
-                                <!-- Unread Notification -->
                                 <a href="#" class="dropdown-item p-3 border-bottom d-flex align-items-center unread-notification">
                                     <div class="notification-icon me-3 bg-success bg-opacity-10 text-success rounded-circle p-2">
                                         <i class="fas fa-check-circle"></i>
@@ -342,7 +223,6 @@
                                     </div>
                                     <div class="unread-indicator"></div>
                                 </a>
-                                <!-- Normal Notification -->
                                 <a href="#" class="dropdown-item p-3 border-bottom d-flex align-items-center unread-notification">
                                     <div class="notification-icon me-3 bg-primary bg-opacity-10 text-primary rounded-circle p-2">
                                         <i class="fas fa-percent"></i>
@@ -354,7 +234,6 @@
                                     </div>
                                     <div class="unread-indicator"></div>
                                 </a>
-                                <!-- Normal Notification -->
                                 <a href="#" class="dropdown-item p-3 border-bottom d-flex align-items-center unread-notification">
                                     <div class="notification-icon me-3 bg-warning bg-opacity-10 text-warning rounded-circle p-2">
                                         <i class="fas fa-truck"></i>
@@ -373,7 +252,7 @@
                         </div>
                     </li>
 
-                    <!-- Chat Icon -->
+                    <!-- Chat -->
                     <li class="nav-item position-relative me-3">
                         <a class="nav-link" href="{{ route('chat.page') }}" title="Chat">
                             <i class="fas fa-comment-dots"></i>
@@ -392,9 +271,6 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{{ route('profile.edit') }}">
                                 <i class="fas fa-user me-2"></i> Profile
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ route('saved.index') }}">
-                                <i class="fas fa-heart me-2"></i> Saved Items
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
@@ -417,49 +293,45 @@
         @yield('content')
     </main>
 
-    <!-- Footer -->
+    <!-- ===== Footer (same structure as app.blade.php) ===== -->
     <footer class="site-footer">
         <div class="site-footer__wrap">
             <div class="site-footer__grid">
-                <!-- Office Location -->
+                <!-- Office Address -->
                 <div class="site-footer__item">
                     <h4 class="site-footer__title"><i class="fas fa-map-marker-alt"></i> Office Address</h4>
                     <p class="site-footer__text">
                         No. 15 Chile St. Ph1 Greenheights Subdivision,<br>
-                        Concepcion 1, Marikina City,<br>
-                        Philippines 1807
+                        Concepcion 1, Marikina City, Philippines 1807
                     </p>
                 </div>
-                
-                <!-- Contact Information -->
+
+                <!-- Combined Contact Numbers -->
                 <div class="site-footer__item">
-                    <h4 class="site-footer__title"><i class="fas fa-phone-alt"></i> Telephone Numbers</h4>
+                    <h4 class="site-footer__title"><i class="fas fa-phone"></i> Contact Numbers</h4>
+                    <p class="site-footer__text" style="margin-bottom:6px;">
+                        <strong>Telephone:</strong> (632)8-997-7959
+                    </p>
                     <p class="site-footer__text">
-                        (632)8-997-7959 &nbsp;|&nbsp; (632)8-584-5572
+                        <strong>Mobile Numbers:</strong><br>
+                        +63 909 087 9416 <span style="color:#ffd580;font-size:.9em;">| Marketing Department</span><br>
+                        +63 928 395 3532 <span style="color:#ffd580;font-size:.9em;">| Technical Department</span><br>
+                        +63 918 905 8316
                     </p>
                 </div>
-                
-                <!-- Mobile Numbers -->
-                <div class="site-footer__item">
-                    <h4 class="site-footer__title"><i class="fas fa-mobile-alt"></i> Mobile Numbers</h4>
-                    <p class="site-footer__text">
-                        +63 909 087 9416<br>
-                        +63 928 395 3532 &nbsp;|&nbsp; +63 918 905 8316
-                    </p>
-                </div>
-                
-                <!-- Email Contacts -->
+
+                <!-- Email Addresses -->
                 <div class="site-footer__item">
                     <h4 class="site-footer__title"><i class="fas fa-envelope"></i> Email Address</h4>
                     <p class="site-footer__text">
                         sales@gemarcph.com<br>
-                        technical@gemarcph.com
+                        technical@gemarcph.com<br>
+                        gemarcent.fo@gmail.com<br>
+                        gemarc.fo@gemarcph.com
                     </p>
                 </div>
             </div>
         </div>
-        
-        <!-- Copyright Bar -->
         <div class="site-footer__bar">
             &copy; {{ date('Y') }} Gemarc Enterprises Incorporated. All rights reserved.
         </div>

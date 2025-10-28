@@ -9,9 +9,13 @@ class SettingsController extends Controller
     public function saveBasicInfo(Request $request)
     {
         $request->validate([
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|max:100',
             'contact_no' => 'nullable|string|max:32',
         ]);
         $user = Auth::user();
+        $user->name = $request->name;
+        $user->email = $request->email;
         $user->contact_no = $request->contact_no;
         $user->save();
         return redirect()->route('settings')->with('success', 'Basic info saved!');

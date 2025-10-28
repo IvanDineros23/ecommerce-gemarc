@@ -28,16 +28,17 @@
                 @csrf
                 <div class="mb-3">
                     <label for="name" class="form-label">Name</label>
-                    <input type="text" class="form-control bg-light" id="name" value="{{ Auth::user()->name }}" readonly disabled>
+                    <input type="text" name="name" class="form-control" id="name" value="{{ old('name', Auth::user()->name) }}" required>
                 </div>
                 <div class="mb-3">
                     <label for="current_email" class="form-label">Current Email</label>
-                    <input type="email" class="form-control bg-light" id="current_email" value="{{ Auth::user()->email }}" readonly disabled>
+                    <input type="email" name="email" class="form-control" id="current_email" value="{{ old('email', Auth::user()->email) }}" required>
                 </div>
                 <div class="mb-3">
                     <label for="contact_no" class="form-label">Contact Number</label>
                     <input type="text" name="contact_no" class="form-control" id="contact_no" value="{{ old('contact_no', Auth::user()->contact_no) }}" placeholder="09XXXXXXXXX">
                 </div>
+                <button type="submit" class="btn btn-success">Save Basic Info</button>
                 @if(!$isEmployee)
                     <div class="mb-3">
                         <label for="new_email" class="form-label">New Email</label>

@@ -74,11 +74,44 @@
 .submit-btn:hover{filter:brightness(1.05); transform:translateY(-1px);}
 
 /* Map */
-.map-section{background:#f8fafc; padding:2.25rem 0;}
-.map-section h2{max-width:1100px; margin:0 auto 1rem; font-weight:600; color:#111;}
-.map-container{max-width:1100px; margin:0 auto; border-radius:16px; overflow:hidden; background:#fff; border:1px solid #e5e7eb;}
-.google-maps{width:100%; height:420px; border:0; display:block;}
-.map-address{padding:12px 14px; color:#374151}
+
+.map-section {
+  background: #f8fafc;
+  padding: 2.25rem 0;
+  min-height: 480px;
+  clear: both;
+  display: block !important;
+  position: relative;
+  z-index: 1;
+}
+.map-section h2 {
+  max-width: 1100px;
+  margin: 0 auto 1rem;
+  font-weight: 600;
+  color: #111;
+}
+.map-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  border-radius: 16px;
+  overflow: visible !important;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  min-height: 420px;
+  display: block;
+}
+.google-maps {
+  width: 100%;
+  height: 420px;
+  border: 0;
+  display: block;
+  min-height: 420px;
+  background: #fff;
+}
+.map-address {
+  padding: 12px 14px;
+  color: #374151;
+}
 
 /* Ensure FA icons show even if kit defaults to regular */
 .contact-details i, .submit-btn i{font-family:"Font Awesome 6 Free","Font Awesome 5 Free"; font-weight:900;}
@@ -186,21 +219,71 @@
 
           <form id="contactForm" method="POST" action="{{ route('contact.submit') }}" novalidate>
             @csrf
+            @if(session('success'))
+            <div id="successAlert" class="mb-3 p-3 rounded bg-green-100 text-green-800 font-semibold border border-green-300 text-center">
+              <i class="fas fa-check-circle"></i> {{ session('success') }}
+            </div>
+            @endif
             <div class="form-group">
               <label for="fullname">Full Name *</label>
-              <input type="text" id="fullname" name="fullname" required>
+              <input type="text" id="fullname" name="fullname" required autocomplete="name" placeholder="Enter your name">
             </div>
             <div class="form-group">
               <label for="email">Email Address *</label>
-              <input type="email" id="email" name="email" required>
+              <input type="email" id="email" name="email" required autocomplete="email" pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$" placeholder="Enter your email address">
             </div>
             <div class="form-group">
-              <label for="phone">Phone Number</label>
-              <input type="tel" id="phone" name="phone">
+              <label for="phone">Phone Number *</label>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <select id="countryCode" name="countryCode" required style="max-width:130px;">
+                  <option value="+63">+63 PH</option>
+                  <option value="+1">+1 US</option>
+                  <option value="+44">+44 UK</option>
+                  <option value="+61">+61 AU</option>
+                  <option value="+81">+81 JP</option>
+                  <option value="+65">+65 SG</option>
+                  <option value="+91">+91 IN</option>
+                  <option value="+86">+86 CN</option>
+                  <option value="+49">+49 DE</option>
+                  <option value="+33">+33 FR</option>
+                  <option value="+39">+39 IT</option>
+                  <option value="+7">+7 RU</option>
+                  <option value="+34">+34 ES</option>
+                  <option value="+82">+82 KR</option>
+                  <option value="+971">+971 AE</option>
+                  <option value="+62">+62 ID</option>
+                  <option value="+855">+855 KH</option>
+                  <option value="+852">+852 HK</option>
+                  <option value="+20">+20 EG</option>
+                  <option value="+27">+27 ZA</option>
+                  <option value="+90">+90 TR</option>
+                  <option value="+234">+234 NG</option>
+                  <option value="+212">+212 MA</option>
+                  <option value="+972">+972 IL</option>
+                  <option value="+48">+48 PL</option>
+                  <option value="+351">+351 PT</option>
+                  <option value="+358">+358 FI</option>
+                  <option value="+46">+46 SE</option>
+                  <option value="+31">+31 NL</option>
+                  <option value="+47">+47 NO</option>
+                  <option value="+45">+45 DK</option>
+                  <option value="+43">+43 AT</option>
+                  <option value="+41">+41 CH</option>
+                  <option value="+36">+36 HU</option>
+                  <option value="+420">+420 CZ</option>
+                  <option value="+48">+48 PL</option>
+                  <option value="+380">+380 UA</option>
+                  <option value="+66">+66 TH</option>
+                  <option value="+84">+84 VN</option>
+                  <option value="+64">+64 NZ</option>
+                  <!-- Add more as needed -->
+                </select>
+                <input type="tel" id="phone" name="phone" required pattern="[0-9]{7,15}" autocomplete="tel" placeholder="9123456789">
+              </div>
             </div>
             <div class="form-group">
               <label for="company">Company</label>
-              <input type="text" id="company" name="company">
+              <input type="text" id="company" name="company" autocomplete="organization" placeholder="Enter your company">
             </div>
             <div class="form-group">
               <label for="service">Service Interest</label>
@@ -214,16 +297,18 @@
             </div>
             <div class="form-group">
               <label for="message">Message *</label>
-              <textarea id="message" name="message" rows="5" required></textarea>
+              <textarea id="message" name="message" rows="5" required placeholder="Type your message here..."></textarea>
             </div>
 
             {{-- reCAPTCHA widget --}}
-            <div class="g-recaptcha" data-sitekey="6LcgmsUrAAAAAIj2wLxxrKoNsxrQ_CBXXBriafOF"></div>
-
+            <div style="display:flex;justify-content:center;align-items:center;width:100%;margin:18px 0 0 0;">
+              <div class="g-recaptcha" data-sitekey="6LcgmsUrAAAAAIj2wLxxrKoNsxrQ_CBXXBriafOF"></div>
+            </div>
             <br>
-            <button type="submit" class="submit-btn">
+            <button type="submit" class="submit-btn" id="submitBtn" disabled style="pointer-events:none;filter:grayscale(1);opacity:.6;">
               <i class="fas fa-paper-plane"></i> Send Message
             </button>
+            <!-- NOTE: The Send Message button is always enabled for testing. Please restore the 'disabled' attribute and validation logic after testing. -->
           </form>
         </div>
       </div>

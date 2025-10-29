@@ -37,6 +37,12 @@
                                 <label class="form-label">Contact Number</label>
                                 <div class="form-control bg-light">{{ $user->contact_no }}</div>
                             </div>
+                            @if($user->isEmployee())
+                            <div class="mb-3">
+                                <label class="form-label">Department</label>
+                                <div class="form-control bg-light">{{ ucfirst($user->department ?? 'N/A') }}</div>
+                            </div>
+                            @endif
                             @if($user->isUser())
                             <div class="mb-3">
                                 <label class="form-label">Delivery Address</label>

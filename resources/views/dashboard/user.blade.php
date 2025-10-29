@@ -133,7 +133,7 @@ function searchBar() {
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                     Download our company brochure here
                 </div>
-                <a href="/GEI%202025%20brochure%20(1).pdf" class="text-orange-600 hover:underline font-semibold" target="_blank">Gemarc Enterprises Incorporated Company Brochure (PDF)</a>
+                <a href="/GEMARC%202026%20brochurePDF.pdf" class="text-orange-600 hover:underline font-semibold" target="_blank">Gemarc Enterprises Incorporated Company Brochure (PDF)</a>
             </div>
         </div>
     </div>

@@ -204,7 +204,7 @@
                     <li class="nav-item dropdown position-relative me-2">
                         <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
                             <i class="fas fa-bell"></i>
-                            <span class="notification-badge cart-badge">3</span>
+                            <span class="notification-badge cart-badge" style="display:none"></span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end p-0 overflow-hidden" style="width: 320px; max-height: 400px;">
                             <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
@@ -257,7 +257,7 @@
                         @php $user = auth()->user(); @endphp
                         <a class="nav-link" href="{{ $user && $user->role === 'employee' ? route('employee.chat.page') : route('chat.page') }}" title="Chat">
                             <i class="fas fa-comment-dots"></i>
-                            <span class="chat-badge cart-badge">2</span>
+                            <span class="chat-badge cart-badge" style="display:none"></span>
                         </a>
                     </li>
                     
@@ -342,5 +342,77 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     @stack('scripts')
+
+@if(auth()->check() && auth()->user()->isEmployee())
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function updateBadges(notifCount, chatCount) {
+        var notifBadge = document.querySelector('.notification-badge.cart-badge');
+        var chatBadge = document.querySelector('.chat-badge.cart-badge');
+        if (notifBadge) {
+            notifBadge.style.display = notifCount > 0 ? 'inline-block' : 'none';
+            notifBadge.textContent = notifCount > 0 ? notifCount : '';
+        }
+        if (chatBadge) {
+            chatBadge.style.display = chatCount > 0 ? 'inline-block' : 'none';
+            chatBadge.textContent = chatCount > 0 ? chatCount : '';
+        }
+    }
+
+    async function pollBadges() {
+        try {
+            const res = await fetch('/notifications/fetch', { credentials: 'same-origin' });
+            if (!res.ok) return;
+            const data = await res.json();
+            if (data.success) {
+                updateBadges(data.notif_count, data.chat_unread);
+            } else {
+                updateBadges(0, 0);
+            }
+        } catch (e) {
+            updateBadges(0, 0);
+        }
+    }
+    pollBadges();
+    setInterval(pollBadges, 5000);
+});
+</script>
+@endif
+
+@if(auth()->check() && auth()->user()->isUser())
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function updateBadges(notifCount, chatCount) {
+        var notifBadge = document.querySelector('.notification-badge.cart-badge');
+        var chatBadge = document.querySelector('.chat-badge.cart-badge');
+        if (notifBadge) {
+            notifBadge.style.display = notifCount > 0 ? 'inline-block' : 'none';
+            notifBadge.textContent = notifCount > 0 ? notifCount : '';
+        }
+        if (chatBadge) {
+            chatBadge.style.display = chatCount > 0 ? 'inline-block' : 'none';
+            chatBadge.textContent = chatCount > 0 ? chatCount : '';
+        }
+    }
+
+    async function pollBadges() {
+        try {
+            const res = await fetch('/notifications/fetch', { credentials: 'same-origin' });
+            if (!res.ok) return;
+            const data = await res.json();
+            if (data.success) {
+                updateBadges(data.notif_count, data.chat_unread);
+            } else {
+                updateBadges(0, 0);
+            }
+        } catch (e) {
+            updateBadges(0, 0);
+        }
+    }
+    pollBadges();
+    setInterval(pollBadges, 5000);
+});
+</script>
+@endif
 </body>
 </html>

@@ -16,10 +16,13 @@ class ContactSubmissionController extends Controller
             'service' => 'nullable|string|max:255',
             'message' => 'required|string',
         ]);
+        $countryCode = $request->input('countryCode');
+        $phone = $request->input('phone');
+        $fullPhone = $countryCode ? ($countryCode . ' ' . $phone) : $phone;
         ContactSubmission::create([
             'full_name' => $request->input('fullname'),
             'email' => $request->input('email'),
-            'phone' => $request->input('phone'),
+            'phone' => $fullPhone,
             'company' => $request->input('company'),
             'service_interest' => $request->input('service'),
             'message' => $request->input('message'),

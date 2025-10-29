@@ -39,7 +39,7 @@
                             <p class="card-text text-muted small mb-3" style="height: 3em; overflow: hidden;">{{ $product->description ?? '' }}</p>
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <span class="fw-bold fs-5">₱{{ number_format($product->unit_price ?? 0,2) }}</span>
-                                <a href="{{ route('shop.show', $product->id) }}" class="btn btn-sm btn-outline-success">View Details</a>
+                                <a href="{{ route('shop.index', ['q' => $product->name]) }}" class="btn btn-sm btn-outline-success">View Details</a>
                             </div>
                             <div class="d-flex justify-content-between mt-2">
                                 <form method="POST" action="{{ route('cart.add') }}">

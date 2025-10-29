@@ -11,6 +11,8 @@ use App\Models\Product;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ContactSubmissionController;
 use App\Http\Controllers\InquiryController;
+use App\Http\Controllers\Api\FaqController;
+use App\Http\Controllers\Api\PollController;
 
 // Employee Controllers
 use App\Http\Controllers\EmployeeInquiryController;
@@ -228,6 +230,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
+| Polls / FAQs JSON endpoints
+|--------------------------------------------------------------------------
+*/
+Route::get('/api/faqs', [FaqController::class, 'index']);
+Route::get('/api/polls', [PollController::class, 'index']);
+Route::post('/polls/{poll}/vote', [PollController::class, 'vote']);
+
+// Marketing employees can fetch aggregated poll results
+Route::get('/marketing/polls/results', [PollController::class, 'results'])->middleware(['auth', \App\Http\Middleware\EnsureDepartment::class . ':marketing']);
+
+/*
+|--------------------------------------------------------------------------
 | Employee Area
 |--------------------------------------------------------------------------
 */
@@ -235,6 +249,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Employee dashboard
     Route::get('/employee/dashboard', fn () => view('dashboard.employee'))->name('employee.dashboard');
+
+    // Marketing: manage polls & faqs (department-restricted)
+    Route::get('/employee/marketing/faqs', [\App\Http\Controllers\Employee\MarketingFaqController::class, 'index'])->name('employee.marketing.faqs');
+    Route::post('/employee/marketing/faqs', [\App\Http\Controllers\Employee\MarketingFaqController::class, 'store'])->name('employee.marketing.faqs.store');
+    Route::put('/employee/marketing/faqs/{faq}', [\App\Http\Controllers\Employee\MarketingFaqController::class, 'update'])->name('employee.marketing.faqs.update');
+    Route::delete('/employee/marketing/faqs/{faq}', [\App\Http\Controllers\Employee\MarketingFaqController::class, 'destroy'])->name('employee.marketing.faqs.destroy');
+
+    Route::get('/employee/marketing/polls', [\App\Http\Controllers\Employee\MarketingPollController::class, 'index'])->name('employee.marketing.polls');
+    Route::post('/employee/marketing/polls', [\App\Http\Controllers\Employee\MarketingPollController::class, 'store'])->name('employee.marketing.polls.store');
+    Route::put('/employee/marketing/polls/{poll}', [\App\Http\Controllers\Employee\MarketingPollController::class, 'update'])->name('employee.marketing.polls.update');
+    Route::delete('/employee/marketing/polls/{poll}', [\App\Http\Controllers\Employee\MarketingPollController::class, 'destroy'])->name('employee.marketing.polls.destroy');
+    Route::post('/employee/marketing/polls/{poll}/options', [\App\Http\Controllers\Employee\MarketingPollController::class, 'addOption'])->name('employee.marketing.polls.options.add');
+    Route::delete('/employee/marketing/polls/{poll}/options/{option}', [\App\Http\Controllers\Employee\MarketingPollController::class, 'removeOption'])->name('employee.marketing.polls.options.remove');
+    Route::put('/employee/marketing/polls/{poll}/options/{option}', [\App\Http\Controllers\Employee\MarketingPollController::class, 'updateOption'])->name('employee.marketing.polls.options.update');
+    Route::post('/employee/marketing/polls/{poll}/options/reorder', [\App\Http\Controllers\Employee\MarketingPollController::class, 'reorderOptions'])->name('employee.marketing.polls.options.reorder');
 
     // Product Inquiries page
     Route::get('/employee/inquiries', [InquiryController::class, 'index'])->name('employee.inquiries.index');

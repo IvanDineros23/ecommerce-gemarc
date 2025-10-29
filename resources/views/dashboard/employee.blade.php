@@ -109,6 +109,29 @@
                     <div class="font-bold text-orange-500">Product Inquiries</div>
                     <div class="text-xs text-gray-500 mt-1">View and manage product inquiries</div>
                 </a>
+                
+                {{-- Marketing-specific: FAQ & Poll management links --}}
+                <a href="{{ route('employee.marketing.faqs') }}"
+                   class="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center hover:bg-green-50 transition min-h-[150px]">
+                    <svg class="w-10 h-10 mb-2 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="7" width="18" height="10" rx="2" fill="#ccfbf1"/>
+                        <path d="M3 7V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2" stroke="#14b8a6"/>
+                        <path d="M8 11h8M8 14h6" stroke="#0f766e" stroke-linecap="round"/>
+                    </svg>
+                    <div class="font-bold text-teal-600">FAQ Management</div>
+                    <div class="text-xs text-gray-500 mt-1">Create and edit FAQs shown on the user homepage</div>
+                </a>
+
+                <a href="{{ route('employee.marketing.polls') }}"
+                   class="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center hover:bg-green-50 transition min-h-[150px]">
+                    <svg class="w-10 h-10 mb-2 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="7" width="18" height="10" rx="2" fill="#fff7ed"/>
+                        <path d="M8 11h8M8 14h5" stroke="#f59e0b" stroke-linecap="round"/>
+                        <circle cx="18" cy="18" r="3" fill="#f59e0b"/>
+                    </svg>
+                    <div class="font-bold text-amber-600">Polls & Surveys</div>
+                    <div class="text-xs text-gray-500 mt-1">Create polls that appear on the homepage (manage options/results)</div>
+                </a>
             </div>
 
         @elseif($isAccounting)

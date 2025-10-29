@@ -17,6 +17,9 @@
     @stack('styles')
     
     <style>
+    /* Ensure Alpine x-cloak elements are hidden until Alpine initializes */
+    [x-cloak] { display: none !important; }
+
     /* Ecommerce Navbar Styles */
     .ecommerce-navbar {
         background: #ffffff;

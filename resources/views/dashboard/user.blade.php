@@ -178,21 +178,56 @@ function faqList(){
         faqs: [],
         loading: false,
         error: null,
+        currentPage: 0,
+        itemsPerPage: 4,
         async load(){
             this.loading = true;
             try{
                 let url = (window.location.origin || '') + '/api/faqs';
                 let res = await fetch(url, { credentials: 'same-origin' });
-                if(res.ok){ this.faqs = await res.json(); this.faqs.forEach(f=>f.open=false); this.error = null; }
+                if(res.ok){ 
+                    this.faqs = await res.json(); 
+                    this.faqs.forEach(f=>f.open=false); 
+                    this.error = null; 
+                }
                 else {
                     const txt = await res.text();
                     console.error('Failed loading /api/faqs', res.status, txt);
                     this.error = `Failed to load FAQs (status ${res.status}). Check console/network.`;
                 }
-            }catch(e){ console.error(e); this.error = 'Network error while loading FAQs (check console)'; }
+            }catch(e){ 
+                console.error(e); 
+                this.error = 'Network error while loading FAQs (check console)'; 
+            }
             this.loading = false;
         },
-        toggle(i){ this.faqs[i].open = !this.faqs[i].open }
+        toggle(i){ 
+            this.faqs[i].open = !this.faqs[i].open 
+        },
+        getCurrentPageFaqs() {
+            const start = this.currentPage * this.itemsPerPage;
+            return this.faqs.slice(start, start + this.itemsPerPage);
+        },
+        getTotalPages() {
+            return Math.ceil(this.faqs.length / this.itemsPerPage);
+        },
+        nextPage() {
+            if (this.currentPage < this.getTotalPages() - 1) {
+                this.currentPage++;
+                // Close all open FAQs when changing pages
+                this.faqs.forEach(f => f.open = false);
+            }
+        },
+        prevPage() {
+            if (this.currentPage > 0) {
+                this.currentPage--;
+                // Close all open FAQs when changing pages
+                this.faqs.forEach(f => f.open = false);
+            }
+        },
+        getGlobalIndex(localIndex) {
+            return (this.currentPage * this.itemsPerPage) + localIndex;
+        }
     }
 }
 
@@ -424,7 +459,6 @@ function polls(){
                         <img src="/images/gemarclogo.png" alt="No Image" class="mb-1 rounded max-h-20 object-contain">
                     @endif
                     <div class="font-semibold text-green-900 text-xs text-center line-clamp-2">{{ $product->name }}</div>
-                    <div class="text-orange-600 font-bold text-xs">₱{{ number_format($product->unit_price,2) }}</div>
                 </div>
             @empty
                 <div class="col-span-full text-center text-gray-400 py-8">No recommended products.</div>
@@ -435,15 +469,31 @@ function polls(){
     <!-- Interactive homepage additions: FAQ, Tips/Reminders, Poll -->
     <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- FAQ (loaded from server) -->
-        <div class="bg-white rounded-xl shadow p-6">
-            <div class="text-lg font-bold text-green-800 mb-4">Frequently Asked Questions</div>
-            <div x-data="faqList()" x-init="load()" class="space-y-2">
+        <div class="bg-white rounded-xl shadow p-6 flex flex-col min-h-[400px]" x-data="faqList()" x-init="load()">
+            <div class="flex items-center justify-between mb-4">
+                <div class="text-lg font-bold text-green-800">Frequently Asked Questions</div>
+                <div class="flex items-center gap-2">
+                    <button @click="prevPage()" :disabled="currentPage === 0" 
+                            class="text-green-600 hover:text-green-800 disabled:text-gray-300 disabled:cursor-not-allowed">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <button @click="nextPage()" :disabled="currentPage >= getTotalPages() - 1" 
+                            class="text-green-600 hover:text-green-800 disabled:text-gray-300 disabled:cursor-not-allowed">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="space-y-2 flex-1">
                 <template x-if="loading">
-                    <div class="text-sm text-gray-500">Loading...</div>
+                    <div class="text-sm text-gray-500 flex items-center justify-center h-32">Loading...</div>
                 </template>
-                <template x-for="(item, idx) in faqs" :key="item.id">
+                <template x-for="(item, idx) in getCurrentPageFaqs()" :key="item.id">
                     <div class="border rounded p-3">
-                        <button @click="toggle(idx)" class="w-full text-left flex items-start justify-between gap-4">
+                        <button @click="toggle(getGlobalIndex(idx))" class="w-full text-left flex items-start justify-between gap-4">
                             <div>
                                 <div class="font-semibold text-gray-800" x-text="item.question"></div>
                             </div>
@@ -455,16 +505,23 @@ function polls(){
                     </div>
                 </template>
                 <template x-if="!loading && faqs.length === 0">
-                    <div class="text-gray-400">No FAQs available at the moment.</div>
+                    <div class="text-gray-400 flex items-center justify-center h-32">No FAQs available at the moment.</div>
                 </template>
                 <template x-if="error">
-                    <div class="text-sm text-red-600"> <span x-text="error"></span> <button @click="load()" class="ml-2 text-xs underline">Retry</button></div>
+                    <div class="text-sm text-red-600 flex items-center justify-center h-32"> <span x-text="error"></span> <button @click="load()" class="ml-2 text-xs underline">Retry</button></div>
+                </template>
+                
+                <!-- Pagination info -->
+                <template x-if="!loading && faqs.length > 0">
+                    <div class="text-xs text-gray-400 text-center mt-auto pt-4">
+                        Page <span x-text="currentPage + 1"></span>/<span x-text="getTotalPages()"></span>
+                    </div>
                 </template>
             </div>
         </div>
 
         <!-- Tips / Reminders (realistic, persisted locally) -->
-        <div class="bg-white rounded-xl shadow p-6" x-data="reminders()" x-init="init()">
+        <div class="bg-white rounded-xl shadow p-6 flex flex-col min-h-[400px]" x-data="reminders()" x-init="init()">
             <div class="flex items-center justify-between mb-3">
                 <div class="text-lg font-bold text-green-800">Tips & Reminders</div>
                 <div class="flex items-center gap-2">
@@ -481,13 +538,13 @@ function polls(){
                 </div>
             </div>
             
-            <div class="min-h-[240px]">
+            <div class="flex-1 flex flex-col">
                 <template x-if="!hasVisibleTips">
-                    <div class="text-center text-gray-500 py-4">No active tips at the moment.</div>
+                    <div class="text-center text-gray-500 py-4 flex-1 flex items-center justify-center">No active tips at the moment.</div>
                 </template>
 
                 <div x-show="hasVisibleTips" 
-                     class="grid grid-cols-1 gap-4"
+                     class="grid grid-cols-1 gap-4 flex-1"
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0"
                      x-transition:enter-end="opacity-100"
@@ -509,7 +566,7 @@ function polls(){
                             </div>
                         </div>
                     </template>
-                    <div class="text-xs text-gray-400 text-center">
+                    <div class="text-xs text-gray-400 text-center mt-auto">
                         Page <span x-text="currentPage + 1"></span>/<span x-text="getTotalPages()"></span>
                     </div>
                 </div>
@@ -517,23 +574,23 @@ function polls(){
         </div>
 
         <!-- Interactive Poll / Survey (server-backed; multiple polls + navigation) -->
-        <div class="bg-white rounded-xl shadow p-6">
+        <div class="bg-white rounded-xl shadow p-6 flex flex-col min-h-[400px]">
             <div class="flex items-center justify-between mb-4">
                 <div class="text-lg font-bold text-green-800">Quick Poll</div>
                 <div class="text-sm text-gray-500">Participate & help us improve</div>
             </div>
-            <div x-data="polls()" x-init="init()">
+            <div x-data="polls()" x-init="init()" class="flex-1 flex flex-col">
                 <template x-if="loading">
-                    <div class="text-sm text-gray-500">Loading polls...</div>
+                    <div class="text-sm text-gray-500 flex items-center justify-center flex-1">Loading polls...</div>
                 </template>
 
                 <template x-if="!loading && polls.length">
-                    <div>
+                    <div class="flex-1 flex flex-col">
                         <div class="text-sm text-gray-700 mb-3 font-medium" x-text="current.question"></div>
 
                         <template x-if="!voted">
-                            <div>
-                                <div class="space-y-2">
+                            <div class="flex-1 flex flex-col">
+                                <div class="space-y-2 flex-1">
                                     <template x-for="opt in current.options" :key="opt.id">
                                         <div class="flex items-center gap-3">
                                             <input type="radio" 
@@ -556,32 +613,31 @@ function polls(){
                                 </div>
                             </div>
                         </template>
+
+                        <template x-if="voted">
+                            <div class="space-y-2 flex-1">
+                                <div class="text-xs text-gray-500">Results (total: <span x-text="currentTotal"></span>)</div>
+                                <template x-for="opt in current.options" :key="opt.id">
+                                    <div>
+                                        <div class="flex items-center justify-between text-sm mb-1">
+                                            <div x-text="opt.text"></div>
+                                            <div class="text-xs text-gray-600" x-text="opt.votes + ' votes'"></div>
+                                        </div>
+                                        <div class="w-full bg-gray-100 rounded h-3">
+                                            <div class="bg-orange-500 h-3 rounded" :style="'width: ' + (currentTotal ? (opt.votes/currentTotal*100) : 0) + '%' "></div>
+                                        </div>
+                                    </div>
+                                </template>
+                                <div class="mt-auto pt-4">
+                                    <button @click="next()" class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded">Next poll</button>
+                                </div>
+                            </div>
+                        </template>
                     </div>
                 </template>
 
-                    <template x-if="voted">
-                        <div class="space-y-2">
-                            <div class="text-xs text-gray-500">Results (total: <span x-text="currentTotal"></span>)</div>
-                            <template x-for="opt in current.options" :key="opt.id">
-                                <div>
-                                    <div class="flex items-center justify-between text-sm mb-1">
-                                        <div x-text="opt.text"></div>
-                                        <div class="text-xs text-gray-600" x-text="opt.votes + ' votes'"></div>
-                                    </div>
-                                    <div class="w-full bg-gray-100 rounded h-3">
-                                        <div class="bg-orange-500 h-3 rounded" :style="'width: ' + (currentTotal ? (opt.votes/currentTotal*100) : 0) + '%' "></div>
-                                    </div>
-                                </div>
-                            </template>
-                            <div class="mt-2">
-                                <button @click="next()" class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded">Next poll</button>
-                            </div>
-                        </div>
-                    </template>
-                </template>
-
                 <template x-if="!loading && polls.length === 0">
-                    <div class="text-gray-400">No polls available right now.</div>
+                    <div class="text-gray-400 flex items-center justify-center flex-1">No polls available right now.</div>
                 </template>
             </div>
         </div>

@@ -1,5 +1,56 @@
 @extends('layouts.ecommerce')
 @section('content')
+<!-- Toast Notifications -->
+<div x-data="toast()" 
+    class="fixed top-4 right-4 z-[9999] flex flex-col items-end space-y-4"
+    style="min-width: 300px; right: 1rem;"
+    @notify.window="show($event.detail.message, $event.detail.type)">
+    <template x-for="(toast, index) in toasts" :key="index">
+        <div x-show="toast.visible"
+            x-transition:enter="transform ease-out duration-300 transition"
+            x-transition:enter-start="translate-x-full opacity-0"
+            x-transition:enter-end="translate-x-0 opacity-100"
+            x-transition:leave="transform ease-in duration-200 transition"
+            x-transition:leave-start="translate-x-0 opacity-100"
+            x-transition:leave-end="translate-x-full opacity-0"
+            class="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden"
+            style="z-index: 9999;">
+            <div class="p-4">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <template x-if="toast.type === 'success'">
+                            <svg class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </template>
+                        <template x-if="toast.type === 'error'">
+                            <svg class="h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </template>
+                        <template x-if="toast.type === 'info'">
+                            <svg class="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </template>
+                    </div>
+                    <div class="ml-3 w-0 flex-1">
+                        <p x-text="toast.message" class="text-sm text-gray-500"></p>
+                    </div>
+                    <div class="ml-4 flex-shrink-0 flex">
+                        <button @click="remove(index)" class="rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none">
+                            <span class="sr-only">Close</span>
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+</div>
+
 <div class="py-8 w-full">
     <!-- Search Bar -->
     <!-- Removed duplicate search bar -->
@@ -33,6 +84,7 @@
         </div>
         <a href="{{ route('shop.index') }}" class="mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded shadow transition">Shop All Products</a>
     </div>
+
 <style>
     .relative.w-full.flex.items-center {
         max-width: 600px;
@@ -64,6 +116,28 @@
 @push('scripts')
 <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 <script>
+function toast() {
+    return {
+        toasts: [],
+        visible: true,
+        show(message, type = 'info') {
+            const id = Date.now();
+            this.toasts.push({
+                id,
+                message,
+                type,
+                visible: true
+            });
+            setTimeout(() => {
+                this.remove(this.toasts.findIndex(t => t.id === id));
+            }, 5000);
+        },
+        remove(index) {
+            this.toasts.splice(index, 1);
+        }
+    }
+}
+
 function searchBar() {
     return {
         query: '',
@@ -125,15 +199,70 @@ function faqList(){
 function reminders(){
     return {
         tips: [
-            { id: 'cart', title: "Don't forget your cart", text: 'You have items in your cart — check them before they run out of stock.', dismissed: false },
-            { id: 'profile', title: 'Update your profile', text: 'Add company and billing details to speed up checkout for future orders.', dismissed: false },
-            { id: 'reorder', title: 'Reorder often-used items', text: 'Use Saved Lists to quickly create repeat orders for frequently purchased products.', dismissed: false },
+            { id: 'equipment', title: 'Equipment Calibration', text: 'Regular calibration of testing equipment is essential for accurate results. Schedule calibration services at least once every 6 months.', dismissed: false },
+            { id: 'quotation', title: 'Product Quotation Guide', text: 'For faster quotation: Include model number, quantity, delivery timeline, and any special requirements.', dismissed: false },
+            { id: 'bulk', title: 'Bulk Order Benefits', text: 'Get special pricing for orders above ₱500,000 with priority handling and dedicated support.', dismissed: false },
+            { id: 'support', title: 'Technical Support Hours', text: 'Our support team is available Mon-Fri 8AM-5PM and Sat 8AM-12PM. For urgent needs call +63 909 087 9416.', dismissed: false },
+            { id: 'chat', title: 'Live Chat Support', text: 'Need immediate assistance? Use our live chat feature during business hours to connect with our team.', dismissed: false },
+            { id: 'shipping', title: 'Shipping Information', text: 'Orders over ₱100,000 qualify for free shipping within Metro Manila. Contact us for nationwide delivery rates.', dismissed: false },
+            { id: 'warranty', title: 'Warranty Coverage', text: 'All our equipment comes with standard warranty. Extended coverage available for bulk purchases.', dismissed: false },
+            { id: 'training', title: 'Product Training', text: 'Schedule a product training session with our technical team to maximize your equipment usage.', dismissed: false },
+            { id: 'maintenance', title: 'Maintenance Tips', text: 'Regular maintenance extends equipment life. Check our guides for best practices and schedules.', dismissed: false },
+            { id: 'documentation', title: 'Required Documents', text: 'Prepare business registration and tax documents to expedite your account setup.', dismissed: false },
+            { id: 'feedback', title: 'Share Your Feedback', text: 'Your opinion matters! Help us improve by participating in our customer satisfaction surveys.', dismissed: false },
+            { id: 'updates', title: 'Stay Updated', text: 'Check our website regularly for new products, special offers, and industry updates.', dismissed: false }
         ],
-        init(){
-            this.tips.forEach(t => { t.dismissed = localStorage.getItem('tip_'+t.id+'_dismissed') === '1' });
+        currentPage: 0,
+        itemsPerPage: 2,
+        get hasVisibleTips() {
+            return this.tips.some(t => !t.dismissed);
         },
-        dismiss(id){ const t = this.tips.find(x=>x.id===id); if(t){ t.dismissed = true; localStorage.setItem('tip_'+id+'_dismissed','1') } },
-        remindLater(id){ /* simple implementation: just hide for now and set a short timer */ const key = 'tip_'+id+'_remind_at'; localStorage.setItem(key, Date.now()+7*24*60*60*1000); this.dismiss(id) }
+        getVisibleTips() {
+            return this.tips.filter(t => !t.dismissed);
+        },
+        getTotalPages() {
+            return Math.ceil(this.getVisibleTips().length / this.itemsPerPage);
+        },
+        getCurrentPageTips() {
+            const visibleTips = this.getVisibleTips();
+            const start = this.currentPage * this.itemsPerPage;
+            return visibleTips.slice(start, start + this.itemsPerPage);
+        },
+        init() {
+            this.tips.forEach(t => {
+                const dismissed = localStorage.getItem('tip_'+t.id+'_dismissed') === '1';
+                const remindAt = localStorage.getItem('tip_'+t.id+'_remind_at');
+                t.dismissed = dismissed && (!remindAt || parseInt(remindAt) > Date.now());
+            });
+            this.currentPage = 0;
+        },
+        nextTip() {
+            if (this.currentPage < this.getTotalPages() - 1) {
+                this.currentPage++;
+            } else {
+                this.currentPage = 0;
+            }
+        },
+        prevTip() {
+            if (this.currentPage > 0) {
+                this.currentPage--;
+            } else {
+                this.currentPage = this.getTotalPages() - 1;
+            }
+        },
+        dismiss(id) { 
+            const t = this.tips.find(x => x.id === id); 
+            if (t) { 
+                t.dismissed = true; 
+                localStorage.setItem('tip_'+id+'_dismissed', '1');
+                this.currentTipIndex = this.tips.findIndex(t => !t.dismissed);
+            } 
+        },
+        remindLater(id) { 
+            const key = 'tip_'+id+'_remind_at'; 
+            localStorage.setItem(key, Date.now() + 7*24*60*60*1000); 
+            this.dismiss(id);
+        }
     }
 }
 
@@ -144,21 +273,58 @@ function polls(){
         selected: null,
         voted: false,
         loading: false,
-        get current(){ return this.polls[this.idx] || { question: '', options: [] } },
-        get currentTotal(){ return this.current.options ? this.current.options.reduce((a,o)=>a+(o.votes||0),0) : 0 },
-        async init(){ await this.load(); this.voted = false; },
-        async load(){
+        get current(){ 
+            const poll = this.polls[this.idx];
+            if (poll) {
+                console.log('Current poll:', poll);
+                console.log('Poll options:', poll.options);
+            }
+            return poll || { question: '', options: [] };
+        },
+        get currentTotal(){ 
+            const options = this.current?.options || [];
+            return options.reduce((a,o) => a + (o.votes || 0), 0);
+        },
+        async init(){ 
+            console.log('Initializing polls...'); 
             this.loading = true;
+            await this.load(); 
+            this.voted = false; 
+            this.loading = false;
+        },
+        async load(){
             try{
                 const res = await fetch('/api/polls');
                 if(res.ok){
                     const data = await res.json();
-                    // normalize
-                    this.polls = data.map(p => ({ id: p.id, question: p.question, options: p.options.map(o => ({ id: o.id, text: o.text, votes: o.votes_count })) }));
+                    console.log('Raw API response:', data);
+                    
+                    if (data && Array.isArray(data) && data.length > 0) {
+                        this.polls = data.map(p => ({
+                            id: p.id,
+                            question: p.question,
+                            options: (p.options || []).map(o => ({
+                                id: o.id,
+                                text: o.text,
+                                votes: parseInt(o.votes_count || 0)
+                            }))
+                        }));
+                        
+                        console.log('Processed polls:', this.polls);
+                        if (this.polls.length > 0) {
+                            console.log('First poll options:', this.polls[0].options);
+                        }
+                    } else {
+                        console.error('No valid poll data received');
+                        this.polls = [];
+                    }
                     this.idx = 0;
+                } else {
+                    console.error('Failed to fetch polls:', res.status);
                 }
-            }catch(e){ console.error(e) }
-            this.loading = false;
+            } catch(e){ 
+                console.error('Error loading polls:', e);
+            }
         },
         next(){ if(this.idx < this.polls.length-1) this.idx++; else this.idx = 0; this.selected = null; this.voted = false },
         async submit(){
@@ -166,18 +332,43 @@ function polls(){
             try{
                 const res = await fetch('/polls/'+this.current.id+'/vote', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
                     body: JSON.stringify({ option_id: this.selected })
                 });
+                
+                const data = await res.json();
+                
                 if(res.ok){
                     // refresh polls to get latest counts
                     await this.load();
                     this.voted = true;
+                    window.dispatchEvent(new CustomEvent('notify', { 
+                        detail: { 
+                            message: 'Your vote has been recorded!', 
+                            type: 'success' 
+                        } 
+                    }));
                 } else {
-                    const data = await res.json();
-                    alert(data.message || 'Failed to submit vote');
+                    window.dispatchEvent(new CustomEvent('notify', { 
+                        detail: { 
+                            message: data.message || 'Failed to submit vote', 
+                            type: 'error' 
+                        } 
+                    }));
                 }
-            }catch(e){ console.error(e); alert('Error voting'); }
+            }catch(e){ 
+                console.error('Error submitting vote:', e); 
+                window.dispatchEvent(new CustomEvent('notify', { 
+                    detail: { 
+                        message: 'Error voting. Please try again.', 
+                        type: 'error' 
+                    } 
+                }));
+            }
         }
     }
 }
@@ -273,26 +464,55 @@ function polls(){
         </div>
 
         <!-- Tips / Reminders (realistic, persisted locally) -->
-        <div class="bg-white rounded-xl shadow p-6">
+        <div class="bg-white rounded-xl shadow p-6" x-data="reminders()" x-init="init()">
             <div class="flex items-center justify-between mb-3">
                 <div class="text-lg font-bold text-green-800">Tips & Reminders</div>
-                <button @click="$dispatch('close-tips')" class="text-xs text-gray-400 hover:text-gray-600">Dismiss</button>
+                <div class="flex items-center gap-2">
+                    <button @click="prevTip()" class="text-green-600 hover:text-green-800">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <button @click="nextTip()" class="text-green-600 hover:text-green-800">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
             </div>
-            <div x-data="reminders()" x-init="init()">
-                <template x-for="tip in tips" :key="tip.id">
-                    <div x-show="!tip.dismissed" class="flex items-start gap-3 py-2 border-b last:border-b-0">
-                        <div class="w-8 h-8 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center font-semibold">!</div>
-                        <div class="flex-1">
-                            <div class="text-sm text-gray-700 font-medium" x-text="tip.title"></div>
-                            <div class="text-sm text-gray-600 mt-1" x-text="tip.text"></div>
-                            <div class="mt-2">
-                                <button @click="dismiss(tip.id)" class="text-xs text-green-700 hover:underline">Got it</button>
-                                <button @click="remindLater(tip.id)" class="ml-3 text-xs text-gray-500 hover:underline">Remind me later</button>
+            
+            <div class="min-h-[240px]">
+                <template x-if="!hasVisibleTips">
+                    <div class="text-center text-gray-500 py-4">No active tips at the moment.</div>
+                </template>
+
+                <div x-show="hasVisibleTips" 
+                     class="grid grid-cols-1 gap-4"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0"
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0">
+                    <template x-for="(tip, index) in getCurrentPageTips()" :key="tip.id">
+                        <div class="flex items-start gap-3 py-2 border-b last:border-b-0">
+                            <div class="w-8 h-8 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center font-semibold">!</div>
+                            <div class="flex-1">
+                                <div class="text-sm text-gray-700 font-medium" x-text="tip.title"></div>
+                                <div class="text-sm text-gray-600 mt-1" x-text="tip.text"></div>
+                                <div class="mt-2 flex items-center justify-between">
+                                    <div>
+                                        <button @click="dismiss(tip.id)" class="text-xs text-green-700 hover:underline">Got it</button>
+                                        <button @click="remindLater(tip.id)" class="ml-3 text-xs text-gray-500 hover:underline">Remind me later</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                    </template>
+                    <div class="text-xs text-gray-400 text-center">
+                        Page <span x-text="currentPage + 1"></span>/<span x-text="getTotalPages()"></span>
                     </div>
-                </template>
-                <div class="text-xs text-gray-400 mt-3">Tips are stored locally. Clear browser storage or account data to restore.</div>
+                </div>
             </div>
         </div>
 
@@ -308,22 +528,36 @@ function polls(){
                 </template>
 
                 <template x-if="!loading && polls.length">
-                    <div class="text-sm text-gray-700 mb-3 font-medium" x-text="current.question"></div>
+                    <div>
+                        <div class="text-sm text-gray-700 mb-3 font-medium" x-text="current.question"></div>
 
-                    <template x-if="!voted">
-                        <div>
-                            <template x-for="(opt, idx) in current.options" :key="opt.id">
-                                <label class="flex items-center gap-3 mb-2 cursor-pointer">
-                                    <input type="radio" :value="opt.id" x-model="selected" class="form-radio text-orange-500" />
-                                    <span class="text-sm text-gray-700" x-text="opt.text"></span>
-                                </label>
-                            </template>
-                            <div class="mt-3 flex items-center gap-2">
-                                <button @click="submit()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded">Vote</button>
-                                <button @click="next()" class="text-sm text-gray-500 underline">Next poll</button>
+                        <template x-if="!voted">
+                            <div>
+                                <div class="space-y-2">
+                                    <template x-for="opt in current.options" :key="opt.id">
+                                        <div class="flex items-center gap-3">
+                                            <input type="radio" 
+                                                :id="'opt-'+opt.id" 
+                                                name="poll-option" 
+                                                :value="opt.id" 
+                                                x-model="selected" 
+                                                class="form-radio text-orange-500" />
+                                            <label :for="'opt-'+opt.id" 
+                                                class="text-sm text-gray-700 cursor-pointer"
+                                                x-text="opt.text"></label>
+                                        </div>
+                                    </template>
+                                </div>
+                                <div class="mt-3 flex items-center gap-2">
+                                    <button @click="submit()" 
+                                        class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded">Vote</button>
+                                    <button @click="next()" 
+                                        class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded">Next poll</button>
+                                </div>
                             </div>
-                        </div>
-                    </template>
+                        </template>
+                    </div>
+                </template>
 
                     <template x-if="voted">
                         <div class="space-y-2">
@@ -340,7 +574,7 @@ function polls(){
                                 </div>
                             </template>
                             <div class="mt-2">
-                                <button @click="next()" class="text-sm text-green-700 hover:underline">Next poll</button>
+                                <button @click="next()" class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded">Next poll</button>
                             </div>
                         </div>
                     </template>

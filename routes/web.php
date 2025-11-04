@@ -234,6 +234,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::get('/api/faqs', [FaqController::class, 'index']);
+
+// Polls API
+Route::get('/api/polls', [PollController::class, 'index']);
+Route::post('/polls/{poll}/vote', [PollController::class, 'vote'])->middleware('auth');
+Route::delete('/api/polls/{poll}', [PollController::class, 'destroy'])->middleware(['auth', 'can:manage-marketing']);
+
+// Employee views
 Route::get('/api/polls', [PollController::class, 'index']);
 Route::post('/polls/{poll}/vote', [PollController::class, 'vote']);
 
@@ -254,7 +261,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/employee/marketing/faqs', [\App\Http\Controllers\Employee\MarketingFaqController::class, 'index'])->name('employee.marketing.faqs');
     Route::post('/employee/marketing/faqs', [\App\Http\Controllers\Employee\MarketingFaqController::class, 'store'])->name('employee.marketing.faqs.store');
     Route::put('/employee/marketing/faqs/{faq}', [\App\Http\Controllers\Employee\MarketingFaqController::class, 'update'])->name('employee.marketing.faqs.update');
-    Route::delete('/employee/marketing/faqs/{faq}', [\App\Http\Controllers\Employee\MarketingFaqController::class, 'destroy'])->name('employee.marketing.faqs.destroy');
+        Route::delete('/employee/marketing/faqs/{faq}', [\App\Http\Controllers\Employee\MarketingFaqController::class, 'destroy'])->name('employee.marketing.faqs.destroy');
+
+    // Marketing - Tips & Reminders
+    Route::get('/employee/marketing/tips', [\App\Http\Controllers\Employee\MarketingTipsController::class, 'index'])->name('employee.marketing.tips');
+    Route::post('/employee/marketing/tips', [\App\Http\Controllers\Employee\MarketingTipsController::class, 'store'])->name('employee.marketing.tips.store');
+    Route::put('/employee/marketing/tips/{tip}', [\App\Http\Controllers\Employee\MarketingTipsController::class, 'update'])->name('employee.marketing.tips.update');
+    Route::delete('/employee/marketing/tips/{tip}', [\App\Http\Controllers\Employee\MarketingTipsController::class, 'destroy'])->name('employee.marketing.tips.destroy');
+
+    // Marketing - Polls
 
     Route::get('/employee/marketing/polls', [\App\Http\Controllers\Employee\MarketingPollController::class, 'index'])->name('employee.marketing.polls');
     Route::post('/employee/marketing/polls', [\App\Http\Controllers\Employee\MarketingPollController::class, 'store'])->name('employee.marketing.polls.store');

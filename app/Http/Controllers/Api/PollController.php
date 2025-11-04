@@ -13,7 +13,26 @@ class PollController extends Controller
     // Publicly list active polls with options and aggregated vote counts
     public function index()
     {
-        $polls = Poll::where('is_active', true)->orderBy('sort_order')->with('options')->get();
+        $polls = Poll::where('is_active', true)
+            ->orderBy('sort_order')
+            ->with(['options' => function($query) {
+                $query->orderBy('id');
+            }])
+            ->get()
+            ->map(function($poll) {
+                // Ensure options are properly structured
+                return [
+                    'id' => $poll->id,
+                    'question' => $poll->question,
+                    'options' => $poll->options->map(function($option) {
+                        return [
+                            'id' => $option->id,
+                            'text' => $option->text,
+                            'votes_count' => $option->votes_count ?? 0
+                        ];
+                    })
+                ];
+            });
         return response()->json($polls);
     }
 
@@ -56,6 +75,30 @@ class PollController extends Controller
         });
 
         return response()->json(['success' => true, 'message' => 'Thank you for voting']);
+    }
+
+    // Delete a poll (marketing only)
+    public function destroy(Poll $poll)
+    {
+        try {
+            DB::beginTransaction();
+            
+            // Delete related votes first
+            PollVote::where('poll_id', $poll->id)->delete();
+            
+            // Delete poll options
+            PollOption::where('poll_id', $poll->id)->delete();
+            
+            // Finally delete the poll
+            $poll->delete();
+            
+            DB::commit();
+            
+            return response()->json(['success' => true, 'message' => 'Poll deleted successfully']);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'message' => 'Failed to delete poll: ' . $e->getMessage()], 500);
+        }
     }
 
     // Marketing-only aggregated results

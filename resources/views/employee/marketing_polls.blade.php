@@ -1,5 +1,50 @@
 @extends('layouts.ecommerce')
 @section('content')
+<!-- Toast Notification Component -->
+<div x-data="toast()"
+     x-on:notify.window="show($event.detail.message, $event.detail.type)"
+     class="fixed top-4 right-4 z-[9999] flex flex-col items-end space-y-4"
+     style="min-width: 300px; right: 1rem;">
+    <template x-for="(toast, index) in toasts" :key="index">
+        <div x-show="toast.visible"
+             x-transition:enter="transform ease-out duration-300 transition"
+             x-transition:enter-start="translate-x-full opacity-0"
+             x-transition:enter-end="translate-x-0 opacity-100"
+             x-transition:leave="transform ease-in duration-200 transition"
+             x-transition:leave-start="translate-x-0 opacity-100"
+             x-transition:leave-end="translate-x-full opacity-0"
+             class="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
+            <div class="p-4">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <template x-if="toast.type === 'success'">
+                            <svg class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </template>
+                        <template x-if="toast.type === 'error'">
+                            <svg class="h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </template>
+                    </div>
+                    <div class="ml-3 w-0 flex-1">
+                        <p x-text="toast.message" class="text-sm text-gray-500"></p>
+                    </div>
+                    <div class="ml-4 flex-shrink-0 flex">
+                        <button @click="remove(index)" class="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500">
+                            <span class="sr-only">Close</span>
+                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+</div>
+
 <div class="w-full mx-auto px-6 sm:px-8 lg:px-10">
     <div class="p-6 w-full">
     <h2 class="text-2xl font-bold mb-4">Marketing - Polls</h2>
@@ -122,6 +167,25 @@
 @push('scripts')
 <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 <script>
+function toast() {
+    return {
+        toasts: [],
+        show(message, type = 'success') {
+            this.toasts.push({
+                message,
+                type,
+                visible: true
+            });
+            setTimeout(() => {
+                this.toasts = this.toasts.filter(t => t.message !== message);
+            }, 3000);
+        },
+        remove(index) {
+            this.toasts.splice(index, 1);
+        }
+    };
+}
+
 function newPoll(){
     return {
         question: '',
@@ -136,17 +200,45 @@ function newPoll(){
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
                 body: JSON.stringify(payload)
             }).then(async r=>{
-                // try to parse json response; controller may redirect so we fallback to fetching polls
-                try{ const data = await r.json(); if(data && data.success){ /* created */ } }catch(e){}
+                // try to parse json response
+                try{ 
+                    const data = await r.json(); 
+                    if(data && data.success){ 
+                        // Show success toast notification
+                        window.dispatchEvent(new CustomEvent('notify', { 
+                            detail: { 
+                                message: 'Poll created successfully!', 
+                                type: 'success' 
+                            } 
+                        }));
+                    } 
+                }catch(e){}
+
                 // refresh polls list via API and broadcast
                 try{
                     const res = await fetch('/api/polls', { credentials: 'same-origin' });
-                    if(res.ok){ const polls = await res.json(); window.dispatchEvent(new CustomEvent('polls-updated', { detail: polls })); }
-                }catch(e){ console.error('Failed to refresh polls after create', e) }
+                    if(res.ok){ 
+                        const polls = await res.json(); 
+                        window.dispatchEvent(new CustomEvent('polls-updated', { detail: polls }));
+                    }
+                }catch(e){ 
+                    console.error('Failed to refresh polls after create', e);
+                }
+
                 // clear form
                 this.question = '';
                 this.optionsText = '';
-            }).catch(e=>{ console.error(e); alert('Error creating poll') })
+                
+                // Refresh the page after a short delay to show updated list
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            }).catch(e=>{ 
+                console.error(e); 
+                window.dispatchEvent(new CustomEvent('notify', { 
+                    detail: { message: 'Error creating poll', type: 'error' } 
+                }));
+            })
         }
     }
 }
@@ -239,17 +331,70 @@ window.polls = function(){
         openDeletePoll(id){ this.deletingPoll = { show: true, id }; },
         closeDeletePoll(){ this.deletingPoll = { show: false, id: null }; },
         async confirmDeletePoll(){
-            try{
-                const id = this.deletingPoll.id;
-                const res = await fetch('/employee/marketing/polls/' + id, { method: 'DELETE', credentials: 'same-origin', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' } });
-                if(res.ok){
-                    // remove poll from list
-                    this.polls = this.polls.filter(x=> x.id != id);
-                    this.closeDeletePoll();
+            try {
+                if (!this.deletingPoll || !this.deletingPoll.id) {
+                    console.error('No poll selected for deletion');
                     return;
                 }
-                alert('Failed deleting poll');
-            }catch(e){ console.error(e); alert('Error deleting poll') }
+
+                const id = this.deletingPoll.id;
+                const res = await fetch('/employee/marketing/polls/' + id, { 
+                    method: 'DELETE', 
+                    credentials: 'same-origin', 
+                    headers: { 
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}', 
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    } 
+                });
+
+                let data;
+                try {
+                    data = await res.json();
+                } catch (e) {
+                    console.error('Failed to parse response:', e);
+                    data = { success: false, message: 'Invalid server response' };
+                }
+                
+                if(res.ok){
+                    // remove poll from list
+                    this.polls = this.polls.filter(x => x.id != id);
+                    this.closeDeletePoll();
+                    
+                    // Show success toast
+                    window.dispatchEvent(new CustomEvent('notify', { 
+                        detail: { 
+                            message: 'Poll deleted successfully', 
+                            type: 'success' 
+                        } 
+                    }));
+                    
+                    // Reload page to refresh everything
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                    return;
+                }
+                
+                // Show error toast
+                window.dispatchEvent(new CustomEvent('notify', { 
+                    detail: { 
+                        message: data.message || 'Failed to delete poll. Please try again.', 
+                        type: 'error' 
+                    } 
+                }));
+            } catch(e) { 
+                console.error('Error during poll deletion:', e);
+                window.dispatchEvent(new CustomEvent('notify', { 
+                    detail: { 
+                        message: 'Network error while deleting poll. Please try again.', 
+                        type: 'error' 
+                    } 
+                }));
+            } finally {
+                // Make sure modal is closed even if there's an error
+                this.closeDeletePoll();
+            }
         },
 
         removePoll(id){ this.openDeletePoll(id); },

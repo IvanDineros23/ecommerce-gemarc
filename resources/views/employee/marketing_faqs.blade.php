@@ -1,12 +1,53 @@
 @extends('layouts.ecommerce')
 @section('content')
+<!-- Toast Notification Component -->
+<div x-data="toast()"
+     x-on:notify.window="show($event.detail.message, $event.detail.type)"
+     class="fixed top-4 right-4 z-[9999] flex flex-col items-end space-y-4"
+     style="min-width: 300px; right: 1rem;">
+    <template x-for="(toast, index) in toasts" :key="index">
+        <div x-show="toast.visible"
+             x-transition:enter="transform ease-out duration-300 transition"
+             x-transition:enter-start="translate-x-full opacity-0"
+             x-transition:enter-end="translate-x-0 opacity-100"
+             x-transition:leave="transform ease-in duration-200 transition"
+             x-transition:leave-start="translate-x-0 opacity-100"
+             x-transition:leave-end="translate-x-full opacity-0"
+             class="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
+            <div class="p-4">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <template x-if="toast.type === 'success'">
+                            <svg class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </template>
+                        <template x-if="toast.type === 'error'">
+                            <svg class="h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </template>
+                    </div>
+                    <div class="ml-3 w-0 flex-1">
+                        <p x-text="toast.message" class="text-sm text-gray-500"></p>
+                    </div>
+                    <div class="ml-4 flex-shrink-0 flex">
+                        <button @click="remove(index)" class="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500">
+                            <span class="sr-only">Close</span>
+                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+</div>
+
 <div class="w-full mx-auto px-6 sm:px-8 lg:px-10">
     <div class="p-6 w-full">
     <h2 class="text-2xl font-bold mb-4">Marketing - FAQs</h2>
-
-    @if(session('success'))
-        <div class="mb-3 text-green-700">{{ session('success') }}</div>
-    @endif
 
     <div class="mb-6 w-full" x-data="faqForm()">
         <form @submit.prevent="submit()">
@@ -88,6 +129,25 @@
 @push('scripts')
 <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 <script>
+function toast() {
+    return {
+        toasts: [],
+        show(message, type = 'success') {
+            this.toasts.push({
+                message,
+                type,
+                visible: true
+            });
+            setTimeout(() => {
+                this.toasts = this.toasts.filter(t => t.message !== message);
+            }, 3000);
+        },
+        remove(index) {
+            this.toasts.splice(index, 1);
+        }
+    }
+}
+
 // Provide global factory functions so x-data="faqForm()" and x-data="faqs()" work regardless of Alpine init ordering
 window.faqForm = function(){
     return {
@@ -101,14 +161,28 @@ window.faqForm = function(){
                     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN':'{{ csrf_token() }}', 'Accept':'application/json' },
                     body: JSON.stringify({ question: this.question, answer: this.answer })
                 });
-                if(res.ok){ const d = await res.json(); if(d.success){
+                if(res.ok){ 
+                    const d = await res.json(); 
+                    if(d.success){
                         window.dispatchEvent(new CustomEvent('faq-created', { detail: d.faq }));
+                        window.dispatchEvent(new CustomEvent('notify', { 
+                            detail: { message: 'FAQ created successfully', type: 'success' }
+                        }));
                         this.question = '';
                         this.answer = '';
                         return;
-                    } }
-                const txt = await res.text(); console.error('Create FAQ failed', res.status, txt); alert('Failed creating FAQ');
-            }catch(e){ console.error(e); alert('Error') }
+                    } 
+                }
+                console.error('Create FAQ failed');
+                window.dispatchEvent(new CustomEvent('notify', { 
+                    detail: { message: 'Failed to create FAQ', type: 'error' }
+                }));
+            }catch(e){ 
+                console.error(e); 
+                window.dispatchEvent(new CustomEvent('notify', { 
+                    detail: { message: 'Error creating FAQ', type: 'error' }
+                }));
+            }
         }
     };
 };
@@ -160,13 +234,22 @@ window.faqs = function(){
                     if(d.success){
                         this.faqs[this.editing.index] = d.faq;
                         this.closeEdit();
+                        window.dispatchEvent(new CustomEvent('notify', { 
+                            detail: { message: 'FAQ updated successfully', type: 'success' }
+                        }));
                         return;
                     }
                 }
-                const txt = await res.text();
-                console.error('Update FAQ failed', res.status, txt);
-                alert('Failed updating FAQ');
-            }catch(e){ console.error(e); alert('Error updating FAQ') }
+                console.error('Update FAQ failed');
+                window.dispatchEvent(new CustomEvent('notify', { 
+                    detail: { message: 'Failed to update FAQ', type: 'error' }
+                }));
+            }catch(e){ 
+                console.error(e); 
+                window.dispatchEvent(new CustomEvent('notify', { 
+                    detail: { message: 'Error updating FAQ', type: 'error' }
+                }));
+            }
         },
 
         openDeleteModal(f, idx){
@@ -188,12 +271,21 @@ window.faqs = function(){
                 if(res.ok){
                     this.faqs.splice(this.deleting.index, 1);
                     this.closeDelete();
+                    window.dispatchEvent(new CustomEvent('notify', { 
+                        detail: { message: 'FAQ deleted successfully', type: 'success' }
+                    }));
                     return;
                 }
-                const txt = await res.text();
-                console.error('Delete FAQ failed', res.status, txt);
-                alert('Failed deleting FAQ');
-            }catch(e){ console.error(e); alert('Error deleting FAQ') }
+                console.error('Delete FAQ failed');
+                window.dispatchEvent(new CustomEvent('notify', { 
+                    detail: { message: 'Failed to delete FAQ', type: 'error' }
+                }));
+            }catch(e){ 
+                console.error(e); 
+                window.dispatchEvent(new CustomEvent('notify', { 
+                    detail: { message: 'Error deleting FAQ', type: 'error' }
+                }));
+            }
         },
 
         trapFocus(selector){

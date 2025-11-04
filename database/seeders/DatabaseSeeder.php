@@ -13,12 +13,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-    // Seed admin, employee, and normal user accounts
-    $this->call(CreateAdminUserSeeder::class);
-    $this->call(CreateEmployeeUserSeeder::class);
-    $this->call(CreateNormalUserSeeder::class);
-
-    // Seed Dom Sales employee
+        // Create demo users with roles
+        $this->call(CreateAdminUserSeeder::class);
+        $this->call(CreateEmployeeUserSeeder::class);
+        $this->call(CreateNormalUserSeeder::class);
+        $this->call(TipsSeeder::class);    // Seed Dom Sales employee
     $this->call(CreateDomSalesUserSeeder::class);
 
     // Seed demo products and images for MVP

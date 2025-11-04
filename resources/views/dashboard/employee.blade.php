@@ -132,6 +132,17 @@
                     <div class="font-bold text-amber-600">Polls & Surveys</div>
                     <div class="text-xs text-gray-500 mt-1">Create polls that appear on the homepage (manage options/results)</div>
                 </a>
+
+                <a href="{{ route('employee.marketing.tips') }}"
+                   class="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center hover:bg-green-50 transition min-h-[150px]">
+                    <svg class="w-10 h-10 mb-2 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="7" width="18" height="10" rx="2" fill="#ecfdf5"/>
+                        <path d="M3 7V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2" stroke="#059669"/>
+                        <path d="M12 10l3 3m0 0l-3 3m3-3H8" stroke="#059669" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div class="font-bold text-emerald-600">Tips & Reminders</div>
+                    <div class="text-xs text-gray-500 mt-1">Manage helpful tips and reminders shown to users</div>
+                </a>
             </div>
 
         @elseif($isAccounting)

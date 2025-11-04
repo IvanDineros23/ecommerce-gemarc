@@ -21,50 +21,142 @@ class MarketingPollController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'title' => 'nullable|string|max:255',
-            'question' => 'required|string',
-            'is_active' => 'nullable|boolean',
-        ]);
-        $poll = Poll::create([
-            'title' => $data['title'] ?? null,
-            'question' => $data['question'],
-            'is_active' => $request->has('is_active') ? (bool)$request->is_active : true,
-        ]);
-        // options: accept array or newline-separated string
-        $optionsInput = $request->input('options');
-        $options = [];
-        if (is_array($optionsInput)) {
-            $options = $optionsInput;
-        } elseif (is_string($optionsInput)) {
-            // accept single textarea where lines are options
-            $lines = preg_split('/\r?\n/', $optionsInput);
-            $options = array_map('trim', $lines);
-        }
+        try {
+            $data = $request->validate([
+                'title' => 'nullable|string|max:255',
+                'question' => 'required|string',
+                'is_active' => 'nullable|boolean',
+            ]);
 
-        foreach ($options as $opt) {
-            if (is_string($opt) && trim($opt) !== '') {
-                PollOption::create(['poll_id' => $poll->id, 'text' => $opt]);
+            // Start transaction to ensure all related data is saved
+            \DB::beginTransaction();
+
+            $poll = Poll::create([
+                'title' => $data['title'] ?? null,
+                'question' => $data['question'],
+                'is_active' => $request->has('is_active') ? (bool)$request->is_active : true,
+            ]);
+
+            // Handle options
+            $optionsInput = $request->input('options');
+            $options = [];
+            if (is_array($optionsInput)) {
+                $options = $optionsInput;
+            } elseif (is_string($optionsInput)) {
+                $lines = preg_split('/\r?\n/', $optionsInput);
+                $options = array_map('trim', $lines);
             }
+
+            foreach ($options as $opt) {
+                if (is_string($opt) && trim($opt) !== '') {
+                    PollOption::create(['poll_id' => $poll->id, 'text' => $opt]);
+                }
+            }
+
+            \DB::commit();
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Poll created successfully',
+                    'poll' => $poll->load('options')
+                ]);
+            }
+
+            return back()->with('success', 'Poll created');
+
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error('Failed to create poll: ' . $e->getMessage());
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to create poll'
+                ], 500);
+            }
+
+            return back()->with('error', 'Failed to create poll')->withInput();
         }
-        return back()->with('success', 'Poll created');
     }
 
     public function update(Request $request, Poll $poll)
     {
-        $data = $request->validate([
-            'title' => 'nullable|string|max:255',
-            'question' => 'required|string',
-            'is_active' => 'nullable|boolean',
-        ]);
-        $poll->update(['title' => $data['title'] ?? null, 'question' => $data['question'], 'is_active' => $request->has('is_active') ? (bool)$request->is_active : true]);
-        return back()->with('success', 'Poll updated');
+        try {
+            $data = $request->validate([
+                'title' => 'nullable|string|max:255',
+                'question' => 'required|string',
+                'is_active' => 'nullable|boolean',
+            ]);
+
+            \DB::beginTransaction();
+
+            $poll->update([
+                'title' => $data['title'] ?? null,
+                'question' => $data['question'],
+                'is_active' => $request->has('is_active') ? (bool)$request->is_active : true
+            ]);
+
+            \DB::commit();
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Poll updated successfully',
+                    'poll' => $poll->fresh()
+                ]);
+            }
+
+            return back()->with('success', 'Poll updated');
+
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error('Failed to update poll: ' . $e->getMessage());
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to update poll'
+                ], 500);
+            }
+
+            return back()->with('error', 'Failed to update poll')->withInput();
+        }
     }
 
     public function destroy(Poll $poll)
     {
-        $poll->delete();
-        return back()->with('success', 'Poll removed');
+        try {
+            \DB::beginTransaction();
+            
+            // Delete poll options and the poll itself
+            $poll->options()->delete();
+            $poll->delete();
+            
+            \DB::commit();
+
+            if (request()->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Poll deleted successfully'
+                ]);
+            }
+
+            return back()->with('success', 'Poll deleted');
+            
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error('Failed to delete poll: ' . $e->getMessage());
+
+            if (request()->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to delete poll'
+                ], 500);
+            }
+
+            return back()->with('error', 'Failed to delete poll');
+        }
     }
 
     // Add or update options

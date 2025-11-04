@@ -28,5 +28,9 @@ class AuthServiceProvider extends ServiceProvider
             // Use the role column for admin check
             return $user->role === 'admin';
         });
+
+        Gate::define('manage-marketing', function (User $user) {
+            return $user->role === 'marketing' || $user->role === 'admin';
+        });
     }
 }

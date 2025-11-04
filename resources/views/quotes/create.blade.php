@@ -28,7 +28,6 @@
                         <th>Image</th>
                         <th>Product</th>
                         <th>Description</th>
-                        <th class="text-end">Price</th>
                         <th class="text-center">Quantity</th>
                         <th class="text-center">Add</th>
                     </tr>
@@ -53,7 +52,6 @@
                         </td>
                         <td class="product-name fw-medium">{{ $product->name }}</td>
                         <td class="product-desc text-secondary">{{ $product->description }}</td>
-                        <td class="text-end fw-medium">₱{{ number_format($product->unit_price, 2) }}</td>
                         <td class="text-center">
                             <input type="number" name="quantities[{{ $product->id }}]" min="0" max="9999" value="0" class="form-control" style="width: 70px; margin: 0 auto;">
                         </td>

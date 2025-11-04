@@ -19,10 +19,141 @@ function productModal() {
         close(){ this.show = false; }
     }
 }
+
+function toastNotification() {
+    return {
+        toasts: [],
+        showToast(message, type = 'success') {
+            const id = Date.now();
+            this.toasts.push({ id, message, type });
+            setTimeout(() => {
+                this.removeToast(id);
+            }, 3000);
+        },
+        removeToast(id) {
+            this.toasts = this.toasts.filter(toast => toast.id !== id);
+        }
+    }
+}
+
+// Function to show toast from forms
+function showToast(message, type = 'success') {
+    if (window.toastData) {
+        window.toastData.showToast(message, type);
+    }
+}
+
+// AJAX function to save product
+async function saveProduct(productId, productName) {
+    // Prevent multiple clicks
+    event.target.disabled = true;
+    
+    try {
+        const formData = new FormData();
+        formData.append('product_id', productId);
+        formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+
+        const response = await fetch('{{ route("saved.store") }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: formData
+        });
+
+        if (response.ok) {
+            showToast(`"${productName}" has been saved to your list!`, 'success');
+            // Reload page to update button state
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            showToast('Failed to save product. Please try again.', 'error');
+            event.target.disabled = false;
+        }
+    } catch (error) {
+        showToast('Network error. Please check your connection.', 'error');
+        console.error('Save error:', error);
+        event.target.disabled = false;
+    }
+}
+
+// AJAX function to unsave product
+async function unsaveProduct(savedItemId, productName) {
+    // Prevent multiple clicks
+    event.target.disabled = true;
+    
+    try {
+        const formData = new FormData();
+        formData.append('_method', 'DELETE');
+        formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+
+        const response = await fetch(`/saved/${savedItemId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: formData
+        });
+
+        if (response.ok || response.status === 302) {
+            showToast(`"${productName}" has been removed from your saved list!`, 'success');
+            // Reload page to update button state
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            showToast('Failed to unsave product. Please try again.', 'error');
+            event.target.disabled = false;
+        }
+    } catch (error) {
+        showToast('Network error. Please check your connection.', 'error');
+        console.error('Unsave error:', error);
+        event.target.disabled = false;
+    }
+}
 </script>
 @endpush
 
 @section('content')
+<!-- Toast Notification Container -->
+<div x-data="toastNotification()" x-init="window.toastData = $data" class="fixed top-20 right-4 z-[9999] space-y-2 w-80" x-cloak>
+    <template x-for="toast in toasts" :key="toast.id">
+        <div x-show="true" 
+             x-transition:enter="transform ease-out duration-300 transition"
+             x-transition:enter-start="translate-x-full opacity-0"
+             x-transition:enter-end="translate-x-0 opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="translate-x-0 opacity-100"
+             x-transition:leave-end="translate-x-full opacity-0"
+             class="w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
+            <div class="p-4">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <svg x-show="toast.type === 'success'" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <svg x-show="toast.type === 'error'" class="h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-3 w-0 flex-1 pt-0.5">
+                        <p class="text-sm font-medium text-gray-900" x-text="toast.message"></p>
+                    </div>
+                    <div class="ml-4 flex-shrink-0 flex">
+                        <button @click="removeToast(toast.id)" class="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none">
+                            <span class="sr-only">Close</span>
+                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+</div>
+
 <div class="py-8">
     <div class="flex flex-col items-center justify-center mb-8">
         <h1 class="text-3xl font-bold text-green-800 mb-2">Shop All Products</h1>
@@ -55,8 +186,7 @@ function productModal() {
                     <div class="p-4 flex flex-col flex-1 w-full">
                         <div class="font-bold text-green-800 text-lg mb-1 line-clamp-1">{{ $product->name }}</div>
                         <div class="text-gray-600 text-sm mb-2 line-clamp-2">{{ $product->description }}</div>
-                        <div class="mt-auto flex items-center justify-between gap-2">
-                            <div class="text-orange-600 font-bold text-lg">₱{{ number_format($product->unit_price,2) }}</div>
+                        <div class="mt-auto flex gap-2 justify-center">
                             <div class="flex gap-2">
                                 @auth
                                     @php
@@ -68,14 +198,11 @@ function productModal() {
                                         }
                                     @endphp
                                     @if(!$alreadySaved)
-                                        <form method="POST" action="{{ route('saved.store') }}">
-                                            @csrf
-                                            <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                            <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded text-sm font-semibold hover:bg-blue-600" title="Save Product">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="inline h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5v14l7-7 7 7V5a2 2 0 00-2-2H7a2 2 0 00-2 2z" /></svg>
-                                                Save
-                                            </button>
-                                        </form>
+                                        <button onclick="saveProduct({{ $product->id }}, '{{ $product->name }}')" 
+                                                class="bg-blue-500 text-white px-3 py-1 rounded text-sm font-semibold hover:bg-blue-600" title="Save Product">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="inline h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5v14l7-7 7 7V5a2 2 0 00-2-2H7a2 2 0 00-2 2z" /></svg>
+                                            Save
+                                        </button>
                                     @else
                                         @php
                                             $savedItemId = null;
@@ -87,11 +214,10 @@ function productModal() {
                                             }
                                         @endphp
                                         @if($savedItemId)
-                                            <form method="POST" action="{{ route('saved.destroy', $savedItemId) }}" style="display:inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm font-semibold hover:bg-blue-200" title="Unsave Product">Unsave</button>
-                                            </form>
+                                            <button onclick="unsaveProduct({{ $savedItemId }}, '{{ $product->name }}')" 
+                                                    class="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm font-semibold hover:bg-blue-200" title="Unsave Product">
+                                                Unsave
+                                            </button>
                                         @else
                                             <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm font-semibold" title="Already Saved">Saved</span>
                                         @endif

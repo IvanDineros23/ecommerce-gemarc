@@ -154,23 +154,23 @@
     position: absolute; inset: 0;
     display: none !important;
     opacity: 0;
-    transform: translateX(60px) scale(.98);
-    transition: opacity 0.5s cubic-bezier(.77,0,.18,1), transform 0.7s cubic-bezier(.77,0,.18,1), filter 0.7s;
-    filter: blur(2px);
+    transform: translateX(100px) scale(.95);
+    transition: opacity 0.8s cubic-bezier(.77,0,.18,1), transform 0.8s cubic-bezier(.77,0,.18,1), filter 0.8s;
+    filter: blur(6px);
     z-index: 1;
 }
 .hero-slide.preparing {
     display: flex !important;
     opacity: 0;
-    transform: translateX(60px) scale(.98);
-    filter: blur(2px);
+    transform: translateX(100px) scale(.95);
+    filter: blur(6px);
     z-index: 2;
 }
 .hero-slide.leaving {
     display: flex !important;
     opacity: 0;
-    transform: translateX(-60px) scale(.98);
-    filter: blur(4px);
+    transform: translateX(-100px) scale(.95);
+    filter: blur(8px);
     z-index: 1;
 }
 .hero-track > .hero-slide.active {
@@ -200,8 +200,22 @@
 .machine-item:hover:before{opacity:1;}
 .machine-image{width:90%;height:90%;object-fit:contain;filter:drop-shadow(0 10px 18px rgba(0,0,0,.35));transition:.7s;image-rendering:auto;}
 .machine-item:hover .machine-image{transform:scale(1.06);} 
-/* Dots */
-.highlights-navigation{display:flex;justify-content:center;align-items:center;gap:14px;margin:3rem 0 0;}
+/* Navigation & Progress */
+.highlights-navigation{display:flex;flex-direction:column;align-items:center;gap:1rem;margin:3rem 0 0;}
+
+/* Progress Bar */
+.highlights-progress{width:120px;height:3px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden;position:relative;}
+.highlights-progress .bar{height:100%;background:linear-gradient(90deg,#f59e0b,#ea580c);width:0%;transition:width 0.3s ease;border-radius:2px;}
+.highlights-progress .bar.playing{animation:progressFill var(--ap-dur, 5000ms) linear;}
+.highlights-progress .bar.paused{animation-play-state:paused;}
+
+@keyframes progressFill{
+    from{width:0%;}
+    to{width:100%;}
+}
+
+/* Navigation Dots */
+.nav-dots{display:flex;justify-content:center;align-items:center;gap:14px;}
 .highlights-navigation .nav-dot{width:14px;height:14px;background:rgba(255,255,255,.3);border:none;border-radius:50%;cursor:pointer;transition:.4s;position:relative;}
 .highlights-navigation .nav-dot.active{background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.25);} 
 .highlights-navigation .nav-dot:hover{background:rgba(255,255,255,.55);} 
@@ -481,11 +495,18 @@ window.homeHero = (function(){
                         </div>
                     </div>
                     <div class="highlights-navigation">
-                                                                        <button class="nav-dot" data-index="0" type="button"></button>
-                                                                        <button class="nav-dot" data-index="1" type="button"></button>
-                                                                        <button class="nav-dot" data-index="2" type="button"></button>
-                                                                        <button class="nav-dot" data-index="3" type="button"></button>
-                                                                        <button class="nav-dot" data-index="4" type="button"></button>
+                        <!-- Progress Bar -->
+                        <div class="highlights-progress">
+                            <div class="bar"></div>
+                        </div>
+                        <!-- Navigation Dots -->
+                        <div class="nav-dots">
+                            <button class="nav-dot" data-index="0" type="button"></button>
+                            <button class="nav-dot" data-index="1" type="button"></button>
+                            <button class="nav-dot" data-index="2" type="button"></button>
+                            <button class="nav-dot" data-index="3" type="button"></button>
+                            <button class="nav-dot" data-index="4" type="button"></button>
+                        </div>
                     </div>
                 </div>
             </div>

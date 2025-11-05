@@ -442,8 +442,7 @@ function polls(){
                                 <div class="text-xs text-gray-500">{{ ucfirst($o->status) }}</div>
                             </div>
                             <div class="text-right">
-                                <div class="font-semibold text-gray-800">₱{{ number_format($o->total_amount,2) }}</div>
-                                <a href="{{ route('orders.show',$o) }}" class="text-green-700 hover:underline text-xs ml-2">View</a>
+                                <a href="{{ route('orders.show',$o) }}" class="text-green-700 hover:underline text-xs">View</a>
                             </div>
                         </li>
                     @empty

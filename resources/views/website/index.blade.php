@@ -533,7 +533,7 @@ window.homeHero = (function(){
         @endphp
 
         @if($carouselProducts->count())
-        <section id="product-showcase" class="py-20 bg-gray-50">
+        <section id="product-showcase" class="py-20 bg-gradient-to-br from-gray-50 to-gray-100">
             <div class="container mx-auto px-4">
                 <div class="text-center mb-16">
                     <h2 class="text-5xl font-bold text-gray-800 mb-6">Featured Products</h2>
@@ -541,39 +541,47 @@ window.homeHero = (function(){
                         Discover our most popular construction materials and premium equipment
                     </p>
                 </div>
-                <div class="relative max-w-6xl mx-auto">
-                    <button type="button" id="fp-prev" class="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-white text-gray-700 rounded-full shadow z-10">
+                <div class="relative max-w-7xl mx-auto">
+                    <button type="button" id="fp-prev" class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-sm text-gray-700 rounded-full shadow-lg hover:shadow-xl z-10 transition-all duration-300 hover:bg-white">
                         <i class="fas fa-chevron-left"></i>
                     </button>
-                    <button type="button" id="fp-next" class="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-white text-gray-700 rounded-full shadow z-10">
+                    <button type="button" id="fp-next" class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-sm text-gray-700 rounded-full shadow-lg hover:shadow-xl z-10 transition-all duration-300 hover:bg-white">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                     
-                    <div id="fp-track-container" class="overflow-hidden mx-10">
+                    <div id="fp-track-container" class="overflow-hidden mx-16">
                         <div id="fp-track" class="relative overflow-x-auto no-scrollbar">
-                            <div class="flex gap-6 snap-x snap-mandatory scroll-pl-6" style="scroll-behavior:smooth;">
+                            <div class="flex gap-2 snap-x snap-mandatory scroll-pl-6" style="scroll-behavior:smooth;">
                                 @foreach($carouselProducts as $i => $p)
-                            <article id="fp-{{ $i }}" class="product-card min-w-[95%] sm:min-w-[60%] md:min-w-[45%] lg:min-w-[32%] snap-start rounded-3xl shadow-2xl p-10 flex flex-col items-center text-center h-[480px]">
-                                <div class="w-56 h-56 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center mb-6 overflow-hidden">
-                                    <img src="{{ $p['image_url'] }}" alt="{{ $p['name'] }}" class="w-full h-full object-contain" style="max-width:210px;max-height:210px;" />
+                            <article id="fp-{{ $i }}" class="product-card min-w-[95%] sm:min-w-[60%] md:min-w-[45%] lg:min-w-[30%] snap-start group">
+                                <div class="bg-transparent backdrop-blur-none shadow-none overflow-hidden h-[420px] flex flex-col border-0 outline-0">
+                                    <!-- Image Section -->
+                                    <div class="relative bg-transparent h-64 flex items-center justify-center overflow-hidden">
+                                        <img src="{{ $p['image_url'] }}" alt="{{ $p['name'] }}" 
+                                             class="w-full h-full object-contain p-4 drop-shadow-2xl filter" />
+                                        <div class="absolute inset-0 bg-gradient-to-t from-white/10 to-transparent opacity-0 transition-opacity duration-500"></div>
+                                    </div>
+                                    
+                                    <!-- Content Section -->
+                                    <div class="p-6 flex flex-col flex-1 bg-transparent backdrop-blur-none">
+                                        <h3 class="font-bold text-xl mb-3 text-gray-800 line-clamp-2 leading-tight drop-shadow-sm">{{ $p['name'] }}</h3>
+                                        @php $desc = trim($p['description']); @endphp
+                                        <p class="text-sm text-gray-700 mb-4 leading-relaxed line-clamp-3 flex-1 drop-shadow-sm">
+                                            {{ $desc ? Str::limit($desc, 100) : 'Premium construction equipment designed for professional use and reliable performance.' }}
+                                        </p>
+                                        
+                                        <!-- Action Button -->
+                                        <a href="{{ route('auth.welcome') }}" 
+                                           class="w-full px-6 py-3 rounded-xl bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-xl text-white font-semibold transition-all duration-300 shadow-lg text-center border-0 outline-0">
+                                            <i class="fas fa-eye mr-2"></i>View Details
+                                        </a>
+                                    </div>
                                 </div>
-                                <h3 class="font-bold text-2xl mb-3 text-gray-800 line-clamp-1">{{ $p['name'] }}</h3>
-                                @php $desc = trim($p['description']); @endphp
-                                <p class="text-base text-gray-600 mb-4 leading-relaxed line-clamp-2">
-                                    {{ $desc ? Str::limit($desc, 80) : 'Premium construction equipment' }}
-                                </p>
-                                @if($p['price'] > 0)
-                                    <div class="text-xl font-bold text-green-600 mb-4">₱{{ number_format($p['price'], 2) }}</div>
-                                @endif
-                                <a href="{{ route('auth.welcome') }}" class="mt-auto w-full px-7 py-4 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold transition duration-300 shadow hover:shadow-xl text-lg">
-                                    <i class="fas fa-shopping-cart mr-2"></i>Shop Now
-                                </a>
                             </article>
                         @endforeach
                             </div>
                     </div>
                 </div>
-            </div>
             </div>
         </section>
                 @push('scripts')

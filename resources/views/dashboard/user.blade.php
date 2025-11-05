@@ -413,9 +413,20 @@ function polls(){
     <div class="flex flex-col items-center justify-center w-full mb-8">
         <div class="flex flex-col md:flex-row gap-6 w-full justify-center">
             <!-- Create/Request Quote -->
-            <div class="bg-white rounded-xl shadow p-4 flex flex-col flex-1 min-w-[260px] max-w-[350px] items-center">
-                <div class="text-lg font-bold text-green-800 mb-2 flex items-center gap-2">📝 Request a Quote</div>
-                <a href="{{ route('quotes.create') }}" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded font-semibold w-max">Create Quote</a>
+            <div class="bg-white rounded-xl shadow p-6 flex flex-col flex-1 min-w-[260px] max-w-[350px] items-center justify-between">
+                <div class="text-center mb-4">
+                    <div class="text-xl font-bold text-green-800 mb-3 flex items-center justify-center gap-2">📝 Request a Quote</div>
+                    <p class="text-base text-gray-600 mb-4">Get customized pricing for bulk orders and special requirements</p>
+                    <div class="bg-orange-50 rounded-lg p-4 mb-4">
+                        <div class="text-sm text-orange-700 font-semibold mb-2">Quick Benefits:</div>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li>• Competitive bulk pricing</li>
+                            <li>• Custom product configurations</li>
+                            <li>• Fast response time</li>
+                        </ul>
+                    </div>
+                </div>
+                <a href="{{ route('quotes.create') }}" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold w-full text-center transition-colors text-base">Create Quote</a>
             </div>
             <!-- Recent Orders -->
             <div class="bg-white rounded-xl shadow p-6 flex flex-col flex-1 min-w-[260px] max-w-[350px] items-center" x-data="recentOrdersCarousel()">
@@ -459,27 +470,50 @@ function polls(){
                 @endif
             </div>
             <!-- Company Brochure -->
-            <div class="bg-white rounded-xl shadow p-6 flex flex-col flex-1 min-w-[260px] max-w-[350px] items-center">
-                <div class="text-lg font-bold text-green-800 mb-2 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                    Download our company brochure here
+            <div class="bg-white rounded-xl shadow p-6 flex flex-col flex-1 min-w-[260px] max-w-[350px] items-center justify-between">
+                <div class="text-center mb-4">
+                    <div class="text-xl font-bold text-green-800 mb-3 flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        Company Resources
+                    </div>
+                    <p class="text-base text-gray-600 mb-4">Download our latest company information and product catalogs</p>
+                    <div class="bg-green-50 rounded-lg p-4 mb-4">
+                        <div class="text-sm text-green-700 font-semibold mb-2">What's Inside:</div>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li>• Complete product catalog</li>
+                            <li>• Company certifications</li>
+                            <li>• Contact information</li>
+                        </ul>
+                    </div>
                 </div>
-                <a href="/GEMARC%202026%20brochurePDF.pdf" class="text-orange-600 hover:underline font-semibold" target="_blank">Gemarc Enterprises Incorporated Company Brochure (PDF)</a>
+                <a href="/GEMARC%202026%20brochurePDF.pdf" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold w-full text-center transition-colors text-base" target="_blank">Download Brochure</a>
             </div>
         </div>
     </div>
     <div class="bg-white rounded-xl shadow p-6">
-        <div class="text-lg font-bold text-orange-600 mb-2">Recommended for You</div>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+        <div class="text-2xl font-bold text-orange-600 mb-6">Recommended for You</div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 w-full">
             @forelse ($recommendedProducts as $product)
-                <div class="bg-gray-50 rounded-xl shadow flex flex-col items-center p-2 min-h-[120px]">
+                <div class="bg-gray-50 rounded-xl shadow hover:shadow-lg transition-shadow duration-200 overflow-hidden flex flex-col" style="height: 280px;">
                     @php $img = $product->firstImagePath(); @endphp
-                    @if($img)
-                        <img src="{{ asset('storage/' . $img) }}" alt="{{ $product->name }}" class="mb-1 rounded max-h-20 object-contain">
-                    @else
-                        <img src="/images/gemarclogo.png" alt="No Image" class="mb-1 rounded max-h-20 object-contain">
-                    @endif
-                    <div class="font-semibold text-green-900 text-xs text-center line-clamp-2">{{ $product->name }}</div>
+                    <div class="relative w-full bg-white border-b" style="height: 160px;">
+                        <div class="absolute inset-0 p-4 flex items-center justify-center">
+                            @if($img)
+                                <img src="{{ asset('storage/' . $img) }}" alt="{{ $product->name }}" 
+                                     style="max-width: 120px; max-height: 120px; width: 100%; height: 100%; object-fit: contain;">
+                            @else
+                                <img src="/images/gemarclogo.png" alt="No Image" 
+                                     style="max-width: 120px; max-height: 120px; width: 100%; height: 100%; object-fit: contain;">
+                            @endif
+                        </div>
+                    </div>
+                    <div class="flex flex-col flex-grow p-3 justify-between">
+                        <h3 class="font-semibold text-green-900 text-sm text-center line-clamp-2 mb-2">{{ $product->name }}</h3>
+                        <a href="{{ route('shop.index') }}" 
+                           class="bg-orange-500 hover:bg-orange-600 text-white text-sm px-4 py-2.5 rounded-lg transition-colors duration-200 text-center font-medium">
+                            View in Shop
+                        </a>
+                    </div>
                 </div>
             @empty
                 <div class="col-span-full text-center text-gray-400 py-8">No recommended products.</div>

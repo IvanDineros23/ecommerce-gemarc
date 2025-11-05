@@ -163,8 +163,13 @@ Route::get('/shop', function (Request $request) {
     return view('shop.index', compact('products', 'q'));
 })->name('shop.index');
 
-// Product details
+// Product details - Employee side
 Route::get('/products/{product}', [EmployeeProductController::class, 'show'])->name('products.show');
+
+// Public product details
+Route::get('/shop/product/{product}', function (Request $request, Product $product) {
+    return view('shop.product', compact('product'));
+})->name('shop.product');
 
 // Misc demos
 Route::get('/auth/welcome', fn () => view('auth.welcome'))->name('auth.welcome');

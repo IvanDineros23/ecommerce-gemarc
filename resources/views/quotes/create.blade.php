@@ -86,15 +86,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('product-search');
     const clearBtn = document.getElementById('clear-search');
     const rows = document.querySelectorAll('.product-row');
+    const tableBody = document.querySelector('#products-table tbody');
     
     function filterRows() {
-        const val = searchInput.value.toLowerCase();
+        const val = searchInput.value.toLowerCase().trim();
         let found = 0;
         
         rows.forEach(row => {
             const name = row.querySelector('.product-name').textContent.toLowerCase();
             const desc = row.querySelector('.product-desc').textContent.toLowerCase();
-            if (name.includes(val) || desc.includes(val)) {
+            
+            if (val === '' || name.includes(val) || desc.includes(val)) {
                 row.style.display = '';
                 found++;
             } else {
@@ -102,38 +104,89 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
         
-        // Show no results message
+        // Handle no results message
         let noResults = document.getElementById('no-results');
         if (found === 0 && val.length > 0) {
             if (!noResults) {
-                noResults = document.createElement('div');
+                noResults = document.createElement('tr');
                 noResults.id = 'no-results';
-                noResults.className = 'alert alert-info text-center my-3';
-                noResults.textContent = 'No products found matching your search.';
-                document.getElementById('products-table').parentNode.appendChild(noResults);
+                noResults.innerHTML = `
+                    <td colspan="5" class="text-center py-4">
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-search me-2"></i>
+                            No products found matching "<strong>${val}</strong>". Try different keywords.
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(noResults);
+            } else {
+                noResults.querySelector('strong').textContent = val;
+                noResults.style.display = '';
             }
-            noResults.style.display = '';
         } else if (noResults) {
             noResults.style.display = 'none';
         }
+
+        // Update search input styling based on results
+        if (val.length > 0) {
+            searchInput.classList.remove('is-invalid');
+            if (found === 0) {
+                searchInput.classList.add('is-invalid');
+            } else {
+                searchInput.classList.add('is-valid');
+            }
+        } else {
+            searchInput.classList.remove('is-valid', 'is-invalid');
+        }
     }
     
-    searchInput.addEventListener('input', filterRows);
+    // Real-time search as user types
+    searchInput.addEventListener('input', function() {
+        filterRows();
+        
+        // Show/hide clear button based on input
+        if (this.value.length > 0) {
+            clearBtn.style.display = 'block';
+        } else {
+            clearBtn.style.display = 'block'; // Always show for better UX
+        }
+    });
+    
+    // Clear search functionality
     clearBtn.addEventListener('click', function() {
         searchInput.value = '';
+        searchInput.classList.remove('is-valid', 'is-invalid');
         filterRows();
         searchInput.focus();
     });
+
+    // Enhanced keyboard support
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            this.value = '';
+            this.classList.remove('is-valid', 'is-invalid');
+            filterRows();
+        }
+    });
     
-    // Add hover effect to rows
+    // Add enhanced hover effect to rows
     rows.forEach(row => {
         row.addEventListener('mouseover', function() {
-            this.style.backgroundColor = '#f8f9fa';
+            if (this.style.display !== 'none') {
+                this.style.backgroundColor = '#f8f9fa';
+                this.style.transform = 'scale(1.01)';
+                this.style.transition = 'all 0.2s ease';
+            }
         });
         row.addEventListener('mouseout', function() {
             this.style.backgroundColor = '';
+            this.style.transform = 'scale(1)';
         });
     });
+
+    // Focus search input on page load
+    searchInput.focus();
+});
 </script>
 @endpush
 @endsection

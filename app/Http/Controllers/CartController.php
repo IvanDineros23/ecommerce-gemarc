@@ -56,6 +56,7 @@ class CartController extends Controller
             'checked_out_at' => null,
         ]);
 
+        // Update quantities
         foreach ($request->input('quantities', []) as $itemId => $qty) {
             $item = $cart->items()->find($itemId);
             if ($item && (int)$qty > 0) {
@@ -64,7 +65,16 @@ class CartController extends Controller
             }
         }
 
-        return redirect()->route('cart.index')->with('status', 'Cart updated.');
+        // Update specifications
+        foreach ($request->input('specifications', []) as $itemId => $specifications) {
+            $item = $cart->items()->find($itemId);
+            if ($item) {
+                $item->specifications = $specifications;
+                $item->save();
+            }
+        }
+
+        return redirect()->route('cart.index')->with('status', 'Cart and specifications updated successfully.');
     }
 
     // GET /cart/checkout
@@ -102,21 +112,48 @@ class CartController extends Controller
     {
         $user = $request->user();
 
+        // Validate quantities and specifications from cart
         $data = $request->validate([
+            'quantities.*' => 'nullable|integer|min:1',
+            'specifications.*' => 'nullable|string|max:2000',
             'ship_to_name'    => 'nullable|string|max:120',
             'ship_to_address' => 'nullable|string|max:255',
             'notes'           => 'nullable|string|max:1000',
-            'payment_method'  => 'required|string|max:32',
-            'delivery_method' => 'required|string|max:32',
+            'payment_method'  => 'nullable|string|max:32',
+            'delivery_method' => 'nullable|string|max:32',
         ]);
 
         $cart = Cart::where('user_id', $user->id)->whereNull('checked_out_at')->firstOrFail();
-    $items = $cart->items()->with('product:id,name,unit_price')->get();
+        $items = $cart->items()->with('product:id,name,unit_price')->get();
 
         if ($items->isEmpty()) {
             return redirect()->route('cart.index')->with('status', 'Your cart is empty.');
         }
 
+        // First update cart quantities and specifications if provided
+        if (isset($data['quantities']) || isset($data['specifications'])) {
+            foreach ($items as $item) {
+                $updated = false;
+                
+                // Update quantity if provided
+                if (isset($data['quantities'][$item->id])) {
+                    $item->qty = max(1, (int)$data['quantities'][$item->id]);
+                    $updated = true;
+                }
+                
+                // Update specifications if provided
+                if (isset($data['specifications'][$item->id])) {
+                    $item->specifications = $data['specifications'][$item->id];
+                    $updated = true;
+                }
+                
+                if ($updated) {
+                    $item->save();
+                }
+            }
+        }
+
+        // Recalculate totals with updated quantities
         $subtotal = $items->sum(function (CartItem $i) {
             $unit = $i->unit_price ?? optional($i->product)->unit_price ?? 0;
             return $unit * $i->qty;
@@ -136,22 +173,23 @@ class CartController extends Controller
                 'shipping_amount'  => $shipping,
                 'tax_amount'       => $tax,
                 'total_amount'     => $total,
-                'ship_to_name'     => $data['ship_to_name'] ?? null,
-                'ship_to_address'  => $data['ship_to_address'] ?? null,
-                'notes'            => $data['notes'] ?? null,
-                'payment_method'   => $data['payment_method'],
-                'delivery_method'  => $data['delivery_method'],
+                'ship_to_name'     => $data['ship_to_name'] ?? $user->name,
+                'ship_to_address'  => $data['ship_to_address'] ?? $user->address,
+                'notes'            => $data['notes'] ?? 'Order submitted from cart with specifications',
+                'payment_method'   => $data['payment_method'] ?? 'pending_quote',
+                'delivery_method'  => $data['delivery_method'] ?? 'standard',
             ]);
 
             foreach ($items as $i) {
                 $unit = $i->unit_price ?? optional($i->product)->unit_price ?? 0;
                 OrderItem::create([
-                    'order_id'   => $order->id,
-                    'product_id' => $i->product_id,
-                    'name'       => optional($i->product)->name,
-                    'quantity'   => $i->qty,
-                    'unit_price' => $unit,
-                    'line_total' => $unit * $i->qty,
+                    'order_id'       => $order->id,
+                    'product_id'     => $i->product_id,
+                    'name'           => optional($i->product)->name,
+                    'quantity'       => $i->qty,
+                    'unit_price'     => $unit,
+                    'line_total'     => $unit * $i->qty,
+                    'specifications' => $i->specifications, // Include specifications
                 ]);
             }
 
@@ -169,8 +207,8 @@ class CartController extends Controller
             $cart->update(['checked_out_at' => now()]);
         });
 
-    // Redirect to dashboard with success modal
-    return redirect()->route('dashboard')->with('checkout_success', true);
+        // Redirect to orders page with success message
+        return redirect()->route('orders.index')->with('success', 'Order submitted successfully! Your specifications have been included for review by our sales team.');
     }
 
     // GET /orders/{order}/receipt

@@ -86,6 +86,46 @@
         animation: pulse 2s infinite;
     }
     .notification-badge { background: #f59e0b; }
+    
+    <script>
+    function markAllAsRead() {
+        // Remove unread indicators
+        document.querySelectorAll('.unread-notification').forEach(item => {
+            item.classList.remove('unread-notification');
+        });
+        
+        // Hide notification badge
+        const badge = document.querySelector('.notification-badge');
+        if (badge) {
+            badge.style.display = 'none';
+        }
+        
+        // Optional: Send AJAX request to server to mark as read
+        fetch('/notifications/mark-all-read', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json'
+            }
+        }).catch(error => console.log('Mark as read failed:', error));
+    }
+    
+    // Auto-hide notification badge after a while
+    document.addEventListener('DOMContentLoaded', function() {
+        const notificationDropdown = document.querySelector('.nav-item.dropdown .dropdown-menu');
+        if (notificationDropdown) {
+            notificationDropdown.addEventListener('show.bs.dropdown', function() {
+                // Optionally mark as read when opened
+                setTimeout(() => {
+                    const badge = document.querySelector('.notification-badge');
+                    if (badge && badge.style.display !== 'none') {
+                        badge.style.opacity = '0.5';
+                    }
+                }, 2000);
+            });
+        }
+    });
+    </script>
     .chat-badge { background: #3b82f6; }
     @keyframes pulse {
         0% { transform: scale(1); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
@@ -207,51 +247,122 @@
                     <li class="nav-item dropdown position-relative me-2">
                         <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
                             <i class="fas fa-bell"></i>
-                            <span class="notification-badge cart-badge" style="display:none"></span>
+                            @php
+                                $user = auth()->user();
+                                $unreadCount = 0;
+                                if ($user) {
+                                    // Get recent activities for notifications
+                                    $recentOrders = \App\Models\Order::where('user_id', $user->id)->where('created_at', '>', now()->subDays(7))->count();
+                                    $recentQuotes = \App\Models\Quote::where('user_id', $user->id)->where('created_at', '>', now()->subDays(7))->count();
+                                    $unreadCount = $recentOrders + $recentQuotes;
+                                }
+                            @endphp
+                            @if($unreadCount > 0)
+                                <span class="notification-badge cart-badge">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>
+                            @endif
                         </a>
                         <div class="dropdown-menu dropdown-menu-end p-0 overflow-hidden" style="width: 320px; max-height: 400px;">
                             <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
                                 <h6 class="m-0 fw-bold">Notifications</h6>
-                                <a href="#" class="text-decoration-none small">Mark all as read</a>
+                                <a href="#" class="text-decoration-none small" onclick="markAllAsRead()">Mark all as read</a>
                             </div>
-                            <div class="notifications-list">
-                                <a href="#" class="dropdown-item p-3 border-bottom d-flex align-items-center unread-notification">
-                                    <div class="notification-icon me-3 bg-success bg-opacity-10 text-success rounded-circle p-2">
-                                        <i class="fas fa-check-circle"></i>
+                            <div class="notifications-list" style="max-height: 300px; overflow-y: auto;">
+                                @auth
+                                    @php
+                                        // Get real notifications
+                                        $userNotifications = collect();
+                                        
+                                        // Recent orders
+                                        $recentOrders = \App\Models\Order::where('user_id', auth()->id())
+                                            ->latest()
+                                            ->limit(3)
+                                            ->get();
+                                        
+                                        foreach($recentOrders as $order) {
+                                            $userNotifications->push([
+                                                'type' => 'order',
+                                                'icon' => 'fas fa-shopping-cart',
+                                                'color' => 'success',
+                                                'title' => 'Order #' . $order->id . ' ' . ucfirst($order->status),
+                                                'message' => 'Your order has been ' . $order->status,
+                                                'time' => $order->created_at->diffForHumans(),
+                                                'link' => route('orders.show', $order->id)
+                                            ]);
+                                        }
+                                        
+                                        // Recent quotes
+                                        $recentQuotes = \App\Models\Quote::where('user_id', auth()->id())
+                                            ->latest()
+                                            ->limit(3)
+                                            ->get();
+                                        
+                                        foreach($recentQuotes as $quote) {
+                                            $userNotifications->push([
+                                                'type' => 'quote',
+                                                'icon' => 'fas fa-file-alt',
+                                                'color' => 'primary',
+                                                'title' => 'Quote #' . $quote->id . ' ' . ucfirst($quote->status),
+                                                'message' => 'Your quote request is ' . $quote->status,
+                                                'time' => $quote->created_at->diffForHumans(),
+                                                'link' => '#'
+                                            ]);
+                                        }
+                                        
+                                        // Recent shipments
+                                        $recentShipments = \App\Models\Shipment::where('user_id', auth()->id())
+                                            ->latest()
+                                            ->limit(2)
+                                            ->get();
+                                        
+                                        foreach($recentShipments as $shipment) {
+                                            $userNotifications->push([
+                                                'type' => 'shipment',
+                                                'icon' => 'fas fa-truck',
+                                                'color' => 'warning',
+                                                'title' => 'Shipment #' . $shipment->id . ' ' . ucfirst($shipment->status),
+                                                'message' => 'Your package is ' . str_replace('_', ' ', $shipment->status),
+                                                'time' => $shipment->created_at->diffForHumans(),
+                                                'link' => '#'
+                                            ]);
+                                        }
+                                        
+                                        $userNotifications = $userNotifications->sortByDesc(function($notif) {
+                                            return $notif['time'];
+                                        })->take(8);
+                                    @endphp
+                                    
+                                    @forelse($userNotifications as $notification)
+                                        <a href="{{ $notification['link'] }}" class="dropdown-item p-3 border-bottom d-flex align-items-center unread-notification">
+                                            <div class="notification-icon me-3 bg-{{ $notification['color'] }} bg-opacity-10 text-{{ $notification['color'] }} rounded-circle p-2">
+                                                <i class="{{ $notification['icon'] }}"></i>
+                                            </div>
+                                            <div class="notification-content flex-grow-1">
+                                                <p class="mb-1 text-dark fw-semibold">{{ $notification['title'] }}</p>
+                                                <p class="small text-muted mb-0">{{ $notification['message'] }}</p>
+                                                <span class="notification-time small">{{ $notification['time'] }}</span>
+                                            </div>
+                                            <div class="unread-indicator"></div>
+                                        </a>
+                                    @empty
+                                        <div class="dropdown-item p-3 text-center text-muted">
+                                            <i class="fas fa-bell-slash fa-2x mb-2 text-muted"></i>
+                                            <p class="mb-0">No notifications yet</p>
+                                            <small>We'll notify you about orders, quotes, and shipments</small>
+                                        </div>
+                                    @endforelse
+                                @else
+                                    <div class="dropdown-item p-3 text-center text-muted">
+                                        <i class="fas fa-user-lock fa-2x mb-2 text-muted"></i>
+                                        <p class="mb-0">Please log in</p>
+                                        <small>Login to see your notifications</small>
                                     </div>
-                                    <div class="notification-content flex-grow-1">
-                                        <p class="mb-1 text-dark fw-semibold">Order #102938 confirmed</p>
-                                        <p class="small text-muted mb-0">Your order has been processed and shipped.</p>
-                                        <span class="notification-time small">2 hours ago</span>
-                                    </div>
-                                    <div class="unread-indicator"></div>
-                                </a>
-                                <a href="#" class="dropdown-item p-3 border-bottom d-flex align-items-center unread-notification">
-                                    <div class="notification-icon me-3 bg-primary bg-opacity-10 text-primary rounded-circle p-2">
-                                        <i class="fas fa-percent"></i>
-                                    </div>
-                                    <div class="notification-content flex-grow-1">
-                                        <p class="mb-1 text-dark fw-semibold">New discount available!</p>
-                                        <p class="small text-muted mb-0">Use code GEMARC15 for 15% off your next order.</p>
-                                        <span class="notification-time small">Yesterday</span>
-                                    </div>
-                                    <div class="unread-indicator"></div>
-                                </a>
-                                <a href="#" class="dropdown-item p-3 border-bottom d-flex align-items-center unread-notification">
-                                    <div class="notification-icon me-3 bg-warning bg-opacity-10 text-warning rounded-circle p-2">
-                                        <i class="fas fa-truck"></i>
-                                    </div>
-                                    <div class="notification-content flex-grow-1">
-                                        <p class="mb-1 text-dark fw-semibold">Package delivered!</p>
-                                        <p class="small text-muted mb-0">Your order #98765 was delivered successfully.</p>
-                                        <span class="notification-time small">Oct 7, 2025</span>
-                                    </div>
-                                    <div class="unread-indicator"></div>
-                                </a>
+                                @endauth
                             </div>
-                            <div class="text-center p-2 border-top">
-                                <a href="#" class="text-decoration-none small">View all notifications</a>
-                            </div>
+                            @auth
+                                <div class="text-center p-2 border-top">
+                                    <a href="{{ route('dashboard') }}" class="text-decoration-none small">View all notifications</a>
+                                </div>
+                            @endauth
                         </div>
                     </li>
 

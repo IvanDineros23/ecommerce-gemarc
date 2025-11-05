@@ -18,6 +18,7 @@ class OrderItem extends Model
         'quantity',
         'unit_price',
         'line_total',
+        'specifications',
     ];
 
     // Relationship to Order

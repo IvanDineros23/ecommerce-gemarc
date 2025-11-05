@@ -418,11 +418,25 @@ function polls(){
                 <a href="{{ route('quotes.create') }}" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded font-semibold w-max">Create Quote</a>
             </div>
             <!-- Recent Orders -->
-            <div class="bg-white rounded-xl shadow p-6 flex flex-col flex-1 min-w-[260px] max-w-[350px] items-center">
-                <div class="text-lg font-bold text-green-800 mb-2">Your Recent Orders</div>
+            <div class="bg-white rounded-xl shadow p-6 flex flex-col flex-1 min-w-[260px] max-w-[350px] items-center" x-data="recentOrdersCarousel()">
+                <div class="text-lg font-bold text-green-800 mb-2 flex items-center justify-between w-full">
+                    <span>Your Recent Orders</span>
+                    @if($recentOrders->count() > 3)
+                    <div class="flex gap-1">
+                        <button @click="previousPage()" :disabled="currentPage === 0" 
+                                class="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors">
+                            <i class="fas fa-chevron-left text-xs text-gray-600"></i>
+                        </button>
+                        <button @click="nextPage()" :disabled="currentPage >= Math.ceil(totalOrders / 3) - 1" 
+                                class="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors">
+                            <i class="fas fa-chevron-right text-xs text-gray-600"></i>
+                        </button>
+                    </div>
+                    @endif
+                </div>
                 <ul class="divide-y w-full">
-                    @forelse ($recentOrders as $o)
-                        <li class="flex items-center justify-between py-4">
+                    @forelse ($recentOrders as $index => $o)
+                        <li x-show="isVisible({{ $index }})" class="flex items-center justify-between py-4">
                             <div>
                                 <div class="font-semibold">#{{ $o->id }} · {{ $o->created_at->format('Y-m-d') }}</div>
                                 <div class="text-xs text-gray-500">{{ ucfirst($o->status) }}</div>
@@ -436,6 +450,14 @@ function polls(){
                         <li class="py-4 text-gray-400">No orders yet.</li>
                     @endforelse
                 </ul>
+                
+                @if($recentOrders->count() > 3)
+                <div class="mt-3 text-center">
+                    <span class="text-xs text-gray-500">
+                        <span x-text="currentPage + 1"></span>/<span x-text="Math.ceil(totalOrders / 3)"></span>
+                    </span>
+                </div>
+                @endif
             </div>
             <!-- Company Brochure -->
             <div class="bg-white rounded-xl shadow p-6 flex flex-col flex-1 min-w-[260px] max-w-[350px] items-center">
@@ -643,4 +665,33 @@ function polls(){
         </div>
     </div>
 </div>
+
+<script>
+  function recentOrdersCarousel() {
+    return {
+      currentPage: 0,
+      totalOrders: {{ $recentOrders->count() }},
+      ordersPerPage: 3,
+      
+      isVisible(index) {
+        const startIndex = this.currentPage * this.ordersPerPage;
+        const endIndex = startIndex + this.ordersPerPage;
+        return index >= startIndex && index < endIndex;
+      },
+      
+      nextPage() {
+        const maxPage = Math.ceil(this.totalOrders / this.ordersPerPage) - 1;
+        if (this.currentPage < maxPage) {
+          this.currentPage++;
+        }
+      },
+      
+      previousPage() {
+        if (this.currentPage > 0) {
+          this.currentPage--;
+        }
+      }
+    }
+  }
+</script>
 @endsection

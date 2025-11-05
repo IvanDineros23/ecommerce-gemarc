@@ -19,7 +19,6 @@
                             <tr>
                                 <th>Reference #</th>
                                 <th>Date</th>
-                                <th class="text-end">Total</th>
                                 <th class="text-center">Status</th>
                                 <th class="text-center">Action</th>
                             </tr>
@@ -29,7 +28,6 @@
                             <tr>
                                 <td>{{ $order->reference_number }}</td>
                                 <td>{{ $order->created_at->format('F d, Y h:i A') }}</td>
-                                <td class="text-end">₱{{ number_format($order->total_amount, 2) }}</td>
                                 <td class="text-center">
                                     @if($order->status == 'pending')
                                         <span class="badge bg-warning text-dark">Pending</span>
@@ -44,9 +42,14 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ route('orders.show', $order) }}" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-eye me-1"></i> View
-                                    </a>
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <a href="{{ route('orders.show', $order) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye me-1"></i> View
+                                        </a>
+                                        <a href="tel:+639090879416" class="btn btn-sm btn-outline-success" title="Call Marketing Department: +63 909 087 9416">
+                                            <i class="fas fa-phone me-1"></i> Call Marketing
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                             @endforeach

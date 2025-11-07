@@ -8,6 +8,7 @@ class Order extends Model
 {
     protected $fillable = [
         'user_id',
+        'quote_id',          // IMPORTANT: kung may quote_id column sa orders table
         'reference_number',
         'status',
         'payment_method',
@@ -32,5 +33,12 @@ class Order extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Relationship: Order belongs to a Quote
+    // (assumption: may `quote_id` column sa `orders` table na FK to `quotes.id`)
+    public function quote()
+    {
+        return $this->belongsTo(Quote::class);
     }
 }

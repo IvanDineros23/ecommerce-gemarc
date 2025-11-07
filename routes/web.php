@@ -22,7 +22,7 @@ use App\Http\Controllers\EmployeeProductController;
 use App\Http\Controllers\EmployeeOrderController;
 use App\Http\Controllers\EmployeeQuoteController;
 use App\Http\Controllers\EmployeeInvoiceController;
-use App\Http\Controllers\EmployeePaymentController;
+use App\HttpControllers\EmployeePaymentController;
 use App\Http\Controllers\EmployeeBillController;
 use App\Http\Controllers\EmployeeExpenseController;
 use App\Http\Controllers\EmployeeCreditController;
@@ -347,6 +347,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/employee/credits',    [EmployeeCreditController::class,   'index'])->name('employee.credits.index');
     Route::get('/employee/tax-reports',[EmployeeTaxReportController::class,'index'])->name('employee.tax-reports.index');
     Route::get('/employee/statements', [EmployeeStatementController::class,'index'])->name('employee.statements.index');
+
+    // Create quotes from orders
+    Route::post(
+        '/employee/quotes/from-order/{order}',
+        [EmployeeQuoteController::class, 'createFromOrder']
+    )->name('employee.quotes.from_order')->middleware(['auth', 'verified']);
+
+    // Cancel pending order from quote management
+    Route::patch('/employee/quotes/cancel-order/{order}', [EmployeeQuoteController::class, 'cancelOrder'])
+        ->name('employee.quotes.cancel_order');
 });
 
 /*

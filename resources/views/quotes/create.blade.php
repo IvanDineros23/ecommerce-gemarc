@@ -1,35 +1,63 @@
 @extends('layouts.ecommerce')
 @section('title', 'Request a Quote | Gemarc Enterprises Inc.')
 @section('content')
-<div class="container py-4">
-    <h2 class="text-center text-success fw-bold mb-4">Request a Quote</h2>
-    
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <strong>Success!</strong> {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<div class="py-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Title Section -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">Create Quote Request</h1>
+            <p class="text-lg text-gray-600">Select products and specify your requirements for a customized quote</p>
         </div>
-    @endif
-    
-    <div class="row justify-content-center">
-        <div class="col-12 col-lg-10">
-            <form class="mb-3">
-                <div class="input-group">
-                    <input type="text" id="product-search" class="form-control" placeholder="Search products..." autocomplete="off">
-                    <button class="btn btn-outline-secondary" type="button" id="clear-search">Clear</button>
+
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 px-8 py-6">
+                <h2 class="text-2xl font-bold text-white">Product Selection</h2>
+            </div>
+
+            @if(session('success'))
+                <div class="bg-green-50 border-l-4 border-green-400 p-4 m-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-green-700">{{ session('success') }}</p>
+                        </div>
+                    </div>
                 </div>
-            </form>
-    <form method="POST" action="{{ route('quotes.store') }}">
-        @csrf
-        <div class="table-responsive">
-            <table class="table table-hover" id="products-table">
-                <thead style="background-color: #e8f5e9;">
-                    <tr>
-                        <th>Image</th>
-                        <th>Product</th>
-                        <th>Description</th>
-                        <th class="text-center">Quantity</th>
-                        <th class="text-center">Add</th>
+            @endif
+
+            <div class="p-8">
+                <div class="mb-6">
+                    <div class="flex gap-2">
+                        <div class="flex-grow">
+                            <input type="text" 
+                                   id="product-search" 
+                                   class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500" 
+                                   placeholder="Search products..." 
+                                   autocomplete="off">
+                        </div>
+                        <button type="button" 
+                                id="clear-search" 
+                                class="px-6 py-3 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors duration-200">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ route('quotes.store') }}" class="space-y-6">
+                    @csrf
+        <div class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+            <table class="w-full" id="products-table">
+                <thead>
+                    <tr class="bg-gray-100 border-b border-gray-200">
+                        <th class="py-4 px-6 text-left text-sm font-semibold text-gray-900">Image</th>
+                        <th class="py-4 px-6 text-left text-sm font-semibold text-gray-900">Product</th>
+                        <th class="py-4 px-6 text-left text-sm font-semibold text-gray-900">Description</th>
+                        <th class="py-4 px-6 text-center text-sm font-semibold text-gray-900">Quantity</th>
+                        <th class="py-4 px-6 text-center text-sm font-semibold text-gray-900">Add</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -61,21 +89,40 @@
                     </tr>
                     @endforeach
                 </tbody>
-            </table>
+                        </table>
+                    </div>
+
+                    <!-- Additional Notes Section -->
+                    <div class="border-t border-gray-200 mt-8 pt-8">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Additional Notes
+                                </label>
+                                <textarea 
+                                    id="notes" 
+                                    name="notes" 
+                                    rows="4" 
+                                    class="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                    placeholder="Any special instructions or requirements..."></textarea>
+                            </div>
+
+                            <div class="flex justify-end pt-4">
+                                <button type="submit" 
+                                    class="inline-flex items-center px-6 py-3 bg-green-600 text-white text-base font-semibold rounded-lg hover:bg-green-700 transition-colors duration-200">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Submit Quote Request
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
-            </div>
-            
-            <div class="mb-4 mt-4">
-                <label for="notes" class="form-label fw-medium">Additional Notes</label>
-                <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Any special instructions or requirements..."></textarea>
-            </div>
-            
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                <button type="submit" class="btn btn-success px-4 py-2">
-                    Submit Quote Request
-                </button>
-            </div>
-        </form>
+    </div>
+</div>
         </div>
     </div>
 </div>

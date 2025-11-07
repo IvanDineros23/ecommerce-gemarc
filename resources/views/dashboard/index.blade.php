@@ -88,7 +88,7 @@ document.addEventListener('alpine:init', () => {
             <div class="text-right">
               <div class="font-semibold text-gray-800">₱{{ number_format($o->total_amount,2) }}</div>
               <div class="flex gap-2 mt-1">
-                <a href="{{ route('orders.show',$o) }}" class="text-green-700 hover:underline text-xs">View</a>
+                <span class="text-gray-400 text-xs">View (popup only)</span>
                 <a href="{{ route('orders.reorder',$o) }}" class="text-orange-600 hover:underline text-xs">Reorder</a>
               </div>
             </div>

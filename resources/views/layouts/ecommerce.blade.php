@@ -286,7 +286,7 @@
                                                 'title' => 'Order #' . $order->id . ' ' . ucfirst($order->status),
                                                 'message' => 'Your order has been ' . $order->status,
                                                 'time' => $order->created_at->diffForHumans(),
-                                                'link' => route('orders.show', $order->id)
+                                                'link' => '#'
                                             ]);
                                         }
                                         

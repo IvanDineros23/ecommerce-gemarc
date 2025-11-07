@@ -453,7 +453,7 @@ function polls(){
                                 <div class="text-xs text-gray-500">{{ ucfirst($o->status) }}</div>
                             </div>
                             <div class="text-right">
-                                <a href="{{ route('orders.show',$o) }}" class="text-green-700 hover:underline text-xs">View</a>
+                                <span class="text-gray-400 text-xs">View (popup only)</span>
                             </div>
                         </li>
                     @empty

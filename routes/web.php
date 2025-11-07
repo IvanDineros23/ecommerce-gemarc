@@ -203,10 +203,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/cart/checkout',      [CartController::class, 'processCheckout'])->name('cart.checkout.process');
     Route::post('/cart/place-order',   [CartController::class, 'processCheckout'])->name('cart.place-order');
 
+    // Quotes
+    Route::get('/quotes/{quote}/download', [QuoteController::class, 'download'])->name('quotes.download');
+
     // Orders (user)
     Route::get('/orders',              [OrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{order}',      [OrderController::class, 'show'])->name('orders.show');
+    Route::get('/orders/{order}/json', [OrderController::class, 'json'])->name('orders.json');
     Route::get('/orders/{order}/receipt', [CartController::class, 'orderReceipt'])->name('orders.receipt');
+    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
     // Settings
     Route::view('/settings', 'dashboard.settings')->name('settings');

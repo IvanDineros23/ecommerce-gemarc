@@ -1,5 +1,34 @@
 @extends('layouts.ecommerce')
 
+@push('scripts')
+<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<style>[x-cloak]{display:none!important}</style>
+<script>
+function toastNotification() {
+    return {
+        toasts: [],
+        showToast(message, type = 'success') {
+            const id = Date.now();
+            this.toasts.push({ id, message, type });
+            setTimeout(() => {
+                this.removeToast(id);
+            }, 3000);
+        },
+        removeToast(id) {
+            this.toasts = this.toasts.filter(toast => toast.id !== id);
+        }
+    }
+}
+
+// Function to show toast from outside Alpine
+function showToast(message, type = 'success') {
+    if (window.toastData) {
+        window.toastData.showToast(message, type);
+    }
+}
+</script>
+@endpush
+
 @section('content')
 <!-- Toast Notification Container (Same as Shop Page) -->
 <div x-data="toastNotification()" x-init="window.toastData = $data" class="fixed top-20 right-4 z-[9999] space-y-2 w-80" x-cloak>
@@ -311,63 +340,60 @@
     updateItemCount();
   });
 
-  // Function to submit cart as order (updated to use unified toast)
-  function submitCartAsOrder() {
+  // Function to submit cart as order
+  async function submitCartAsOrder() {
     const submitBtn = document.getElementById('submitOrderBtn');
     const submitIcon = document.getElementById('submitOrderIcon');
     const submitText = document.getElementById('submitOrderText');
     
-    // Disable button and show loading state
-    submitBtn.disabled = true;
-    submitIcon.className = 'fas fa-spinner fa-spin';
-    submitText.textContent = 'Submitting...';
-    
-    // Show loading toast
-    showToast('Processing your order...', 'info');
-    
-    // First update the cart with specifications
-    const form = document.querySelector('form[action="{{ route('cart.update') }}"]');
-    if (form) {
+    try {
+      // Disable button and show loading state
+      submitBtn.disabled = true;
+      submitIcon.className = 'fas fa-spinner fa-spin';
+      submitText.textContent = 'Submitting...';
+      
+      // Show loading toast
+      showToast('Processing your order...', 'info');
+      
+      // First update the cart with specifications
+      const form = document.querySelector('form[action="{{ route('cart.update') }}"]');
+      if (!form) {
+        throw new Error('Cart form not found');
+      }
+      
       // Create FormData from the cart form
       const formData = new FormData(form);
       
       // Submit via AJAX to place order
-      fetch('{{ route('cart.place-order') }}', {
+      const response = await fetch('{{ route('cart.place-order') }}', {
         method: 'POST',
         headers: {
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
           'Accept': 'application/json',
         },
         body: formData
-      })
-      .then(response => {
-        if (response.ok) {
-          // Show success toast
-          showToast('Order submitted successfully! Redirecting to orders page...', 'success');
-          
-          // Update button to success state
-          submitIcon.className = 'fas fa-check';
-          submitText.textContent = 'Order Submitted!';
-          
-          // Redirect after short delay
-          setTimeout(() => {
-            window.location.href = '{{ route('orders.index') }}';
-          }, 1500);
-        } else {
-          throw new Error('Failed to submit order');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        showToast('Failed to submit order. Please try again.', 'error');
-        
-        // Reset button state
-        submitBtn.disabled = false;
-        submitIcon.className = 'fas fa-paper-plane';
-        submitText.textContent = 'Submit Order';
       });
-    } else {
-      showToast('Cart form not found. Please refresh the page.', 'error');
+      
+      if (!response.ok) {
+        throw new Error('Failed to submit order');
+      }
+      
+      // Update button to success state
+      submitIcon.className = 'fas fa-check';
+      submitText.textContent = 'Order Submitted!';
+      
+      // Show success toast and wait for it to be seen
+      showToast('Order submitted successfully! Redirecting to orders page...', 'success');
+      
+      // Wait for toast to be visible before redirecting
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Redirect to orders page
+      window.location.href = '{{ route('orders.index') }}';
+      
+    } catch (error) {
+      console.error('Error:', error);
+      showToast('Failed to submit order. Please try again.', 'error');
       
       // Reset button state
       submitBtn.disabled = false;

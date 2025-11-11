@@ -1,179 +1,312 @@
 @extends('layouts.ecommerce')
+
 @section('content')
-<style>
-[x-cloak] { display: none !important; }
-</style>
-<div class="max-w-5xl mx-auto py-10" x-data="productModal()">
-    <h1 class="text-2xl font-bold text-green-800 mb-6">Product Management</h1>
+<style>[x-cloak]{display:none!important}</style>
+
+<div class="py-8 bg-gray-50">
+  <div class="max-w-6xl mx-auto" x-data="productPage()">
+
+    {{-- Title --}}
+    <h1 class="text-2xl md:text-3xl font-extrabold text-emerald-800 mb-4">Product Management</h1>
+
+    {{-- Toasts --}}
     @if(session('success') && session('added_product_name'))
-        <div x-data="{ show: true }" x-show="show" x-transition class="mb-4 flex items-center justify-between bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded">
-            <span class="font-semibold">Successfully added a product ({{ session('added_product_name') }})</span>
-            <button @click="show = false" class="ml-4 text-green-700 hover:text-green-900">&times;</button>
+      <div x-data="{show:true}" x-show="show" x-transition
+           class="mb-4 flex items-center justify-between bg-emerald-50 border border-emerald-200 text-emerald-900 px-4 py-3 rounded-xl shadow-sm">
+        <div class="flex items-center gap-2">✅
+          <span class="text-sm">Successfully added a product:
+            <span class="font-semibold">{{ session('added_product_name') }}</span>
+          </span>
         </div>
+        <button @click="show=false" class="ml-4 text-emerald-700 hover:text-emerald-900 text-lg leading-none">&times;</button>
+      </div>
     @endif
-    <div class="bg-white rounded-xl shadow p-6 mb-8">
-        <h2 class="text-lg font-semibold text-green-700 mb-4">Add New Product</h2>
-        <form method="POST" action="{{ route('employee.products.store') }}" enctype="multipart/form-data">
-            <div class="mb-4">
-                <label class="block text-gray-700 mb-1">Stock Quantity</label>
-                <input type="number" name="stock_qty" class="w-full border border-gray-300 rounded px-3 py-2" min="0" step="1" required>
+
+    @if(session('product_updated'))
+      <div x-data="{show:true}" x-show="show" x-transition
+           class="mb-4 flex items-center justify-between bg-sky-50 border border-sky-200 text-sky-900 px-4 py-3 rounded-xl shadow-sm">
+        <div class="flex items-center gap-2">✏️
+          <span class="text-sm">{{ session('product_updated') }}</span>
+        </div>
+        <button @click="show=false" class="ml-4 text-sky-700 hover:text-sky-900 text-lg leading-none">&times;</button>
+      </div>
+    @endif
+
+    @if(session('product_deleted'))
+      <div x-data="{show:true}" x-show="show" x-transition
+           class="mb-4 flex items-center justify-between bg-red-50 border border-red-200 text-red-900 px-4 py-3 rounded-xl shadow-sm">
+        <div class="flex items-center gap-2">🗑️
+          <span class="text-sm">{{ session('product_deleted') }}</span>
+        </div>
+        <button @click="show=false" class="ml-4 text-red-700 hover:text-red-900 text-lg leading-none">&times;</button>
+      </div>
+    @endif
+
+    {{-- ================= Add New Product ================= --}}
+  <section class="bg-white rounded-2xl shadow-sm border border-emerald-100 mb-8">
+      <div class="px-6 pt-5 pb-4 flex items-center justify-between gap-4 border-b border-gray-100">
+        <div>
+          <h2 class="text-lg font-semibold text-emerald-800">Add New Product</h2>
+          <p class="text-xs text-gray-500">Fill out the details below to add a new item to the catalogue.</p>
+        </div>
+      </div>
+
+  <form method="POST" action="{{ route('employee.products.store') }}" enctype="multipart/form-data"
+    class="px-6 pt-4 pb-8 space-y-5">
+        @csrf
+        <div class="grid gap-6 md:grid-cols-2">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">Product Name</label>
+            <input type="text" name="name"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              required>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">Unit Price</label>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center justify-center text-sm font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md px-3 py-2">₱</span>
+              <input type="number" name="unit_price" min="0" step="0.01" placeholder="Enter amount"
+                class="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required>
             </div>
-            @csrf
-            <div class="mb-4">
-                <label class="block text-gray-700 mb-1">Product Name</label>
-                <input type="text" name="name" class="w-full border border-gray-300 rounded px-3 py-2" required>
+          </div>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-2">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">Stock Quantity</label>
+            <input type="number" name="stock_qty" min="0" step="1"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              required>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">Product Image</label>
+            <input type="file" name="image"
+              class="w-full border border-dashed border-gray-300 rounded-lg px-3 py-3 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+            <p class="mt-1 text-[11px] text-gray-400">Optional. JPG / PNG, preferably square.</p>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">Description</label>
+          <textarea name="description" rows="3"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            placeholder="Describe what this product is used for…" required></textarea>
+        </div>
+
+        {{-- Footer bar for Add Product button --}}
+        <div class="mt-6 pt-4 border-t border-gray-100 flex justify-end">
+          <button type="submit"
+                  class="group inline-flex items-center gap-3 rounded-full bg-emerald-600 px-6 py-3
+                         text-white text-sm md:text-base font-semibold shadow-lg ring-1 ring-emerald-300/30
+                         transition-all hover:bg-emerald-700 hover:shadow-xl hover:-translate-y-0.5
+                         focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2">
+            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/20">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12h14"/>
+              </svg>
+            </span>
+            <span>Add Product</span>
+          </button>
+        </div>
+        <br>
+      </form>
+    </section>
+
+    {{-- ================= All Products ================= --}}
+    <section class="bg-white rounded-2xl shadow-sm border border-gray-200">
+      <div class="px-6 pt-5 pb-4 flex items-center justify-between gap-4 border-b border-gray-100">
+        <div>
+          <h2 class="text-lg font-semibold text-emerald-800">All Products</h2>
+          <p class="text-xs text-gray-500">Overview of all items currently in the system.</p>
+        </div>
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
+          {{ $products->count() }} items
+        </span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm table-fixed">
+          <colgroup>
+            <col style="width:20%"><col style="width:35%"><col style="width:12%"><col style="width:8%"><col style="width:13%"><col style="width:12%">
+          </colgroup>
+          <thead class="bg-gray-50 text-xs text-gray-600 uppercase tracking-wide">
+            <tr>
+              <th class="px-4 py-3 text-left font-semibold">Name</th>
+              <th class="px-4 py-3 text-left font-semibold">Description</th>
+              <th class="px-4 py-3 text-left font-semibold">Unit Price</th>
+              <th class="px-4 py-3 text-left font-semibold">Stock</th>
+              <th class="px-4 py-3 text-left font-semibold">Image</th>
+              <th class="px-4 py-3 text-left font-semibold text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            @foreach($products as $product)
+              @php $img = $product->firstImagePath(); @endphp
+              <tr class="hover:bg-emerald-50/40 transition-colors">
+                <td class="px-4 py-3 align-top font-medium text-gray-900">{{ $product->name }}</td>
+                <td class="px-4 py-3 align-top text-gray-700">
+                  <div class="max-h-16 overflow-hidden text-ellipsis">{{ $product->description }}</div>
+                </td>
+                <td class="px-4 py-3 align-top text-gray-800 whitespace-nowrap">₱{{ number_format($product->unit_price, 2) }}</td>
+                <td class="px-4 py-3 align-top text-gray-800 text-center">{{ $product->stock }}</td>
+                <td class="px-4 py-3 align-top text-center">
+                  @if($img)
+                    <img src="{{ asset('storage/' . $img) }}" alt="{{ $product->name }}" class="w-16 h-16 object-cover rounded-md border border-gray-200 mx-auto">
+                  @else
+                    <span class="text-[11px] text-gray-400">No image</span>
+                  @endif
+                </td>
+                <td class="px-4 py-3 align-top">
+                  <div class="flex flex-col items-center gap-1">
+                    {{-- EDIT (button, no submit) --}}
+                    <button type="button"
+                      class="text-xs font-semibold text-sky-700 hover:text-sky-900 hover:underline"
+                      @click='openEdit({
+                        id: {{ $product->id }},
+                        name: @json($product->name),
+                        description: @json($product->description),
+                        unit_price: {{ $product->unit_price }},
+                        stock: {{ $product->stock }},
+                        image_url: @json($img ? asset("storage/".$img) : ""),
+                        update_url: @json(route("employee.products.update", $product))
+                      })'>
+                      Edit
+                    </button>
+
+                    {{-- DELETE (button, no submit) --}}
+                    <form id="deleteForm-{{ $product->id }}" action="{{ route('employee.products.destroy', $product) }}" method="POST" class="hidden">
+                      @csrf @method('DELETE')
+                    </form>
+                    <button type="button"
+                      class="text-xs font-semibold text-red-600 hover:text-red-700 hover:underline"
+                      @click='openDelete({ id: {{ $product->id }}, name: @json($product->name) })'>
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            @endforeach
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    {{-- ================= Edit Modal ================= --}}
+    <div x-show="showEdit" x-transition.opacity x-cloak
+         class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+         @keydown.window.escape="closeEdit()" @click.self="closeEdit()">
+      <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 w-full max-w-lg relative" @click.stop>
+        <button @click="closeEdit()" class="absolute top-2 right-3 text-gray-400 hover:text-red-600 text-2xl leading-none">&times;</button>
+        <h2 class="text-xl font-bold text-orange-600 mb-4">Edit Product</h2>
+
+        <form :action="edit.update_url" method="POST" enctype="multipart/form-data" class="space-y-4">
+          @csrf
+          @method('PUT')
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">Product Name</label>
+            <input type="text" name="name"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              x-model="edit.name" required>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">Description</label>
+            <textarea name="description" rows="3"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              x-model="edit.description" required></textarea>
+          </div>
+
+          <div class="grid gap-4 md:grid-cols-2">
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">Unit Price</label>
+              <input type="number" name="unit_price" min="0" step="0.01"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                x-model="edit.unit_price" required>
             </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 mb-1">Description</label>
-                <textarea name="description" class="w-full border border-gray-300 rounded px-3 py-2" required></textarea>
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">Stock Quantity</label>
+              <input type="number" name="stock" min="0" step="1"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                x-model="edit.stock" required>
             </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 mb-1">Unit Price</label>
-                <input type="number" name="unit_price" class="w-full border border-gray-300 rounded px-3 py-2" min="0" step="0.01" required>
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 mb-1">Image</label>
-                <input type="file" name="image" class="w-full border border-gray-300 rounded px-3 py-2">
-            </div>
-            <button type="submit" class="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800 font-semibold">Add Product</button>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">Image</label>
+            <input type="file" name="image"
+              class="w-full border border-dashed border-gray-300 rounded-lg px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+            <template x-if="edit.image_url">
+              <img :src="edit.image_url" alt="Product Image" class="w-16 h-16 object-cover rounded mt-2 border border-gray-200">
+            </template>
+          </div>
+
+          <div class="flex justify-end">
+            <button type="submit" class="bg-orange-500 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-sm hover:bg-orange-600 active:bg-orange-700 transition">
+              Update Product
+            </button>
+          </div>
         </form>
+      </div>
     </div>
 
-    <!-- Edit Product Modal -->
-    <div x-show="show" x-transition.opacity x-cloak class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
-        @keydown.window.escape="close()"
-        @click.self="close()">
-        <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-lg relative" @click.stop>
-            <button @click="close" class="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-2xl">&times;</button>
-            <h2 class="text-xl font-bold text-orange-600 mb-4">Edit Product</h2>
-            <form :action="updateUrl" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="_token" :value="csrf">
-                <input type="hidden" name="_method" value="PUT">
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-1">Product Name</label>
-                    <input type="text" name="name" class="w-full border border-gray-300 rounded px-3 py-2" x-model="form.name" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-1">Description</label>
-                    <textarea name="description" class="w-full border border-gray-300 rounded px-3 py-2" x-model="form.description" required></textarea>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-1">Unit Price</label>
-                    <input type="number" name="unit_price" class="w-full border border-gray-300 rounded px-3 py-2" min="0" step="0.01" x-model="form.unit_price" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-1">Stock Quantity</label>
-                    <input type="number" name="stock_qty" class="w-full border border-gray-300 rounded px-3 py-2" min="0" step="1" x-model="form.stock_qty" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-1">Image</label>
-                    <input type="file" name="image" class="w-full border border-gray-300 rounded px-3 py-2">
-                    <template x-if="form.image">
-                        <img :src="form.image" alt="Product Image" class="w-16 h-16 object-cover rounded mt-2">
-                    </template>
-                </div>
-                <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 font-semibold">Update Product</button>
-            </form>
+    {{-- ================= Delete Modal ================= --}}
+    <div x-show="showDelete" x-transition.opacity x-cloak
+         class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+         @keydown.window.escape="closeDelete()" @click.self="closeDelete()">
+      <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 w-full max-w-md relative" @click.stop>
+        <button @click="closeDelete()" class="absolute top-2 right-3 text-gray-400 hover:text-red-600 text-2xl leading-none">&times;</button>
+        <h2 class="text-xl font-bold text-red-600 mb-3">Delete Product</h2>
+        <p class="mb-6 text-sm text-gray-700">
+          Are you sure you want to delete <span class="font-semibold" x-text="del.name"></span>? This action cannot be undone.
+        </p>
+        <div class="flex justify-end gap-3">
+          <button @click="closeDelete()" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm hover:bg-gray-200">Cancel</button>
+          <button @click="confirmDelete()" class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700">Yes, Delete</button>
         </div>
+      </div>
     </div>
-    <script>
-    function productModal() {
-        return {
-            show: false,
-            form: { name: '', description: '', unit_price: '', stock_qty: '', image: '' },
-            updateUrl: '',
-            csrf: '{{ csrf_token() }}',
-            showDelete: false,
-            deleteProduct: { id: null, name: '' },
-            open(product) {
-                this.form.name = product.name;
-                this.form.description = product.description;
-                this.form.unit_price = product.unit_price;
-                this.form.stock_qty = product.stock_qty;
-                this.form.image = product.image_url || '';
-                this.updateUrl = product.update_url;
-                this.show = true;
-            },
-            close() {
-                this.show = false;
-            },
-            openDelete(product) {
-                this.deleteProduct = product;
-                this.showDelete = true;
-            },
-            closeDelete() {
-                this.showDelete = false;
-                this.deleteProduct = { id: null, name: '' };
-            },
-            confirmDelete() {
-                if (this.deleteProduct.id) {
-                    document.getElementById('deleteForm' + this.deleteProduct.id).submit();
-                }
-                this.closeDelete();
-            }
-        }
+
+  </div>
+</div>
+
+{{-- Alpine (must be present for the clicks to work) --}}
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<script>
+function productPage(){
+  return {
+    // Edit modal state
+    showEdit: false,
+    edit: { id:null, name:'', description:'', unit_price:'', stock:'', image_url:'', update_url:'' },
+
+    // Delete modal state
+    showDelete: false,
+    del: { id:null, name:'' },
+
+    // Open edit
+    openEdit(p){
+      this.edit = { ...p };
+      this.showEdit = true;
+    },
+    closeEdit(){ this.showEdit = false; },
+
+    // Open delete
+    openDelete(p){
+      this.del = { ...p };
+      this.showDelete = true;
+    },
+    closeDelete(){ this.showDelete = false; this.del = { id:null, name:'' }; },
+
+    // Submit the hidden delete form once confirmed
+    confirmDelete(){
+      if(!this.del.id) return;
+      const form = document.getElementById('deleteForm-' + this.del.id);
+      if(form) form.submit();
+      this.closeDelete();
     }
-    </script>
-    <div class="bg-white rounded-xl shadow p-6">
-        <h2 class="text-lg font-semibold text-green-700 mb-4">All Products</h2>
-        <table class="min-w-full text-sm">
-            <thead>
-                <tr class="text-left border-b">
-                    <th class="py-2">Name</th>
-                    <th class="py-2">Description</th>
-                    <th class="py-2">Unit Price</th>
-                    <th class="py-2">Stock Qty</th>
-                    <th class="py-2">Image</th>
-                    <th class="py-2">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($products as $product)
-                <tr class="border-b">
-                    <td class="py-2">{{ $product->name }}</td>
-                    <td class="py-2">{{ $product->description }}</td>
-                    <td class="py-2">₱{{ number_format($product->unit_price, 2) }}</td>
-                    <td class="py-2">{{ $product->stock }}</td>
-                    <td class="py-2">
-                        @php $img = $product->firstImagePath(); @endphp
-                        @if($img)
-                            <img src="{{ asset('storage/' . $img) }}" alt="{{ $product->name }}" class="w-16 h-16 object-cover rounded">
-                        @else
-                            <span class="text-gray-400">No image</span>
-                        @endif
-                    </td>
-                    <td class="py-2">
-                        <button type="button" class="text-blue-600 hover:underline mr-2" @click="open({
-                            name: '{{ $product->name }}',
-                            description: `{{ str_replace('`', '\`', $product->description) }}`,
-                            unit_price: '{{ $product->unit_price }}',
-                            stock_qty: '{{ $product->stock_qty }}',
-                            image_url: '{{ $img ? asset('storage/' . $img) : '' }}',
-                            update_url: '{{ route('employee.products.update', $product) }}'
-                        })">Edit</button>
-                        <form :id="'deleteForm' + {{ $product->id }}" action="{{ route('employee.products.destroy', $product) }}" method="POST" class="inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:underline" @click.prevent="openDelete({ id: {{ $product->id }}, name: '{{ $product->name }}' })">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-</div>
-<!-- Delete Confirmation Modal -->
-<div x-show="showDelete" x-transition.opacity x-cloak class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50" @keydown.window.escape="closeDelete()" @click.self="closeDelete()">
-    <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative" @click.stop>
-        <button @click="closeDelete" class="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-2xl">&times;</button>
-        <h2 class="text-xl font-bold text-red-600 mb-4">Delete Product</h2>
-        <p class="mb-6">Are you sure you want to delete <span class="font-semibold" x-text="deleteProduct.name"></span>? This action cannot be undone.</p>
-        <div class="flex justify-end gap-4">
-            <button @click="closeDelete" class="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300">Cancel</button>
-            <button @click="confirmDelete" class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 font-semibold">Yes, Delete</button>
-        </div>
-    </div>
-</div>
-</div>
-</div>
+  }
+}
+</script>
 @endsection

@@ -316,6 +316,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/employee/orders/{order}/done',     [EmployeeOrderController::class, 'markAsDone'])->name('employee.orders.done');
     Route::post('/employee/orders/{order}/upload',    [EmployeeOrderController::class, 'uploadReceipt'])->name('employee.orders.upload');
     Route::delete('/employee/orders/{order}',         [EmployeeOrderController::class, 'destroy'])->name('employee.orders.destroy');
+    // Manual order creation
+    Route::post('/employee/orders/manual',            [EmployeeOrderController::class, 'storeManual'])->name('employee.orders.manual.store');
 
     // Quotes management (employee)
     Route::get('/employee/quotes-management',                    [EmployeeQuoteController::class, 'index'])->name('employee.quotes.management.index');

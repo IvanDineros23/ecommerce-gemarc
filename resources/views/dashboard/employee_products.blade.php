@@ -198,7 +198,7 @@
          class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
          @keydown.window.escape="closeEdit()" @click.self="closeEdit()">
       <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 w-full max-w-lg relative" @click.stop>
-        <button @click="closeEdit()" class="absolute top-2 right-3 text-gray-400 hover:text-red-600 text-2xl leading-none">&times;</button>
+        <button @click="closeEdit()" class="absolute top-2 right-2 text-gray-400 hover:text-red-600 text-2xl leading-none">&times;</button>
         <h2 class="text-xl font-bold text-orange-600 mb-4">Edit Product</h2>
 
         <form :action="edit.update_url" method="POST" enctype="multipart/form-data" class="space-y-4">
@@ -257,7 +257,7 @@
          class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
          @keydown.window.escape="closeDelete()" @click.self="closeDelete()">
       <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 w-full max-w-md relative" @click.stop>
-        <button @click="closeDelete()" class="absolute top-2 right-3 text-gray-400 hover:text-red-600 text-2xl leading-none">&times;</button>
+        <button @click="closeDelete()" class="absolute top-2 right-3 text-gray-400 hover:text-red-600 text-2xl leading-none" style="position: absolute; top: 10px; right: 10px;">&times;</button>
         <h2 class="text-xl font-bold text-red-600 mb-3">Delete Product</h2>
         <p class="mb-6 text-sm text-gray-700">
           Are you sure you want to delete <span class="font-semibold" x-text="del.name"></span>? This action cannot be undone.

@@ -481,6 +481,9 @@ Route::middleware(['auth', 'verified', 'can:access-admin'])
 
             return response()->json(['success' => true]);
         });
+
+        // Admin Settings (placeholder)
+        Route::view('/settings', 'admin.placeholders.settings')->name('settings');
     });
 
 /*

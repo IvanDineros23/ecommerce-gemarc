@@ -410,85 +410,143 @@ function polls(){
 </script>
 @endpush
     <!-- Centered Request a Quote and Recent Orders section -->
-    <div class="flex flex-col items-center justify-center w-full mb-8">
-        <div class="flex flex-col md:flex-row gap-6 w-full justify-center">
-            <!-- Create/Request Quote -->
-            <div class="bg-white rounded-xl shadow p-6 flex flex-col flex-1 min-w-[260px] max-w-[350px] items-center justify-between">
-                <div class="text-center mb-4">
-                    <div class="text-xl font-bold text-green-800 mb-3 flex items-center justify-center gap-2">📝 Request a Quote</div>
-                    <p class="text-base text-gray-600 mb-4">Get customized pricing for bulk orders and special requirements</p>
-                    <div class="bg-orange-50 rounded-lg p-4 mb-4">
-                        <div class="text-sm text-orange-700 font-semibold mb-2">Quick Benefits:</div>
-                        <ul class="text-sm text-gray-600 space-y-1">
-                            <li>• Competitive bulk pricing</li>
-                            <li>• Custom product configurations</li>
-                            <li>• Fast response time</li>
-                        </ul>
-                    </div>
-                </div>
-                <a href="{{ route('quotes.create') }}" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold w-full text-center transition-colors text-base">Create Quote</a>
+    {{-- === 3-card row (Request a Quote • Recent Orders • Company Resources) === --}}
+    <div class="w-full mb-8">
+      <div class="mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+
+        {{-- Create/Request Quote --}}
+        <div class="bg-white rounded-xl shadow p-6 flex flex-col h-full min-w-0">
+          <div class="text-center mb-4">
+            <div class="text-xl font-bold text-green-800 mb-3 flex items-center justify-center gap-2">📝 Request a Quote</div>
+            <p class="text-base text-gray-600 mb-4">Get customized pricing for bulk orders and special requirements</p>
+            <div class="bg-orange-50 rounded-lg p-4 mb-4">
+              <div class="text-sm text-orange-700 font-semibold mb-2">Quick Benefits:</div>
+              <ul class="text-sm text-gray-600 space-y-1">
+                <li>• Competitive bulk pricing</li>
+                <li>• Custom product configurations</li>
+                <li>• Fast response time</li>
+              </ul>
             </div>
-            <!-- Recent Orders -->
-            <div class="bg-white rounded-xl shadow p-6 flex flex-col flex-1 min-w-[260px] max-w-[350px] items-center" x-data="recentOrdersCarousel()">
-                <div class="text-lg font-bold text-green-800 mb-2 flex items-center justify-between w-full">
-                    <span>Your Recent Orders</span>
-                    @if($recentOrders->count() > 3)
-                    <div class="flex gap-1">
-                        <button @click="previousPage()" :disabled="currentPage === 0" 
-                                class="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors">
-                            <i class="fas fa-chevron-left text-xs text-gray-600"></i>
-                        </button>
-                        <button @click="nextPage()" :disabled="currentPage >= Math.ceil(totalOrders / 3) - 1" 
-                                class="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors">
-                            <i class="fas fa-chevron-right text-xs text-gray-600"></i>
-                        </button>
-                    </div>
-                    @endif
-                </div>
-                <ul class="divide-y w-full">
-                    @forelse ($recentOrders as $index => $o)
-                        <li x-show="isVisible({{ $index }})" class="flex items-center justify-between py-4">
-                            <div>
-                                <div class="font-semibold">#{{ $o->id }} · {{ $o->created_at->format('Y-m-d') }}</div>
-                                <div class="text-xs text-gray-500">{{ ucfirst($o->status) }}</div>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-gray-400 text-xs">View (popup only)</span>
-                            </div>
-                        </li>
-                    @empty
-                        <li class="py-4 text-gray-400">No orders yet.</li>
-                    @endforelse
-                </ul>
-                
-                @if($recentOrders->count() > 3)
-                <div class="mt-3 text-center">
-                    <span class="text-xs text-gray-500">
-                        <span x-text="currentPage + 1"></span>/<span x-text="Math.ceil(totalOrders / 3)"></span>
-                    </span>
-                </div>
-                @endif
-            </div>
-            <!-- Company Brochure -->
-            <div class="bg-white rounded-xl shadow p-6 flex flex-col flex-1 min-w-[260px] max-w-[350px] items-center justify-between">
-                <div class="text-center mb-4">
-                    <div class="text-xl font-bold text-green-800 mb-3 flex items-center justify-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                        Company Resources
-                    </div>
-                    <p class="text-base text-gray-600 mb-4">Download our latest company information and product catalogs</p>
-                    <div class="bg-green-50 rounded-lg p-4 mb-4">
-                        <div class="text-sm text-green-700 font-semibold mb-2">What's Inside:</div>
-                        <ul class="text-sm text-gray-600 space-y-1">
-                            <li>• Complete product catalog</li>
-                            <li>• Company certifications</li>
-                            <li>• Contact information</li>
-                        </ul>
-                    </div>
-                </div>
-                <a href="/GEMARC%202026%20brochurePDF.pdf" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold w-full text-center transition-colors text-base" target="_blank">Download Brochure</a>
-            </div>
+          </div>
+          <a href="{{ route('quotes.create') }}"
+             class="mt-auto bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold w-full text-center transition-colors text-base">
+            Create Quote
+          </a>
         </div>
+
+        {{-- Recent Orders --}}
+        <div class="bg-white rounded-xl shadow p-6 flex flex-col h-full min-w-0"
+             x-data="recentOrdersCarousel()">
+          <div class="text-lg font-bold text-green-800 mb-2 flex items-center justify-between w-full">
+            <span>Your Recent Orders</span>
+            @if($recentOrders->count() > 3)
+              <div class="flex gap-1">
+                <button type="button" @click="previousPage()" :disabled="currentPage === 0"
+                        class="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors">
+                  <i class="fas fa-chevron-left text-xs text-gray-600"></i>
+                </button>
+                <button type="button" @click="nextPage()"
+                        :disabled="currentPage >= Math.ceil(totalOrders / ordersPerPage) - 1"
+                        class="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors">
+                  <i class="fas fa-chevron-right text-xs text-gray-600"></i>
+                </button>
+              </div>
+            @endif
+          </div>
+
+          <ul class="divide-y w-full">
+            @forelse ($recentOrders as $index => $o)
+                <li x-show="isVisible({{ $index }})" class="flex items-center justify-between py-4">
+                    <div>
+                        <div class="font-semibold">GEI-{{ $o->created_at->format('Ymd') }}-{{ strtoupper(substr(md5($o->id), 0, 4)) }}</div>
+                        <div class="text-xs text-gray-500">{{ ucfirst($o->status) }}</div>
+                    </div>
+                    <div class="text-right">
+                        <button type="button"
+                                class="inline-flex items-center px-3 py-1 rounded-full border border-orange-500 text-orange-600 text-xs font-semibold hover:bg-orange-50 transition"
+                                @click="openModal({ id: '{{ $o->id }}', date: '{{ $o->created_at->format('Y-m-d H:i') }}', status: '{{ ucfirst($o->status) }}' })">
+                            View
+                        </button>
+                    </div>
+                </li>
+            @empty
+                <li class="py-4 text-gray-400">No orders yet.</li>
+            @endforelse
+          </ul>
+
+          @if($recentOrders->count() > 3)
+            <div class="mt-3 text-center">
+              <span class="text-xs text-gray-500">
+                <span x-text="currentPage + 1"></span> /
+                <span x-text="Math.ceil(totalOrders / ordersPerPage)"></span>
+              </span>
+            </div>
+          @endif
+
+          {{-- Modal (kept as-is, with high z-index) --}}
+          <div x-show="showModal" x-cloak x-transition.opacity @keydown.window.escape="closeModal()"
+               class="fixed inset-0 bg-black flex items-center justify-center"
+               style="z-index: 999999 !important;">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6 relative"
+                 @click.away="closeModal()" style="z-index:1000000!important;">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold text-green-800">Order Details</h2>
+                <button type="button" class="text-gray-400 hover:text-gray-600" @click="closeModal()">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                  <span class="font-medium text-gray-600">Order ID</span>
+                  <span x-text="selectedOrder.id"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-medium text-gray-600">Date</span>
+                  <span x-text="selectedOrder.date"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-medium text-gray-600">Status</span>
+                  <span x-text="selectedOrder.status"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-medium text-gray-600">Details</span>
+                  <span x-text="selectedOrder.details || 'No additional details available.'"></span>
+                </div>
+                <p class="mt-2 text-xs text-gray-400">* For full details, please visit the Orders page.</p>
+              </div>
+              <div class="mt-6 flex justify-end">
+                <button type="button" class="px-4 py-2 rounded-md bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 transition" @click="closeModal()">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {{-- Company Brochure --}}
+        <div class="bg-white rounded-xl shadow p-6 flex flex-col h-full min-w-0">
+          <div class="text-center mb-4">
+            <div class="text-xl font-bold text-green-800 mb-3 flex items-center justify-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              Company Resources
+            </div>
+            <p class="text-base text-gray-600 mb-4">Download our latest company information and product catalogs</p>
+            <div class="bg-green-50 rounded-lg p-4 mb-4">
+              <div class="text-sm text-green-700 font-semibold mb-2">What's Inside:</div>
+              <ul class="text-sm text-gray-600 space-y-1">
+                <li>• Complete product catalog</li>
+                <li>• Company certifications</li>
+                <li>• Contact information</li>
+              </ul>
+            </div>
+          </div>
+          <a href="/GEMARC%202026%20brochurePDF.pdf" target="_blank"
+             class="mt-auto bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold w-full text-center transition-colors text-base">
+            Download Brochure
+          </a>
+        </div>
+
+      </div>
     </div>
     <div class="bg-white rounded-xl shadow p-6">
         <div class="text-2xl font-bold text-orange-600 mb-6">Recommended for You</div>
@@ -700,31 +758,49 @@ function polls(){
 </div>
 
 <script>
-  function recentOrdersCarousel() {
+function recentOrdersCarousel() {
     return {
-      currentPage: 0,
-      totalOrders: {{ $recentOrders->count() }},
-      ordersPerPage: 3,
-      
-      isVisible(index) {
-        const startIndex = this.currentPage * this.ordersPerPage;
-        const endIndex = startIndex + this.ordersPerPage;
-        return index >= startIndex && index < endIndex;
-      },
-      
-      nextPage() {
-        const maxPage = Math.ceil(this.totalOrders / this.ordersPerPage) - 1;
-        if (this.currentPage < maxPage) {
-          this.currentPage++;
-        }
-      },
-      
-      previousPage() {
-        if (this.currentPage > 0) {
-          this.currentPage--;
-        }
-      }
+        currentPage: 0,
+        totalOrders: {{ $recentOrders->count() }},
+        ordersPerPage: 3,
+
+        showModal: false,
+        selectedOrder: {
+            id: null,
+            date: '',
+            status: '',
+        },
+
+        isVisible(index) {
+            const startIndex = this.currentPage * this.ordersPerPage;
+            const endIndex = startIndex + this.ordersPerPage;
+            return index >= startIndex && index < endIndex;
+        },
+
+        nextPage() {
+            const maxPage = Math.ceil(this.totalOrders / this.ordersPerPage) - 1;
+            if (this.currentPage < maxPage) {
+                this.currentPage++;
+            }
+        },
+
+        previousPage() {
+            if (this.currentPage > 0) {
+                this.currentPage--;
+            }
+        },
+
+        openModal(order) {
+            this.selectedOrder = order;
+            this.showModal = true;
+            document.body.classList.add('overflow-hidden');
+        },
+
+        closeModal() {
+            this.showModal = false;
+            document.body.classList.remove('overflow-hidden');
+        },
     }
-  }
+}
 </script>
 @endsection

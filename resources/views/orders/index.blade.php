@@ -390,6 +390,7 @@
                         <div class="mb-2"><span class="font-semibold">Status:</span> <span x-text="orderDetails.status"></span></div>
                         <div class="mb-2"><span class="font-semibold">Mode of Payment:</span> <span x-text="orderDetails.payment_method"></span></div>
                         <div class="mb-2"><span class="font-semibold">Mode of Delivery:</span> <span x-text="orderDetails.delivery_method"></span></div>
+                        <div class="mb-2"><span class="font-semibold">Remarks:</span> <span x-text="orderDetails.remarks || '—'"></span></div>
                         <div class="mt-4">
                             <table class="w-full text-sm border">
                                 <thead>

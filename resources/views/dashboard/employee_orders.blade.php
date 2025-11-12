@@ -226,6 +226,27 @@
                 </span>
             </div>
 
+            <div class="mb-1 text-gray-700">
+                Remarks:
+                <span class="font-semibold">
+                    {{ $order->remarks ?? 'No remarks provided.' }}
+                </span>
+            </div>
+
+            <div class="mb-3">
+                <label for="remarks-{{ $order->id }}" class="block text-sm font-medium text-gray-700">
+                    Remarks
+                </label>
+                <textarea id="remarks-{{ $order->id }}" name="remarks" rows="3"
+                    class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="Enter remarks for this order">{{ $order->remarks }}</textarea>
+            </div>
+            <button type="button"
+                class="mt-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                onclick="saveRemarks({{ $order->id }})">
+                Save Remarks
+            </button>
+
             <h3 class="font-semibold text-gray-800 mb-2">Items</h3>
             <table class="w-full text-sm mb-4">
                 <thead>
@@ -374,6 +395,54 @@
         });
     }
 
+    function saveRemarks(orderId) {
+        const textarea = document.getElementById('remarks-' + orderId);
+        if (!textarea) {
+            showToast('Remarks field not found.', 'error');
+            return;
+        }
+
+        const remarks = textarea.value.trim();
+        if (!remarks) {
+            showToast('Please enter a remark before saving.', 'error');
+            return;
+        }
+
+        fetch(`/employee/orders/${orderId}/remarks`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+            body: JSON.stringify({ remarks }),
+        })
+        .then(async (response) => {
+            const data = await response.json().catch(() => ({}));
+
+            if (response.ok) {
+                showToast('✅ Remarks saved successfully!', 'success');
+                closeOrderDetailsModal(orderId); // Close the modal after saving
+            } else {
+                showToast(data.message || '❌ Failed to save remarks.', 'error');
+            }
+        })
+        .catch(() => {
+            showToast('⚠️ Network error while saving remarks.', 'error');
+        });
+    }
+
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `
+            fixed top-4 right-4 z-[99999] px-4 py-2 rounded shadow-lg text-sm flex items-center gap-2
+            ${type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}
+        `;
+        toast.innerHTML = `<span>${message}</span>`;
+        document.body.appendChild(toast);
+
+        setTimeout(() => toast.remove(), 4000);
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         setActiveTab('manual-orders');
 
@@ -395,6 +464,54 @@
         attachTableSearch('all-orders-search',       'all-orders-table');
         attachTableSearch('cancelled-orders-search', 'cancelled-orders-table');
     });
+
+    // Multi-order delete functionality
+    const selectAllCheckbox = document.getElementById('select-all');
+    const orderCheckboxes = document.querySelectorAll('.order-checkbox');
+    const deleteSelectedButton = document.getElementById('delete-selected');
+
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', () => {
+            orderCheckboxes.forEach(checkbox => checkbox.checked = selectAllCheckbox.checked);
+            toggleDeleteButton();
+        });
+    }
+
+    orderCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', toggleDeleteButton);
+    });
+
+    function toggleDeleteButton() {
+        const anySelected = Array.from(orderCheckboxes).some(checkbox => checkbox.checked);
+        deleteSelectedButton.disabled = !anySelected;
+    }
+
+    if (deleteSelectedButton) {
+        deleteSelectedButton.addEventListener('click', () => {
+            const selectedIds = Array.from(orderCheckboxes)
+                .filter(checkbox => checkbox.checked)
+                .map(checkbox => checkbox.value);
+
+            if (selectedIds.length > 0) {
+                fetch('/employee/orders/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ ids: selectedIds })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Failed to delete orders.');
+                    }
+                });
+            }
+        });
+    }
 </script>
 
 {{-- manual order modal (may sarili nang scripts sa partial na ito) --}}

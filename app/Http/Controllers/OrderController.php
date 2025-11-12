@@ -31,6 +31,7 @@ class OrderController extends Controller
             'status' => $order->status,
             'payment_method' => $order->payment_method ?? 'N/A',
             'delivery_method' => $order->delivery_method ?? 'N/A',
+            'remarks' => $order->remarks,
             'items' => $items,
         ]);
     }
@@ -72,5 +73,28 @@ class OrderController extends Controller
         );
 
         return response()->json(['success' => true]);
+    }
+
+    public function showJson(\App\Models\Order $order)
+    {
+        $this->authorize('view', $order); // optional but recommended
+        $order->load(['items.product']);
+        return response()->json([
+            'id'              => $order->id,
+            'reference_number'=> $order->reference_number,
+            'created_at'      => $order->created_at->format('F d, Y h:i A'),
+            'status'          => $order->status,
+            'payment_method'  => $order->payment_method,
+            'delivery_method' => $order->delivery_method,
+            'remarks'         => $order->remarks,
+            'items'           => $order->items->map(function ($i) {
+                return [
+                    'id'           => $i->id,
+                    'name'         => $i->product->name ?? $i->name,
+                    'quantity'     => (int) $i->quantity,
+                    'quote_status' => $i->quote_status,
+                ];
+            }),
+        ]);
     }
 }

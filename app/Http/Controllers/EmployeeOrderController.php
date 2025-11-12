@@ -139,5 +139,39 @@ class EmployeeOrderController extends Controller
             ->back()
             ->with('success', 'Order deleted successfully.');
     }
+
+    public function saveRemarks(Request $request, $orderId)
+{
+    $order = Order::findOrFail($orderId);
+    $order->remarks = $request->input('remarks');
+    $order->save();
+
+    return response()->json(['message' => 'Remarks updated successfully.']);
+}
+
+public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        if (is_array($ids) && !empty($ids)) {
+            Order::whereIn('id', $ids)->delete();
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'No orders selected.'], 400);
+    }
+
+    public function bulkDestroy(Request $request)
+{
+    $ids = $request->input('ids', []);
+
+    if (empty($ids)) {
+        return response()->json(['message' => 'No orders selected.'], 422);
+    }
+
+    \App\Models\Order::whereIn('id', $ids)->delete();
+
+    return response()->json(['message' => 'Orders deleted successfully.']);
+}
 }
 

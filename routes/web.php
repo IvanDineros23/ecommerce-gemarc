@@ -208,6 +208,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Orders (user)
     Route::get('/orders',              [OrderController::class, 'index'])->name('orders.index');
+    Route::post('/employee/orders/bulk-destroy', [EmployeeOrderController::class, 'bulkDestroy'])
+    ->name('employee.orders.bulkDestroy');
     Route::get('/orders/{order}/json', [OrderController::class, 'json'])->name('orders.json');
     Route::get('/orders/{order}/receipt', [CartController::class, 'orderReceipt'])->name('orders.receipt');
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
@@ -318,6 +320,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/employee/orders/{order}',         [EmployeeOrderController::class, 'destroy'])->name('employee.orders.destroy');
     // Manual order creation
     Route::post('/employee/orders/manual',            [EmployeeOrderController::class, 'storeManual'])->name('employee.orders.manual.store');
+    Route::post('/employee/orders/{order}/remarks', [EmployeeOrderController::class, 'saveRemarks']);
 
     // Quotes management (employee)
     Route::get('/employee/quotes-management',                    [EmployeeQuoteController::class, 'index'])->name('employee.quotes.management.index');

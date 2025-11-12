@@ -10,6 +10,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('user_id');
             $table->string('status')->default('pending');
             $table->decimal('total_amount', 12, 2)->default(0);
+            $table->text('remarks')->nullable(); // Added remarks column for order status reasons
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });

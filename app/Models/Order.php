@@ -22,6 +22,7 @@ class Order extends Model
         'notes',
         'created_at',
         'updated_at',
+        'remarks', // Added remarks field for order status reasons
     ];
     // Relationship: Order has many OrderItems
     public function items()

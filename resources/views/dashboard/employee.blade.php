@@ -223,189 +223,155 @@
         @endif
     </div>
 
-    {{-- ========= CHARTS ========= --}}
-    @if($isPurchasing)
-        @php
-            $products = \App\Models\Product::all();
-            $stockLabels = $products->pluck('name')->map(fn($n)=>mb_strlen($n)>18?mb_substr($n,0,16).'…':$n)->values();
-            $stockData   = $products->pluck('stock')->values();
-            $valueData   = $products->map(fn($p)=>(float)$p->stock*(float)$p->unit_price)->values();
-            $totalInventoryValue = $valueData->sum();
-        @endphp
+   {{-- ========= CHARTS ========= --}}
+@if($isPurchasing)
+    @php
+        $products = \App\Models\Product::all();
+        $stockLabels = $products->pluck('name')->map(fn($n)=>mb_strlen($n)>18?mb_substr($n,0,16).'…':$n)->values();
+        $stockData   = $products->pluck('stock')->values();
+        $valueData   = $products->map(fn($p)=>(float)$p->stock*(float)$p->unit_price)->values();
+        $totalInventoryValue = $valueData->sum();
+    @endphp
 
-        <div class="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="bg-white rounded-xl shadow p-4">
-                <div class="font-bold text-green-800 mb-2 text-center">Stock Levels</div>
-                <div class="h-48"><canvas id="stockLevelsChart"></canvas></div>
-            </div>
-            <div class="bg-white rounded-xl shadow p-4">
-                <div class="font-bold text-green-800 mb-2 text-center">Inventory Value (Per Product)</div>
-                <div class="h-48"><canvas id="inventoryValueChart"></canvas></div>
-            </div>
-            <div class="bg-white rounded-xl shadow p-4 md:col-span-2">
-                <div class="font-bold text-green-800 mb-2 text-center">Total Inventory Value</div>
-                <div class="h-48"><canvas id="inventoryValueTotalChart"></canvas></div>
-                <div class="mt-3 text-center text-lg font-semibold text-green-700">
-                    ₱{{ number_format($totalInventoryValue, 2) }}
-                </div>
+    <div class="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-white rounded-xl shadow p-4">
+            <div class="font-bold text-green-800 mb-2 text-center">Stock Levels</div>
+            <div class="h-48"><canvas id="stockLevelsChart"></canvas></div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-4">
+            <div class="font-bold text-green-800 mb-2 text-center">Inventory Value (Per Product)</div>
+            <div class="h-48"><canvas id="inventoryValueChart"></canvas></div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-4 md:col-span-2">
+            <div class="font-bold text-green-800 mb-2 text-center">Total Inventory Value</div>
+            <div class="h-48"><canvas id="inventoryValueTotalChart"></canvas></div>
+            <div class="mt-3 text-center text-lg font-semibold text-green-700">
+                ₱{{ number_format($totalInventoryValue, 2) }}
             </div>
         </div>
+    </div>
 
-    @elseif($isMarketing)
-        @php
-            $dbDriver = config('database.default');
+@elseif($isMarketing)
+    @php
+        $db = config('database.default');
 
-            $byYear = function() use($dbDriver){
-                if ($dbDriver === 'sqlite') {
-                    return \App\Models\Order::where('status','paid')
-                        ->selectRaw("cast(strftime('%Y', created_at) as integer) as y, SUM(total_amount) as revenue, COUNT(*) as orders")
-                        ->groupBy('y')->get();
-                } else {
-                    return \App\Models\Order::where('status','paid')
-                        ->selectRaw("YEAR(created_at) as y, SUM(total_amount) as revenue, COUNT(*) as orders")
-                        ->groupBy('y')->get();
-                }
-            };
+        // Helpers: period extractors for MySQL/SQLite
+        $Y = $db === 'sqlite' ? "cast(strftime('%Y', created_at) as integer)" : "YEAR(created_at)";
+        $M = $db === 'sqlite' ? "cast(strftime('%m', created_at) as integer)" : "MONTH(created_at)";
+        $Q = $db === 'sqlite' ? "((cast(strftime('%m', created_at) as integer)+2)/3)" : "QUARTER(created_at)";
+        $W = $db === 'sqlite' ? "cast(strftime('%W', created_at) as integer)" : "WEEK(created_at, 3)";
 
-            $byQuarterThisYear = function() use($dbDriver){
-                if ($dbDriver === 'sqlite') {
-                    return \App\Models\Order::where('status','paid')
-                        ->whereRaw("strftime('%Y', created_at) = ?", [now()->format('Y')])
-                        ->selectRaw("((cast(strftime('%m', created_at) as integer)+2)/3) as q, SUM(total_amount) as revenue, COUNT(*) as orders")
-                        ->groupBy('q')->get();
-                } else {
-                    return \App\Models\Order::where('status','paid')
-                        ->whereYear('created_at', now()->year)
-                        ->selectRaw("QUARTER(created_at) as q, SUM(total_amount) as revenue, COUNT(*) as orders")
-                        ->groupBy('q')->get();
-                }
-            };
+        // ---- COUNT: ALL ORDERS (any status) ----
+        $ordersByMonth = \App\Models\Order::whereYear('created_at', now()->year)
+            ->selectRaw("$M as m, COUNT(*) as c")->groupBy('m')->get();
+        $ordersByQuarter = \App\Models\Order::whereYear('created_at', now()->year)
+            ->selectRaw("$Q as q, COUNT(*) as c")->groupBy('q')->get();
+        $ordersByWeek = \App\Models\Order::whereYear('created_at', now()->year)
+            ->selectRaw("$W as w, COUNT(*) as c")->groupBy('w')->get();
+        $ordersByYear = \App\Models\Order::selectRaw("$Y as y, COUNT(*) as c")->groupBy('y')->get();
 
-            $byMonthThisYear = function() use($dbDriver){
-                if ($dbDriver === 'sqlite') {
-                    return \App\Models\Order::where('status','paid')
-                        ->whereRaw("strftime('%Y', created_at) = ?", [now()->format('Y')])
-                        ->selectRaw("cast(strftime('%m', created_at) as integer) as m, SUM(total_amount) as revenue, COUNT(*) as orders")
-                        ->groupBy('m')->get();
-                } else {
-                    return \App\Models\Order::where('status','paid')
-                        ->whereYear('created_at', now()->year)
-                        ->selectRaw("MONTH(created_at) as m, SUM(total_amount) as revenue, COUNT(*) as orders")
-                        ->groupBy('m')->get();
-                }
-            };
+        // ---- MONEY: only paid/done (more realistic billing) ----
+        // try to include common "done" aliases
+        $doneSet = ['paid','done','completed','complete'];
+        $billingQ = \App\Models\Order::whereIn('status', $doneSet);
 
-            $byWeekThisYear = function() use($dbDriver){
-                if ($dbDriver === 'sqlite') {
-                    return \App\Models\Order::where('status','paid')
-                        ->whereRaw("strftime('%Y', created_at) = ?", [now()->format('Y')])
-                        ->selectRaw("cast(strftime('%W', created_at) as integer) as w, SUM(total_amount) as revenue, COUNT(*) as orders")
-                        ->groupBy('w')->get();
-                } else {
-                    return \App\Models\Order::where('status','paid')
-                        ->whereYear('created_at', now()->year)
-                        ->selectRaw("WEEK(created_at, 3) as w, SUM(total_amount) as revenue, COUNT(*) as orders")
-                        ->groupBy('w')->get();
-                }
-            };
+        $moneyMonth = (clone $billingQ)->whereYear('created_at', now()->year)
+            ->selectRaw("$M as m, SUM(total_amount) as s")->groupBy('m')->get();
+        $moneyQuarter = (clone $billingQ)->whereYear('created_at', now()->year)
+            ->selectRaw("$Q as q, SUM(total_amount) as s")->groupBy('q')->get();
+        $moneyWeek = (clone $billingQ)->whereYear('created_at', now()->year)
+            ->selectRaw("$W as w, SUM(total_amount) as s")->groupBy('w')->get();
+        $moneyYear = (clone $billingQ)
+            ->selectRaw("$Y as y, SUM(total_amount) as s")->groupBy('y')->get();
 
-            $months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-            $monthly = ['labels'=>$months,'revenue'=>array_fill(0,12,0),'orders'=>array_fill(0,12,0),'aov'=>array_fill(0,12,0)];
-            foreach (($byMonthThisYear)() as $row){
-                $i = (int)($row->m) - 1;
-                $monthly['revenue'][$i] = (float)$row->revenue;
-                $monthly['orders'][$i]  = (int)$row->orders;
-                $monthly['aov'][$i]     = $row->orders ? (float)$row->revenue/(int)$row->orders : 0;
-            }
+        // ---- Order status mix (unchanged) ----
+        $statusCountsMonthly = \App\Models\Order::whereYear('created_at', now()->year)
+            ->selectRaw('status, COUNT(*) as cnt')->groupBy('status')->pluck('cnt','status');
+        $statusCountsWeekly = $statusCountsMonthly;
+        $statusCountsQuarterly = $statusCountsMonthly;
+        $statusCountsYearly = \App\Models\Order::selectRaw('status, COUNT(*) as cnt')->groupBy('status')->pluck('cnt','status');
 
-            $quarterly = ['labels'=>['Q1','Q2','Q3','Q4'],'revenue'=>array_fill(0,4,0),'orders'=>array_fill(0,4,0),'aov'=>array_fill(0,4,0)];
-            foreach (($byQuarterThisYear)() as $row){
-                $i = (int)($row->q) - 1;
-                if ($i>=0 && $i<4){
-                    $quarterly['revenue'][$i]=(float)$row->revenue;
-                    $quarterly['orders'][$i]=(int)$row->orders;
-                    $quarterly['aov'][$i]=$row->orders? (float)$row->revenue/(int)$row->orders : 0;
-                }
-            }
+        // ---- Build arrays ----
+        $months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-            $weekly = ['labels'=>array_map(fn($w)=>'W'.$w, range(1,53)),'revenue'=>array_fill(0,53,0),'orders'=>array_fill(0,53,0),'aov'=>array_fill(0,53,0)];
-            foreach (($byWeekThisYear)() as $row){
-                $i = max(1, (int)$row->w);
-                $idx = $i-1;
-                if ($idx>=0 && $idx<53){
-                    $weekly['revenue'][$idx]=(float)$row->revenue;
-                    $weekly['orders'][$idx]=(int)$row->orders;
-                    $weekly['aov'][$idx]=$row->orders? (float)$row->revenue/(int)$row->orders : 0;
-                }
-            }
+        $weekly = ['labels'=>array_map(fn($w)=>'W'.$w, range(1,53)),
+                   'orders'=>array_fill(0,53,0), 'billings'=>array_fill(0,53,0)];
+        foreach ($ordersByWeek as $r) { $i=max(1,(int)$r->w)-1; if($i>=0&&$i<53) $weekly['orders'][$i]=(int)$r->c; }
+        foreach ($moneyWeek   as $r) { $i=max(1,(int)$r->w)-1; if($i>=0&&$i<53) $weekly['billings'][$i]=(float)$r->s; }
 
-            $yearRows = ($byYear)()->sortBy('y')->values();
-            $yearLabels = $yearRows->pluck('y')->map(fn($y)=>(string)$y)->toArray();
-            $yearRevenue = $yearRows->pluck('revenue')->map(fn($v)=>(float)$v)->toArray();
-            $yearOrders  = $yearRows->pluck('orders')->map(fn($v)=>(int)$v)->toArray();
-            $yearAov = [];
-            foreach ($yearRows as $r) { $yearAov[] = $r->orders ? (float)$r->revenue/(int)$r->orders : 0; }
-            $yearly = ['labels'=>$yearLabels,'revenue'=>$yearRevenue,'orders'=>$yearOrders,'aov'=>$yearAov];
+        $monthly = ['labels'=>$months,
+                    'orders'=>array_fill(0,12,0), 'billings'=>array_fill(0,12,0)];
+        foreach ($ordersByMonth as $r){ $i=(int)$r->m-1; $monthly['orders'][$i]=(int)$r->c; }
+        foreach ($moneyMonth   as $r){ $i=(int)$r->m-1; $monthly['billings'][$i]=(float)$r->s; }
 
-            $statusCountsMonthly = \App\Models\Order::where('status','!=',null)->whereYear('created_at', now()->year)
-                ->selectRaw('status, COUNT(*) as cnt')->groupBy('status')->pluck('cnt','status');
-            $statusCountsWeekly = $statusCountsMonthly;
-            $statusCountsQuarterly = $statusCountsMonthly;
-            $statusCountsYearly = \App\Models\Order::selectRaw('status, COUNT(*) as cnt')->groupBy('status')->pluck('cnt','status');
+        $quarterly = ['labels'=>['Q1','Q2','Q3','Q4'],
+                      'orders'=>array_fill(0,4,0), 'billings'=>array_fill(0,4,0)];
+        foreach ($ordersByQuarter as $r){ $i=(int)$r->q-1; if($i>=0&&$i<4) $quarterly['orders'][$i]=(int)$r->c; }
+        foreach ($moneyQuarter   as $r){ $i=(int)$r->q-1; if($i>=0&&$i<4) $quarterly['billings'][$i]=(float)$r->s; }
 
-            $mkDatasets = [
-                'weekly'=>[
-                    'labels'=>$weekly['labels'],
-                    'revenue'=>$weekly['revenue'],
-                    'aov'=>$weekly['aov'],
-                    'status'=>$statusCountsWeekly
-                ],
-                'monthly'=>[
-                    'labels'=>$monthly['labels'],
-                    'revenue'=>$monthly['revenue'],
-                    'aov'=>$monthly['aov'],
-                    'status'=>$statusCountsMonthly
-                ],
-                'quarterly'=>[
-                    'labels'=>$quarterly['labels'],
-                    'revenue'=>$quarterly['revenue'],
-                    'aov'=>$quarterly['aov'],
-                    'status'=>$statusCountsQuarterly
-                ],
-                'yearly'=>[
-                    'labels'=>$yearly['labels'],
-                    'revenue'=>$yearly['revenue'],
-                    'aov'=>$yearly['aov'],
-                    'status'=>$statusCountsYearly
-                ],
-            ];
-        @endphp
+        $yRows = $ordersByYear->sortBy('y')->values();
+        $yMoney = $moneyYear->keyBy('y');
+        $yearly = ['labels'=>[], 'orders'=>[], 'billings'=>[]];
+        foreach ($yRows as $r){
+            $yearly['labels'][] = (string)$r->y;
+            $yearly['orders'][] = (int)$r->c;
+            $yearly['billings'][] = (float)($yMoney[$r->y]->s ?? 0);
+        }
 
-        {{-- Timeframe selector --}}
-        <div class="w-full max-w-6xl mx-auto mb-3 flex items-center justify-end gap-2">
-            <label for="mkTimeframe" class="text-sm text-gray-600">Timeframe:</label>
-            <select id="mkTimeframe" class="border rounded-md px-3 py-1.5 text-sm">
-                <option value="weekly">Weekly ({{ now()->year }})</option>
-                <option value="monthly" selected>Monthly ({{ now()->year }})</option>
-                <option value="quarterly">Quarterly ({{ now()->year }})</option>
-                <option value="yearly">Yearly (All)</option>
-            </select>
+        $mkDatasets = [
+            'weekly'    => ['labels'=>$weekly['labels'],    'orders'=>$weekly['orders'],    'billings'=>$weekly['billings'],    'status'=>$statusCountsWeekly],
+            'monthly'   => ['labels'=>$monthly['labels'],   'orders'=>$monthly['orders'],   'billings'=>$monthly['billings'],   'status'=>$statusCountsMonthly],
+            'quarterly' => ['labels'=>$quarterly['labels'], 'orders'=>$quarterly['orders'], 'billings'=>$quarterly['billings'], 'status'=>$statusCountsQuarterly],
+            'yearly'    => ['labels'=>$yearly['labels'],    'orders'=>$yearly['orders'],    'billings'=>$yearly['billings'],    'status'=>$statusCountsYearly],
+        ];
+    @endphp
+
+    {{-- Timeframe selector --}}
+    <div class="w-full max-w-6xl mx-auto mb-3 flex items-center justify-end gap-2">
+        <label for="mkTimeframe" class="text-sm text-gray-600">Timeframe:</label>
+        <select id="mkTimeframe" class="border rounded-md px-3 py-1.5 text-sm">
+            <option value="weekly">Weekly ({{ now()->year }})</option>
+            <option value="monthly" selected>Monthly ({{ now()->year }})</option>
+            <option value="quarterly">Quarterly ({{ now()->year }})</option>
+            <option value="yearly">Yearly (All)</option>
+        </select>
+    </div>
+
+    {{-- KPI cards --}}
+    <div class="w-full max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4" id="mkKpis">
+        <div class="bg-white rounded-xl shadow p-4">
+            <div class="text-xs text-gray-500">Total Revenue</div>
+            <div class="text-2xl font-bold text-green-700" id="kpiRevenue">₱0</div>
         </div>
-
-        <div class="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="bg-white rounded-xl shadow p-4">
-                <div class="font-bold text-green-800 mb-2 text-center">Revenue</div>
-                <div class="h-48"><canvas id="mkRevenueChart"></canvas></div>
-            </div>
-            <div class="bg-white rounded-xl shadow p-4">
-                <div class="font-bold text-green-800 mb-2 text-center">Orders by Status</div>
-                <div class="h-48"><canvas id="mkStatusChart"></canvas></div>
-            </div>
-            <div class="bg-white rounded-xl shadow p-4 md:col-span-2">
-                <div class="font-bold text-green-800 mb-2 text-center">Average Order Value (₱)</div>
-                <div class="h-48"><canvas id="mkAovChart"></canvas></div>
-            </div>
+        <div class="bg-white rounded-xl shadow p-4">
+            <div class="text-xs text-gray-500">Total Orders</div>
+            <div class="text-2xl font-bold text-slate-700" id="kpiOrders">0</div>
         </div>
+        <div class="bg-white rounded-xl shadow p-4">
+            <div class="text-xs text-gray-500">Avg Order Value</div>
+            <div class="text-2xl font-bold text-emerald-700" id="kpiAov">₱0</div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-4">
+            <div class="text-xs text-gray-500">Paid Rate</div>
+            <div class="text-2xl font-bold text-indigo-700" id="kpiPaidRate">0%</div>
+        </div>
+    </div>
+
+    {{-- Charts --}}
+    <div class="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-white rounded-xl shadow p-4">
+            <div class="font-bold text-green-800 mb-2 text-center">Orders (Count)</div>
+            <div class="h-48"><canvas id="mkOrdersBar"></canvas></div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-4">
+            <div class="font-bold text-green-800 mb-2 text-center">Revenue (₱)</div>
+            <div class="h-48"><canvas id="mkRevenueBar"></canvas></div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-4 md:col-span-2">
+            <div class="font-bold text-green-800 mb-2 text-center">Order Status Mix</div>
+            <div class="h-56"><canvas id="mkStatusPie"></canvas></div>
+        </div>
+    </div>
 
     @elseif($isAccounting)
         @php
@@ -550,36 +516,60 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // ===== Marketing charts =====
+    // ===== Marketing charts (updated logic) =====
     if (IS_MARKETING) {
-        const DS = @json($mkDS);
+        const DS = @json($mkDatasets ?? []);
         const peso = v => ' ₱' + (v||0).toLocaleString(undefined,{maximumFractionDigits:2});
-        const ctxRev = $('mkRevenueChart')?.getContext('2d');
-        const ctxAov = $('mkAovChart')?.getContext('2d');
-        const ctxSta = $('mkStatusChart')?.getContext('2d');
+        const $ = id => document.getElementById(id);
 
-        let revChart, aovChart, staChart;
+        const ctxOrders  = $('mkOrdersBar')?.getContext('2d');
+        const ctxBill    = $('mkRevenueBar')?.getContext('2d'); // reuse canvas
+        const ctxStatus  = $('mkStatusPie')?.getContext('2d');
+
+        let ordersChart, billChart, statusChart;
+
+        function setKpis(d){
+            const totalOrd = (d.orders||[]).reduce((a,b)=>a+(+b||0),0);
+            const totalBil = (d.billings||[]).reduce((a,b)=>a+(+b||0),0);
+            const aov = totalOrd ? totalBil/totalOrd : 0;
+
+            const s = d.status || {};
+            const statusTotal = Object.values(s).reduce((a,b)=>a+(+b||0),0) || totalOrd;
+            const paid = (s.paid || s.PAID || s.done || s.completed || 0);
+            const paidRate = statusTotal ? Math.round((paid/statusTotal)*100) : (totalOrd?100:0);
+
+            if ($('kpiRevenue')) $('kpiRevenue').textContent = '₱' + totalBil.toLocaleString(undefined,{maximumFractionDigits:2});
+            if ($('kpiOrders'))  $('kpiOrders').textContent  = (totalOrd||0).toLocaleString();
+            if ($('kpiAov'))     $('kpiAov').textContent     = '₱' + aov.toLocaleString(undefined,{maximumFractionDigits:2});
+            if ($('kpiPaidRate'))$('kpiPaidRate').textContent= paidRate + '%';
+        }
 
         function buildCharts(tf='monthly'){
-            const d = DS[tf] || {labels:[],revenue:[],aov:[],status:{}};
+            const d = DS[tf] || {labels:[], orders:[], billings:[], status:{}};
+            setKpis(d);
 
-            if (ctxRev) {
-                if (revChart) revChart.destroy();
-                revChart = new Chart(ctxRev, {
-                    type:'line',
-                    data:{ labels:d.labels, datasets:[{ label:'Revenue (₱)', data:d.revenue, borderColor:'#16a34a', fill:false, tension:.3 }] },
-                    options:{ maintainAspectRatio:false, responsive:true,
-                        plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>peso(c.parsed.y) } } },
-                        scales:{ y:{ beginAtZero:true, ticks:{ callback:v=>'₱'+Number(v).toLocaleString() } } }
-                    }
-                });
-            }
-
-            if (ctxAov) {
-                if (aovChart) aovChart.destroy();
-                aovChart = new Chart(ctxAov, {
+            // Orders (all statuses)
+            if (ctxOrders) {
+                if (ordersChart) ordersChart.destroy();
+                ordersChart = new Chart(ctxOrders, {
                     type:'bar',
-                    data:{ labels:d.labels, datasets:[{ label:'AOV (₱)', data:d.aov, backgroundColor:'#10b981' }] },
+                    data:{ labels:d.labels, datasets:[{ label:'Orders', data:d.orders, backgroundColor:'#3b82f6' }] },
+                    options:{ maintainAspectRatio:false, responsive:true, plugins:{ legend:{display:false} },
+                        scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } }
+                    }
+                });
+            }
+
+            // Billings (₱) – paid/done only
+            if (ctxBill) {
+                if (billChart) billChart.destroy();
+                // update heading text if present
+                const titleDiv = ctxBill.canvas.closest('.bg-white')?.querySelector('.font-bold');
+                if (titleDiv) titleDiv.textContent = 'Billings (₱)';
+
+                billChart = new Chart(ctxBill, {
+                    type:'bar',
+                    data:{ labels:d.labels, datasets:[{ label:'Billings (₱)', data:d.billings, backgroundColor:'#16a34a' }] },
                     options:{ maintainAspectRatio:false, responsive:true,
                         plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>peso(c.parsed.y) } } },
                         scales:{ y:{ beginAtZero:true, ticks:{ callback:v=>'₱'+Number(v).toLocaleString() } } }
@@ -587,11 +577,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
 
-            if (ctxSta) {
-                if (staChart) staChart.destroy();
+            // Status mix
+            if (ctxStatus) {
+                if (statusChart) statusChart.destroy();
                 const sLabels = Object.keys(d.status||{});
                 const sValues = Object.values(d.status||{});
-                staChart = new Chart(ctxSta, {
+                statusChart = new Chart(ctxStatus, {
                     type:'doughnut',
                     data:{ labels:sLabels, datasets:[{ data:sValues, backgroundColor:['#22c55e','#f59e0b','#ef4444','#3b82f6','#a855f7','#64748b'] }] },
                     options:{ maintainAspectRatio:false, responsive:true, plugins:{ legend:{ position:'bottom' } } }
@@ -600,9 +591,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         buildCharts('monthly');
-        if ($('mkTimeframe')) {
-            $('mkTimeframe').addEventListener('change', e => buildCharts(e.target.value));
-        }
+        $('mkTimeframe')?.addEventListener('change', e => buildCharts(e.target.value));
     }
 
     // ===== Accounting charts =====

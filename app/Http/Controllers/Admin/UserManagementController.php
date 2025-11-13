@@ -42,9 +42,9 @@ class UserManagementController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        $before = $user->only(['name', 'email', 'role']);
-        $user->update($request->only(['name', 'email', 'role']));
-        $after = $user->only(['name', 'email', 'role']);
+        $before = $user->only(['name', 'email', 'role', 'department']);
+        $user->update($request->only(['name', 'email', 'role', 'department']));
+        $after = $user->only(['name', 'email', 'role', 'department']);
         $changes = [];
         foreach ($before as $key => $value) {
             if ($after[$key] != $value) {
@@ -91,12 +91,14 @@ class UserManagementController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'role' => 'required|string',
+            'department' => 'nullable|string|max:255',
             'password' => 'required|string|min:6',
         ]);
         $user = new User();
         $user->name = $request->name;
         $user->email = $request->email;
         $user->role = $request->role;
+        $user->department = $request->department;
         $user->password = bcrypt($request->password);
         $user->save();
         // Audit log for user creation
@@ -105,7 +107,7 @@ class UserManagementController extends Controller
             'user',
             $user->id,
             [],
-            $user->only(['name', 'email', 'role']),
+            $user->only(['name', 'email', 'role', 'department']),
             'Admin created user: ' . $user->name . ' (ID: ' . $user->id . ')'
         );
         return response()->json(['success' => true, 'user' => $user, 'message' => 'User created successfully!']);

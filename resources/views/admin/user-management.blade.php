@@ -24,6 +24,7 @@
                     <th class="py-2 px-3">Name</th>
                     <th class="py-2 px-3">Email</th>
                     <th class="py-2 px-3">Role</th>
+                    <th class="py-2 px-3">Department</th>
                     <th class="py-2 px-3">Created At</th>
                     <th class="py-2 px-3">Actions</th>
                 </tr>
@@ -35,6 +36,7 @@
                     <td class="py-2 px-3">{{ $user->name }}</td>
                     <td class="py-2 px-3">{{ $user->email }}</td>
                     <td class="py-2 px-3">{{ $user->role }}</td>
+                    <td class="py-2 px-3">{{ $user->department ?? '-' }}</td>
                     <td class="py-2 px-3">{{ $user->created_at }}</td>
                     <td class="py-2 px-3 flex gap-2">
                         <a href="{{ route('admin.user_management.view', $user->id) }}" class="border border-blue-600 text-blue-600 px-3 py-1 rounded hover:bg-blue-50 transition">View</a>
@@ -73,6 +75,10 @@
                         <option value="marketing">Marketing</option>
                         <option value="technical">Technical</option>
                     </select>
+                </div>
+                <div class="mb-3">
+                    <label class="block mb-1 font-semibold">Department</label>
+                    <input type="text" name="department" class="border px-3 py-2 rounded w-full">
                 </div>
                 <div class="mb-3">
                     <label class="block mb-1 font-semibold">Password</label>
@@ -157,6 +163,7 @@
             name:     form.name.value.trim(),
             email:    form.email.value.trim(),
             role:     form.role.value,
+            department: form.department.value,
             password: form.password.value
         };
 
@@ -224,7 +231,7 @@
         tbody.innerHTML = '';
 
         if (!data.length) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6">No users found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6">No users found.</td></tr>';
             return;
         }
 
@@ -236,6 +243,7 @@
                 <td class="py-2 px-3">${user.name}</td>
                 <td class="py-2 px-3">${user.email}</td>
                 <td class="py-2 px-3">${user.role}</td>
+                <td class="py-2 px-3">${user.department ? user.department : '-'}</td>
                 <td class="py-2 px-3">${user.created_at}</td>
                 <td class="py-2 px-3 flex gap-2">
                     <a href="/admin/user-management/${user.id}/view"

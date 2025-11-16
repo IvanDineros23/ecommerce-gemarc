@@ -308,23 +308,7 @@
                                             ]);
                                         }
                                         
-                                        // Recent shipments
-                                        $recentShipments = \App\Models\Shipment::where('user_id', auth()->id())
-                                            ->latest()
-                                            ->limit(2)
-                                            ->get();
-                                        
-                                        foreach($recentShipments as $shipment) {
-                                            $userNotifications->push([
-                                                'type' => 'shipment',
-                                                'icon' => 'fas fa-truck',
-                                                'color' => 'warning',
-                                                'title' => 'Shipment #' . $shipment->id . ' ' . ucfirst($shipment->status),
-                                                'message' => 'Your package is ' . str_replace('_', ' ', $shipment->status),
-                                                'time' => $shipment->created_at->diffForHumans(),
-                                                'link' => '#'
-                                            ]);
-                                        }
+
                                         
                                         $userNotifications = $userNotifications->sortByDesc(function($notif) {
                                             return $notif['time'];
@@ -347,7 +331,7 @@
                                         <div class="dropdown-item p-3 text-center text-muted">
                                             <i class="fas fa-bell-slash fa-2x mb-2 text-muted"></i>
                                             <p class="mb-0">No notifications yet</p>
-                                            <small>We'll notify you about orders, quotes, and shipments</small>
+                                            <small>We'll notify you about orders and quotes</small>
                                         </div>
                                     @endforelse
                                 @else

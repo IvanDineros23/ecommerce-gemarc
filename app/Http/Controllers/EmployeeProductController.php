@@ -14,7 +14,40 @@ use App\Helpers\AuditLogger;
 class EmployeeProductController extends Controller
 {
     /**
-     * Show a single product (for both public and employee routes).
+     * Return ALL products as JSON for client-side filtering (used by Alpine).
+     */
+    public function allProducts()
+    {
+        $products = Product::with('images')
+            ->orderByDesc('created_at')
+            ->get();
+
+        $mapped = $products->map(function ($p) {
+            $imagePath = method_exists($p, 'firstImagePath')
+                ? $p->firstImagePath()
+                : optional($p->images()->first())->path;
+
+            return [
+                'id'          => $p->id,
+                'part_number' => $p->sku ?? '',
+                'fo_number'   => $p->fo_number ?? '',
+                'name'        => $p->name,
+                'brand'       => $p->brand ?? '',
+                'category'    => $p->category ?? '',
+                'unit_price'  => $p->unit_price,
+                'stock'       => $p->stock ?? 0,
+                'description' => $p->description ?? '',
+                'image_url'   => $imagePath ? asset('storage/' . ltrim($imagePath, '/')) : null,
+                'update_url'  => route('employee.products.update', $p->id),
+                'delete_url'  => route('employee.products.destroy', $p->id),
+            ];
+        });
+
+        return response()->json($mapped);
+    }
+
+    /**
+     * Show a single product (not really used now, pero retained).
      */
     public function show(Product $product)
     {
@@ -23,12 +56,14 @@ class EmployeeProductController extends Controller
     }
 
     /**
-     * List products for employee dashboard.
+     * Main page – simple paginate for counts & footer.
+     * Filtering is now PURELY client-side via allProducts().
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::orderByDesc('created_at')->get();
+        $products = Product::orderByDesc('created_at')->paginate(6);
         $notifications = [];
+
         return view('dashboard.employee_products', compact('products', 'notifications'));
     }
 
@@ -43,6 +78,11 @@ class EmployeeProductController extends Controller
             'unit_price'  => 'required|numeric|min:0',
             'stock_qty'   => 'required|integer|min:0',
             'image'       => 'nullable|image|max:2048',
+            'part_number' => 'required|string|max:255',
+            'fo_number'   => 'nullable|string|max:255',
+            'brand'       => 'required|string|max:255',
+            'category'    => 'required|string|max:255',
+            'unit'        => 'nullable|string|max:50',
         ]);
 
         $product = Product::create([
@@ -51,7 +91,11 @@ class EmployeeProductController extends Controller
             'unit_price'  => $data['unit_price'],
             'stock'       => $data['stock_qty'],
             'slug'        => Str::slug($data['name']) . '-' . uniqid(),
-            'sku'         => null,
+            'sku'         => $data['part_number'],
+            'fo_number'   => $data['fo_number'] ?? null,
+            'brand'       => $data['brand'],
+            'category'    => $data['category'],
+            'unit'        => $data['unit'] ?? null,
             'is_active'   => true,
         ]);
 
@@ -64,17 +108,18 @@ class EmployeeProductController extends Controller
             ]);
         }
 
-        // Audit log: employee created product
+        // Audit log
         $employee = Auth::user();
         $details = $employee
             ? "Created by {$employee->name} (ID: {$employee->id}) | Product: '{$product->name}', Price: ₱{$product->unit_price}, Quantity: {$product->stock}"
             : null;
+
         AuditLogger::log(
-            'create',                 // action
-            'employee_product',       // entity
-            $product->id,             // entity_id
-            null,                     // before
-            [                         // after
+            'create',
+            'employee_product',
+            $product->id,
+            null,
+            [
                 'name'       => $product->name,
                 'unit_price' => $product->unit_price,
                 'stock'      => $product->stock,
@@ -89,7 +134,7 @@ class EmployeeProductController extends Controller
     }
 
     /**
-     * Show edit form (re-use page).
+     * Show edit form (legacy).
      */
     public function edit(Product $product)
     {
@@ -108,6 +153,10 @@ class EmployeeProductController extends Controller
             'unit_price'  => 'required|numeric|min:0',
             'stock_qty'   => 'required|integer|min:0',
             'image'       => 'nullable|image|max:2048',
+            'part_number' => 'required|string|max:255',
+            'fo_number'   => 'nullable|string|max:255',
+            'brand'       => 'required|string|max:255',
+            'category'    => 'required|string|max:255',
         ]);
 
         $before = $product->toArray();
@@ -117,16 +166,20 @@ class EmployeeProductController extends Controller
             'description' => $data['description'],
             'unit_price'  => $data['unit_price'],
             'stock'       => $data['stock_qty'],
+            'sku'         => $data['part_number'],
+            'fo_number'   => $data['fo_number'] ?? null,
+            'brand'       => $data['brand'],
+            'category'    => $data['category'],
         ]);
 
         if ($request->hasFile('image')) {
-            // Remove old images
             foreach ($product->images as $img) {
                 if ($img->path) {
                     Storage::disk('public')->delete($img->path);
                 }
                 $img->delete();
             }
+
             $path = $request->file('image')->store('products', 'public');
             ProductImage::create([
                 'product_id' => $product->id,
@@ -135,12 +188,13 @@ class EmployeeProductController extends Controller
             ]);
         }
 
-        // Audit log: employee updated product
+        // Audit log
         $employee = Auth::user();
         $role     = (method_exists($employee, 'isEmployee') && $employee->isEmployee()) ? 'employee' : 'user';
         $oldStock = $before['stock'] ?? null;
         $newStock = $product->stock;
-        $details  = ($oldStock !== $newStock)
+
+        $details = ($oldStock !== $newStock)
             ? "$role '{$employee->name}' (ID: {$employee->id}) updated stock for product '{$product->name}' (ID: {$product->id}) from {$oldStock} to {$newStock}."
             : "$role '{$employee->name}' (ID: {$employee->id}) updated product '{$product->name}' (ID: {$product->id}).";
 
@@ -165,7 +219,7 @@ class EmployeeProductController extends Controller
 
         $product->delete();
 
-        // Audit log: employee deleted product
+        // Audit log
         $employee = Auth::user();
         $role     = (method_exists($employee, 'isEmployee') && $employee->isEmployee()) ? 'employee' : 'user';
         $details  = "$role '{$employee->name}' (ID: {$employee->id}) deleted product '{$product->name}' (ID: {$product->id}).";
@@ -175,4 +229,3 @@ class EmployeeProductController extends Controller
         return redirect()->route('employee.products.index')->with('success', 'Product deleted!');
     }
 }
-

@@ -49,6 +49,16 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // Block login for users in the purchasing, accounting, or technical departments
+        $user = Auth::user();
+        $blockedDepartments = ['purchasing', 'accounting', 'technical'];
+        if ($user && isset($user->department) && in_array(strtolower($user->department), $blockedDepartments)) {
+            Auth::logout();
+            throw ValidationException::withMessages([
+                'email' => 'Login for this department is not allowed.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

@@ -10,9 +10,9 @@ class EmployeeRoleSeeder extends Seeder
     public function run(): void
     {
         $roles = [
-            ['name' => 'Purchasing Employee', 'email' => 'purchasing@gemarc.com', 'department' => 'purchasing', 'role' => 'employee'],
-            ['name' => 'Accounting Employee', 'email' => 'accounting@gemarc.com', 'department' => 'accounting', 'role' => 'employee'],
-            ['name' => 'Technical Employee', 'email' => 'technical@gemarc.com', 'department' => 'technical', 'role' => 'employee'],
+            // ['name' => 'Purchasing Employee', 'email' => 'purchasing@gemarc.com', 'department' => 'purchasing', 'role' => 'employee'],
+            // ['name' => 'Accounting Employee', 'email' => 'accounting@gemarc.com', 'department' => 'accounting', 'role' => 'employee'],
+            // ['name' => 'Technical Employee', 'email' => 'technical@gemarc.com', 'department' => 'technical', 'role' => 'employee'],
         ];
         foreach ($roles as $data) {
             DB::table('users')->updateOrInsert(

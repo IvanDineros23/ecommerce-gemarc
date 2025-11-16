@@ -22,12 +22,7 @@ use App\Http\Controllers\EmployeeProductController;
 use App\Http\Controllers\EmployeeOrderController;
 use App\Http\Controllers\EmployeeQuoteController;
 use App\Http\Controllers\EmployeeInvoiceController;
-use App\HttpControllers\EmployeePaymentController;
-use App\Http\Controllers\EmployeeBillController;
-use App\Http\Controllers\EmployeeExpenseController;
-use App\Http\Controllers\EmployeeCreditController;
-use App\Http\Controllers\EmployeeTaxReportController;
-use App\Http\Controllers\EmployeeStatementController;
+use App\Http\Controllers\EmployeePaymentController;
 
 // User Dashboard Controllers
 use App\Http\Controllers\DashboardController;
@@ -308,6 +303,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Products
     Route::get('/employee/products',                [EmployeeProductController::class, 'index'])->name('employee.products.index');
+    Route::get('/employee/products/all', [EmployeeProductController::class, 'allProducts'])->name('employee.products.all');
     Route::post('/employee/products',               [EmployeeProductController::class, 'store'])->name('employee.products.store');
     Route::get('/employee/products/{product}/edit', [EmployeeProductController::class, 'edit'])->name('employee.products.edit');
     Route::put('/employee/products/{product}',      [EmployeeProductController::class, 'update'])->name('employee.products.update');
@@ -345,13 +341,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/employee/chats', fn () => view('dashboard.employee_chat'))->name('employee.chat.page');
 
     // Finance modules
-    Route::get('/employee/invoices',   [EmployeeInvoiceController::class, 'index'])->name('employee.invoices.index');
-    Route::get('/employee/payments',   [EmployeePaymentController::class,  'index'])->name('employee.payments.index');
-    Route::get('/employee/bills',      [EmployeeBillController::class,     'index'])->name('employee.bills.index');
-    Route::get('/employee/expenses',   [EmployeeExpenseController::class,  'index'])->name('employee.expenses.index');
-    Route::get('/employee/credits',    [EmployeeCreditController::class,   'index'])->name('employee.credits.index');
-    Route::get('/employee/tax-reports',[EmployeeTaxReportController::class,'index'])->name('employee.tax-reports.index');
-    Route::get('/employee/statements', [EmployeeStatementController::class,'index'])->name('employee.statements.index');
+
 
     // Create quotes from orders
     Route::post(
@@ -363,6 +353,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/employee/quotes/cancel-order/{order}', [EmployeeQuoteController::class, 'cancelOrder'])
         ->name('employee.quotes.cancel_order');
 });
+
+
 
 /*
 |--------------------------------------------------------------------------

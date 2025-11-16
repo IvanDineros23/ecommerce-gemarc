@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use App\Models\{ChatMessage, CartItem, Order, Quote, Shipment, Invoice, OrderItem, SavedList, Cart, Product};
+use App\Models\{ChatMessage, CartItem, Order, Quote, Invoice, OrderItem, SavedList, Cart, Product};
 
 class DashboardController extends Controller
 {
@@ -68,7 +68,7 @@ class DashboardController extends Controller
                 'openOrders'  => Order::where('user_id',$u->id)
                                       ->whereIn('status',['pending','paid','processing'])->count(),
                 'openQuotes'  => Quote::where('user_id',$u->id)->where('status','open')->count(),
-                'inTransit'   => Shipment::where('user_id',$u->id)->where('status','in_transit')->count(),
+                // 'inTransit' removed (Shipment model missing)
                 'invoicesDue' => Invoice::where('user_id',$u->id)->where('status','unpaid')->sum('balance_due'),
                 'backorders'  => OrderItem::whereHas('order', fn($q)=>$q->where('user_id',$u->id))
                                           ->sum('backordered_qty'),
@@ -76,7 +76,7 @@ class DashboardController extends Controller
             'notifications' => $allNotifications, // still a Collection
             'openQuotes'    => Quote::where('user_id',$u->id)->where('status','open')
                                     ->orderBy('expires_at')->limit(5)->get(),
-            'shipments'     => Shipment::where('user_id', $u->id)->latest()->limit(5)->get(),
+            // 'shipments' removed (Shipment model missing)
             'savedLists'    => SavedList::where('user_id',$u->id)->latest()->limit(5)->get(),
             'cartItemCount' => $cartItemCount,
             'recommendedProducts' => Product::where('is_active', true)->inRandomOrder()->limit(4)->get(),

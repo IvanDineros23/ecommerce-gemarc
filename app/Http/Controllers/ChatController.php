@@ -13,9 +13,9 @@ class ChatController extends Controller
     private const DEPARTMENTS = [
         'it'          => 'IT',
         'marketing'   => 'Marketing',
-        'accounting'  => 'Accounting',
-        'technical'   => 'Technical',
-        'purchasing'  => 'Purchasing',
+        // 'accounting' removed
+        // 'technical' removed
+        // 'purchasing' removed
     ];
 
     public function users(Request $request)

@@ -30,7 +30,7 @@ class QuoteController extends Controller
                 });
             })
             ->with('images')
-            ->get();
+            ->paginate(10);
         return view('quotes.create', compact('products', 'search'));
     }
 

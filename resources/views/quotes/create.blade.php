@@ -89,7 +89,13 @@
                     </tr>
                     @endforeach
                 </tbody>
-                        </table>
+            </table>
+            {{-- Pagination --}}
+            @if ($products instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                <div class="mt-6 px-6 pb-2">
+                    {{ $products->withQueryString()->links() }}
+                </div>
+            @endif
                     </div>
 
                     <!-- Additional Notes Section -->

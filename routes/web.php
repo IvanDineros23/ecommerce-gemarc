@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -23,6 +24,30 @@ use App\Http\Controllers\EmployeeOrderController;
 use App\Http\Controllers\EmployeeQuoteController;
 use App\Http\Controllers\EmployeeInvoiceController;
 use App\Http\Controllers\EmployeePaymentController;
+
+/*
+|--------------------------------------------------------------------------
+| AJAX endpoint for product suggestions (autocomplete sa /shop)
+|--------------------------------------------------------------------------
+*/
+Route::get('/shop/suggest', function (Request $request) {
+    $term = trim($request->input('q', ''));
+
+    if ($term === '') {
+        return Response::json([]);
+    }
+
+    $results = Product::where('is_active', 1)
+        ->where(function ($q) use ($term) {
+            $q->where('name', 'like', "%{$term}%")
+              ->orWhere('description', 'like', "%{$term}%");
+        })
+        ->orderBy('name')
+        ->limit(8)
+        ->get(['id', 'name']);
+
+    return Response::json($results);
+})->name('shop.suggest');
 
 // User Dashboard Controllers
 use App\Http\Controllers\DashboardController;
@@ -153,7 +178,7 @@ Route::get('/shop', function (Request $request) {
             });
         })
         ->orderByDesc('created_at')
-        ->get();
+        ->paginate(10);
 
     return view('shop.index', compact('products', 'q'));
 })->name('shop.index');

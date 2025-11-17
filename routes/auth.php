@@ -35,13 +35,34 @@ Route::middleware('guest')->group(function () {
         ->name('password.store');
 });
 
+// Allow the password reset form and submission to be accessed even when
+// the user is currently authenticated (clicking the email link from a
+// logged-in browser should still show the reset form). These routes are
+// intentionally registered outside the `guest` middleware.
+Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
+    ->name('password.reset');
+
+Route::post('reset-password', [NewPasswordController::class, 'store'])
+    ->name('password.store');
+
+// The verification *notice* should be shown only to authenticated users.
+// Register it inside the `auth` middleware group below.
+
+// The verification *notice* is only for authenticated users, but the actual
+// verification link should work even when the user is not currently
+// authenticated (e.g., user clicks from email in another browser/device).
+// We therefore register the verification route outside of the `auth`
+// middleware but still protect it with `signed` and `throttle`.
+
+Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
+
 Route::middleware('auth')->group(function () {
+
+    // Show the verification *notice* page only to authenticated users.
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');
-
-    Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
-        ->middleware(['signed', 'throttle:6,1'])
-        ->name('verification.verify');
 
     Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
         ->middleware('throttle:6,1')

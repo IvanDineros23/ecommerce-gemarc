@@ -42,7 +42,15 @@ class RegisteredUserController extends Controller
             'role' => 'user', // Always set new registrations to user role
         ]);
 
-        event(new Registered($user));
+        // Fire the Registered event (sends verification email). Wrap in try/catch
+        // so a mail transport/authentication problem doesn't cause a 500.
+        try {
+            event(new Registered($user));
+        } catch (\Throwable $e) {
+            // Log the error so admins can inspect the mail transport failure,
+            // but continue the registration flow so user creation isn't blocked.
+            \Log::error('Mail transport error while sending registration verification: ' . $e->getMessage());
+        }
 
         Auth::login($user);
 

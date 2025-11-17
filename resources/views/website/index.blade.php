@@ -515,16 +515,18 @@ window.homeHero = (function(){
         
         {{-- ===================== FEATURED PRODUCTS CAROUSEL ===================== --}}
         @php
+            // Fetch all active products for the featured carousel (no fixed limit).
+            // Use random ordering so product placements change on each page refresh.
             $carouselProducts = \App\Models\Product::where('is_active', 1)
-                ->orderByDesc('created_at')
-                ->take(8)
+                ->inRandomOrder()
                 ->get()
                 ->map(function($p){
                     return [
                         'id' => $p->id,
                         'name' => $p->name,
                         'description' => $p->description ?? '',
-                        'price' => $p->price ?? 0,
+                        // prefer unit_price but fall back to price if present on model
+                        'price' => $p->unit_price ?? $p->price ?? 0,
                         'image_url' => method_exists($p,'firstImagePath') && $p->firstImagePath()
                             ? asset('storage/'.$p->firstImagePath())
                             : asset('images/gemarclogo.png'),
@@ -557,8 +559,9 @@ window.homeHero = (function(){
                                 <div class="bg-transparent backdrop-blur-none shadow-none overflow-hidden h-[420px] flex flex-col border-0 outline-0">
                                     <!-- Image Section -->
                                     <div class="relative bg-transparent h-64 flex items-center justify-center overflow-hidden">
-                                        <img src="{{ $p['image_url'] }}" alt="{{ $p['name'] }}" 
-                                             class="w-full h-full object-contain p-4 drop-shadow-2xl filter" />
+                                        <img src="{{ $p['image_url'] }}" alt="{{ $p['name'] }}"
+                                            loading="lazy"
+                                            class="w-full h-full object-contain p-4 drop-shadow-2xl filter" />
                                         <div class="absolute inset-0 bg-gradient-to-t from-white/10 to-transparent opacity-0 transition-opacity duration-500"></div>
                                     </div>
                                     

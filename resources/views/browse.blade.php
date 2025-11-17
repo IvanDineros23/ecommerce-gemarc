@@ -188,6 +188,18 @@ function closeBrowseModal(){
 }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeBrowseModal(); });
 
+// Close modal when clicking the dimmed overlay (outside the modal content)
+(function(){
+  const browseModalEl = document.getElementById('browseModal');
+  if (!browseModalEl) return;
+  browseModalEl.addEventListener('click', function (e) {
+    // If the click target is the overlay itself (not the inner modal box), close
+    if (e.target === browseModalEl) {
+      closeBrowseModal();
+    }
+  }, { passive: true });
+})();
+
 /* ---------- ENTER-ONLY SEARCH (no live filtering) ---------- */
 document.addEventListener('DOMContentLoaded', function () {
   const input = document.getElementById('productSearch') || document.getElementById('product-search-input');

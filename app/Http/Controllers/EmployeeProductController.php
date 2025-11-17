@@ -61,7 +61,8 @@ class EmployeeProductController extends Controller
      */
     public function index(Request $request)
     {
-        $products = Product::orderByDesc('created_at')->paginate(6);
+        // Paginate products to keep the list manageable in the UI (5 per page)
+        $products = Product::orderByDesc('created_at')->paginate(5);
         $notifications = [];
 
         return view('dashboard.employee_products', compact('products', 'notifications'));

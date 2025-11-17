@@ -10,12 +10,15 @@
     <h1 class="text-2xl md:text-3xl font-extrabold text-emerald-800 mb-4">Product Management</h1>
 
     {{-- Toasts --}}
-    @if(session('success') && session('added_product_name'))
-      <div x-data="{show:true}" x-show="show" x-transition
+    @if(session('success'))
+      <div x-data="{show:true, init(){ setTimeout(()=> this.show=false, 4000) }}" x-show="show" x-transition
            class="mb-4 flex items-center justify-between bg-emerald-50 border border-emerald-200 text-emerald-900 px-4 py-3 rounded-xl shadow-sm">
         <div class="flex items-center gap-2">✅
-          <span class="text-sm">Successfully added a product:
-            <span class="font-semibold">{{ session('added_product_name') }}</span>
+          <span class="text-sm">
+            {{ session('success') }}
+            @if(session('added_product_name'))
+              <span class="font-semibold">{{ session('added_product_name') }}</span>
+            @endif
           </span>
         </div>
         <button @click="show=false" class="ml-4 text-emerald-700 hover:text-emerald-900 text-lg leading-none">&times;</button>
@@ -190,6 +193,13 @@
             @endforeach
           </tbody>
         </table>
+      </div>
+
+      <div class="px-6 py-4 border-t border-gray-100 bg-white/50 flex items-center justify-between">
+        <div class="text-sm text-gray-600">Showing <span class="font-medium">{{ $products->firstItem() ?: 0 }}</span> to <span class="font-medium">{{ $products->lastItem() ?: 0 }}</span> of <span class="font-medium">{{ $products->total() }}</span> products</div>
+        <div>
+          {{ $products->links() }}
+        </div>
       </div>
     </section>
 

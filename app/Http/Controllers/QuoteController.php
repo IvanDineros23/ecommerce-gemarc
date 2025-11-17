@@ -107,8 +107,17 @@ class QuoteController extends Controller
     // Employee: list all quotes (actual)
     public function employeeIndex()
     {
+        $search = request()->input('search', ''); // Initialize search variable
+
         $quotes = \App\Models\Quote::with('user')->latest()->get();
-        return view('dashboard.employee_quotes', compact('quotes'));
+        $cancelledQuotes = \App\Models\Quote::with('user')->where('status', 'cancelled')->latest()->get();
+        $manualQuotes = \App\Models\Quote::with('user')->where('status', '!=', 'cancelled')->latest()->get();
+        $ordersNeedingQuote = \App\Models\Quote::with('user')->where('status', 'pending')->latest()->get();
+        
+        // Define all quotes
+        $allQuotes = \App\Models\Quote::all();
+
+        return view('dashboard.employee_quotes', compact('quotes', 'cancelledQuotes', 'manualQuotes', 'ordersNeedingQuote', 'search', 'allQuotes'));
     }
 
     // Employee: show a specific quote (stub)
@@ -116,5 +125,19 @@ class QuoteController extends Controller
     {
         // Fetch and show quote details
         return 'Show quote #' . $quoteId . ' for employee (stub)';
+    }
+
+    // Update notes for a specific quote
+    public function updateNotes(Request $request, $quoteId)
+    {
+        $request->validate([
+            'notes' => 'nullable|string',
+        ]);
+
+        $quote = Quote::findOrFail($quoteId);
+        $quote->notes = $request->input('notes');
+        $quote->save();
+
+        return back()->with('success', 'Notes updated successfully!');
     }
 }

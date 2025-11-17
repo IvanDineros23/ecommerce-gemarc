@@ -352,6 +352,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Cancel pending order from quote management
     Route::patch('/employee/quotes/cancel-order/{order}', [EmployeeQuoteController::class, 'cancelOrder'])
         ->name('employee.quotes.cancel_order');
+
+    // Update notes for a specific quote
+    Route::middleware(['auth', 'verified'])->put('/employee/quotes/{quoteId}/update-notes', [QuoteController::class, 'updateNotes'])->name('employee.quotes.update.notes');
+
+    // Edit Quotation page
+    Route::middleware(['auth', 'verified'])->get('/employee/quotes/{quoteId}/edit', function ($quoteId) {
+        $quote = \App\Models\Quote::findOrFail($quoteId);
+        return view('dashboard.employee_quotes_edit', compact('quote'));
+    })->name('employee.quotes.edit');
 });
 
 

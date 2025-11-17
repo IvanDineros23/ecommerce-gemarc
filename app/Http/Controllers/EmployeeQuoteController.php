@@ -143,8 +143,8 @@ class EmployeeQuoteController extends Controller
             'employee_name'      => 'required|string|max:255',
             'customer_name'      => 'required|string|max:255',
             'customer_email'     => 'required|email',
-            'customer_address'   => 'required|string',
-            'customer_contact'   => 'required|string',
+                'customer_address'   => 'nullable|string',
+                'customer_contact'   => 'nullable|string',
             'items'              => 'required|array|min:1',
             'items.*.name'       => 'required|string',
             'items.*.quantity'   => 'required|integer|min:1',
@@ -195,7 +195,36 @@ class EmployeeQuoteController extends Controller
         $quote->load(['user', 'items']);
         $products = Product::where('is_active', 1)->orderBy('name')->get();
 
-        return view('dashboard.employee_quote_edit', compact('quote', 'products'));
+        // Determine whether the quote has original notes in DB (so we can decide whether
+        // to show the default PDF note block or treat the notes as custom).
+        $originalNotes = $quote->getOriginal('notes');
+        $notesAreDefault = empty($originalNotes);
+
+        // If there are no notes stored for this quote, provide the standard PDF note
+        // as a view-only default so employees can see and edit it before saving.
+        if ($notesAreDefault) {
+            $defaultNotes = "NOTE: FREE CALIBRATION WITH CERTIFICATE FOR OTHER APPARATUS\n\n";
+            $defaultNotes .= "***NOTHING FOLLOWS***\n\n";
+            $defaultNotes .= "For Newly Purchased Item/Equipment that requires Calibration\n";
+            $defaultNotes .= "- One-time FREE Preventive Maintenance.\n";
+            $defaultNotes .= "- One-time FREE Calibration after installation. Includes Certificate of Calibration valid for one year only.\n";
+            $defaultNotes .= "- GEI shall not be liable in any circumstances if the equipment's calibration is void and is lost within one year due to tampering in any form, transfer from one place to another and unauthorized use, etc.\n";
+            $defaultNotes .= "- Re-calibration of the equipment must be charged to the customer.\n";
+            $defaultNotes .= "- Issued CoC and sticker must be returned to GEI before re-issuance of the new COC and sticker.\n";
+            $defaultNotes .= "- Any re-issuance of valid and official Certificate of Calibration together with related documents will be charged a minimum fee of Php70.00 per page.\n\n";
+            $defaultNotes .= "NOTE:\n";
+            $defaultNotes .= "1. AVAILABILITY: On-stock items subject for prior sales.\n";
+            $defaultNotes .= "2. PAYMENT: Full payment. Bank transfer for stock items. Bank to bank / CHECK / CASH. BDO - GEMARC ENTERPRISES INC. Account No. 002150093266\n";
+            $defaultNotes .= "3. WARRANTY: (1) One Year warranty on parts and services for major equipment.\n";
+            $defaultNotes .= "4. VALIDITY: 15 DAYS\n";
+            $defaultNotes .= "5. DELIVERY: Free delivery within Metro Manila, all provincial delivery on Customer's account.\n";
+            $defaultNotes .= "6. QUALITY: All products have passed through our GEI Quality Control and is guaranteed free from defect upon delivery.\n";
+            $defaultNotes .= "7. Once we have received your Purchase Order and your failure to provide us a signed copy of these documents will be an acceptance on your part and all of the contents of the documents and the Terms and Conditions shall be deemed signed and approved.\n";
+
+            $quote->notes = $defaultNotes; // assign for view only (not persisted)
+        }
+
+        return view('dashboard.employee_quote_edit', compact('quote', 'products', 'notesAreDefault'));
     }
 
     /**
@@ -206,8 +235,9 @@ class EmployeeQuoteController extends Controller
         $validated = $request->validate([
             'customer_name'      => 'required|string|max:255',
             'customer_email'     => 'required|email',
-            'customer_address'   => 'required|string',
-            'customer_contact'   => 'required|string',
+                'customer_address'   => 'nullable|string',
+                'customer_contact'   => 'nullable|string',
+            'notes'              => 'nullable|string',
             'items'              => 'required|array|min:1',
             'items.*.name'       => 'required|string',
             'items.*.quantity'   => 'required|integer|min:1',
@@ -237,6 +267,10 @@ class EmployeeQuoteController extends Controller
         }
 
         $quote->total = $total;
+        // Save notes if present
+        if (array_key_exists('notes', $validated)) {
+            $quote->notes = $validated['notes'];
+        }
         $quote->save();
 
         AuditLogger::log(Auth::id(), 'employee', 'update_quote', [
@@ -258,8 +292,8 @@ class EmployeeQuoteController extends Controller
         $validated = $request->validate([
             'customer_name'    => 'required|string|max:255',
             'customer_email'   => 'required|email',
-            'customer_address' => 'required|string',
-            'customer_contact' => 'required|string',
+                'customer_address' => 'nullable|string',
+                'customer_contact' => 'nullable|string',
             'item_mode'        => 'required|in:manual,checklist',
             'manual_items'     => 'nullable|string',
             'product_ids'      => 'nullable|array',

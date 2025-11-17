@@ -76,26 +76,15 @@ class EmployeeProductController extends Controller
             'name'        => 'required|string|max:255',
             'description' => 'required|string',
             'unit_price'  => 'required|numeric|min:0',
-            'stock_qty'   => 'required|integer|min:0',
+            'stock'       => 'required|integer|min:0',
             'image'       => 'nullable|image|max:2048',
-            'part_number' => 'required|string|max:255',
-            'fo_number'   => 'nullable|string|max:255',
-            'brand'       => 'required|string|max:255',
-            'category'    => 'required|string|max:255',
-            'unit'        => 'nullable|string|max:50',
         ]);
 
         $product = Product::create([
-            'name'        => $data['name'],
+              'name'        => $data['name'],
             'description' => $data['description'],
             'unit_price'  => $data['unit_price'],
-            'stock'       => $data['stock_qty'],
-            'slug'        => Str::slug($data['name']) . '-' . uniqid(),
-            'sku'         => $data['part_number'],
-            'fo_number'   => $data['fo_number'] ?? null,
-            'brand'       => $data['brand'],
-            'category'    => $data['category'],
-            'unit'        => $data['unit'] ?? null,
+            'stock'       => $data['stock'],
             'is_active'   => true,
         ]);
 
@@ -151,25 +140,17 @@ class EmployeeProductController extends Controller
             'name'        => 'required|string|max:255',
             'description' => 'required|string',
             'unit_price'  => 'required|numeric|min:0',
-            'stock_qty'   => 'required|integer|min:0',
+            'stock'       => 'required|integer|min:0',
             'image'       => 'nullable|image|max:2048',
-            'part_number' => 'required|string|max:255',
-            'fo_number'   => 'nullable|string|max:255',
-            'brand'       => 'required|string|max:255',
-            'category'    => 'required|string|max:255',
         ]);
 
         $before = $product->toArray();
 
         $product->update([
-            'name'        => $data['name'],
+             'name'        => $data['name'],
             'description' => $data['description'],
             'unit_price'  => $data['unit_price'],
-            'stock'       => $data['stock_qty'],
-            'sku'         => $data['part_number'],
-            'fo_number'   => $data['fo_number'] ?? null,
-            'brand'       => $data['brand'],
-            'category'    => $data['category'],
+            'stock'       => $data['stock'],
         ]);
 
         if ($request->hasFile('image')) {

@@ -14,7 +14,7 @@ class Quote extends Model
         'number',
         'status',
         'total',
-        // 'response_file', // i-uncomment mo lang kung sure ka na may column na ganito sa table
+        'notes', // Added 'notes' field
     ];
 
     public function user()

@@ -30,7 +30,74 @@
         @if($isMarketing)
             {{-- 3 equal cards; icon → title → desc --}}
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                {{-- Only marketing dashboard cards remain --}}
+            <a href="{{ route('employee.quotes.index') }}"
+   class="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center hover:bg-green-50 transition min-h-[150px]">
+    <svg class="w-10 h-10 mb-2 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="7" width="18" height="10" rx="2" fill="#dbeafe"/>
+        <path d="M8 11h8M8 14h5" stroke="#2563eb" stroke-linecap="round"/>
+    </svg>
+    <div class="font-bold text-blue-600">Quote Management</div>
+    <div class="text-xs text-gray-500 mt-1">View and manage customer quotes</div>
+</a>
+<a href="{{ route('employee.orders.index') }}"
+   class="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center hover:bg-green-50 transition min-h-[150px]">
+    <svg class="w-10 h-10 mb-2 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="7" width="18" height="10" rx="2" fill="#ede9fe"/>
+        <path d="M8 11h8M8 14h5" stroke="#7c3aed" stroke-linecap="round"/>
+    </svg>
+    <div class="font-bold text-purple-600">Order Management</div>
+    <div class="text-xs text-gray-500 mt-1">View and manage orders</div>
+</a>
+                                <a href="{{ route('employee.products.index') }}"
+                                   class="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center hover:bg-green-50 transition min-h-[150px]">
+                                    <svg class="w-10 h-10 mb-2 text-green-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <rect x="3" y="7" width="18" height="10" rx="2" fill="#bbf7d0"/>
+                                        <path d="M12 10v4m2-2h-4" stroke="#16a34a" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                    <div class="font-bold text-green-700">Add Product</div>
+                                    <div class="text-xs text-gray-500 mt-1">Add a new product to the ecommerce website</div>
+                                </a>
+                <a href="{{ route('employee.inquiries.index') }}"
+                   class="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center hover:bg-green-50 transition min-h-[150px]">
+                    <svg class="w-10 h-10 mb-2 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="7" width="18" height="10" rx="2" fill="#fff7ed"/><path d="M3 7V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2" stroke="#f97316"/><circle cx="8" cy="13" r="2" fill="#f97316"/><rect x="12" y="11" width="6" height="4" rx="1" fill="#fed7aa"/>
+                    </svg>
+                    <div class="font-bold text-orange-500">Product Inquiries</div>
+                    <div class="text-xs text-gray-500 mt-1">View and manage product inquiries</div>
+                </a>
+
+                <a href="{{ route('employee.marketing.faqs') }}"
+                   class="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center hover:bg-green-50 transition min-h-[150px]">
+                    <svg class="w-10 h-10 mb-2 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="7" width="18" height="10" rx="2" fill="#ccfbf1"/>
+                        <path d="M3 7V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2" stroke="#14b8a6"/>
+                        <path d="M8 11h8M8 14h6" stroke="#0f766e" stroke-linecap="round"/>
+                    </svg>
+                    <div class="font-bold text-teal-600">FAQ Management</div>
+                    <div class="text-xs text-gray-500 mt-1">Create and edit FAQs shown on the user homepage</div>
+                </a>
+
+                <a href="{{ route('employee.marketing.polls') }}"
+                   class="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center hover:bg-green-50 transition min-h-[150px]">
+                    <svg class="w-10 h-10 mb-2 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="7" width="18" height="10" rx="2" fill="#fff7ed"/>
+                        <path d="M8 11h8M8 14h5" stroke="#f59e0b" stroke-linecap="round"/>
+                        <circle cx="18" cy="18" r="3" fill="#f59e0b"/>
+                    </svg>
+                    <div class="font-bold text-amber-600">Polls & Surveys</div>
+                    <div class="text-xs text-gray-500 mt-1">Create polls that appear on the homepage (manage options/results)</div>
+                </a>
+
+                <a href="{{ route('employee.marketing.tips') }}"
+                   class="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center hover:bg-green-50 transition min-h-[150px]">
+                    <svg class="w-10 h-10 mb-2 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="7" width="18" height="10" rx="2" fill="#ecfdf5"/>
+                        <path d="M3 7V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2" stroke="#059669"/>
+                        <path d="M12 10l3 3m0 0l-3 3m3-3H8" stroke="#059669" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div class="font-bold text-emerald-600">Tips & Reminders</div>
+                    <div class="text-xs text-gray-500 mt-1">Manage helpful tips and reminders shown to users</div>
+                </a>
             </div>
         @endif
     </div>

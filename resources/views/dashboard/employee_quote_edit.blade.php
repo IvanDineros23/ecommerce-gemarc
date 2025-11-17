@@ -1,8 +1,22 @@
 @extends('layouts.ecommerce')
 
 @section('content')
-<div class="container mx-auto max-w-2xl p-6 bg-white rounded shadow">
+<br>
+<div class="container mx-auto max-w-7xl p-6 bg-white rounded shadow">
     <h2 class="text-2xl font-bold mb-4">Edit Quotation</h2>
+    {{-- Toast / validation messages --}}
+    @if(session('success'))
+        <div id="toast-success" class="mb-4 p-3 rounded bg-green-600 text-white">{{ session('success') }}</div>
+    @endif
+    @if($errors->any())
+        <div id="toast-error" class="mb-4 p-3 rounded bg-red-600 text-white">
+            <ul class="list-disc pl-5">
+                @foreach($errors->all() as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <form action="{{ route('employee.quotes.update', $quote->id) }}" method="POST">
         @csrf
         @method('PUT')
@@ -21,6 +35,17 @@
         <div class="mb-4">
             <label class="block font-semibold mb-1">Contact Number</label>
             <input type="text" name="customer_contact" class="border rounded p-2 w-full" value="{{ $quote->user->contact_no ?? '' }}" required>
+        </div>
+
+        <!-- Collapsible Notes -->
+        <div class="mb-4">
+            <button type="button" id="toggle-notes" class="w-full flex justify-between items-center bg-gray-200 px-4 py-2 rounded-t font-semibold focus:outline-none">
+                <span>Notes (will appear on PDF)</span>
+                <svg id="icon-notes" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div id="notes-panel" class="bg-gray-50 rounded-b p-4" style="display:none;">
+                <textarea name="notes" id="notes-textarea" class="border rounded p-2 w-full" rows="12" placeholder="Enter notes for the quotation">{{ old('notes', $quote->notes ?? '') }}</textarea>
+            </div>
         </div>
         <div class="mb-6">
             <label class="block font-semibold mb-1">Quotation Items</label>
@@ -80,6 +105,7 @@
     <a href="{{ route('employee.quotes.management.index') }}" class="ml-4 text-gray-600 hover:underline">Cancel</a>
     </form>
 </div>
+<br>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         let itemIndex = {{ count($quote->items) }};
@@ -130,6 +156,27 @@
                 }
             });
         });
+
+        // Notes collapsible
+        const toggleNotes = document.getElementById('toggle-notes');
+        const notesPanel = document.getElementById('notes-panel');
+        const iconNotes = document.getElementById('icon-notes');
+        // Start open if quote has custom notes (passed from controller)
+        let notesOpen = {{ isset($notesAreDefault) && $notesAreDefault ? 'false' : 'true' }};
+        function updateNotesPanel(){
+            notesPanel.style.display = notesOpen ? '' : 'none';
+            iconNotes.style.transform = notesOpen ? 'rotate(0deg)' : 'rotate(-90deg)';
+        }
+        if(toggleNotes){
+            toggleNotes.addEventListener('click', function(){ notesOpen = !notesOpen; updateNotesPanel(); });
+            updateNotesPanel();
+        }
+
+        // Auto-hide success toast
+        const toast = document.getElementById('toast-success');
+        if (toast) setTimeout(()=>{ toast.style.display='none'; }, 3000);
+        const terr = document.getElementById('toast-error');
+        if (terr) setTimeout(()=>{ terr.style.display='none'; }, 8000);
     });
 </script>
 @endsection

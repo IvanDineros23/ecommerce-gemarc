@@ -211,7 +211,7 @@
                                                 <span>📄</span><span>View PDF</span>
                                             </a>
                                             <a href="{{ route('employee.quotes.edit', $quote->id) }}"
-                                               class="bg-yellow-500 text-black px-3 py-1 rounded hover:bg-yellow-600 flex items-center gap-1 min-w-[110px]">
+                                               class="bg-orange-100 text-orange-900 px-3 py-1 rounded hover:bg-orange-200 border-2 border-orange-900 flex items-center gap-1 min-w-[110px]">
                                                 <span>✏️</span><span>Edit</span>
                                             </a>
                                             <button type="button"
@@ -409,7 +409,7 @@
                                                 <span>📄</span><span>View PDF</span>
                                             </a>
                                             <a href="{{ route('employee.quotes.edit', $quote->id) }}"
-                                               class="bg-yellow-500 text-black px-3 py-1 rounded hover:bg-yellow-600 flex items-center gap-1 min-w-[110px]">
+                                               class="bg-orange-100 text-orange-900 px-3 py-1 rounded hover:bg-orange-200 border-2 border-orange-900 flex items-center gap-1 min-w-[110px]">
                                                 <span>✏️</span><span>Edit</span>
                                             </a>
                                             <button type="button"

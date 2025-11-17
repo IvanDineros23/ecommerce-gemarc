@@ -75,7 +75,7 @@
         <div class="grid gap-6 md:grid-cols-2">
           <div>
             <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">Stock Quantity</label>
-            <input type="number" name="stock_qty" min="0" step="1"
+            <input type="number" name="stock" min="0" step="1"
               class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               required>
           </div>
@@ -122,7 +122,7 @@
           <p class="text-xs text-gray-500">Overview of all items currently in the system.</p>
         </div>
         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
-          {{ $products->count() }} items
+          {{ $products->total() }} items
         </span>
       </div>
 

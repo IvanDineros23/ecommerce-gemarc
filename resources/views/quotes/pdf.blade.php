@@ -163,7 +163,7 @@
     <div class="section">
         {!! $notesHtml !!}
     </div>
-
+    <br>
     <div class="section" style="margin-top:30px;">
         <div style="font-size:13px;">Very truly yours,</div>
         <div style="font-size:13px; font-weight:bold; margin-bottom:30px;">GEMARC ENTERPRISES INCORPORATED</div>
@@ -173,11 +173,26 @@
             <div style="margin-top:10px; font-size:13px; font-weight:bold;">{{ $employee->name }}</div>
             <div style="font-size:12px;">{{ $employee->email }}</div>
         @endif
+        @php
+            // Determine a validity end date to display in the PDF (shown as "Valid Until").
+            // Priority: explicit `effectivity_date` -> `expires_at`/`valid_until` -> created_at + 15 days (default validity).
+            $eff = null;
+            if (!empty($quote->effectivity_date)) {
+                $eff = \Carbon\Carbon::parse($quote->effectivity_date);
+            } elseif (!empty($quote->expires_at)) {
+                $eff = \Carbon\Carbon::parse($quote->expires_at);
+            } elseif (!empty($quote->valid_until)) {
+                $eff = \Carbon\Carbon::parse($quote->valid_until);
+            } else {
+                $created = $quote->created_at ? \Carbon\Carbon::parse($quote->created_at) : \Carbon\Carbon::now();
+                $eff = $created->copy()->addDays(15);
+            }
+        @endphp
+
         <div style="margin-top:40px; font-size:11px;">
             Quotation for Goods &nbsp;
             <a href="https://www.gemarcph.com" style="color:#333; text-decoration:none;">www.gemarcph.com</a>
-            &nbsp; Effectivity Date:
-            {{ $quote->effectivity_date ? \Carbon\Carbon::parse($quote->effectivity_date)->format('d F Y') : '' }}
+            &nbsp; Valid Until: {{ $eff ? $eff->format('d F Y') : '' }}
         </div>
     </div>
 </body>

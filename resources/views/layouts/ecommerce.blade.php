@@ -392,6 +392,23 @@
         @yield('content')
     </main>
 
+    {{-- Greeting toast (shows once per browser session on first dashboard load) --}}
+    @auth
+        @php
+            $hour = (int) now()->format('H');
+            if ($hour < 12) { $greeting = 'Good morning'; }
+            elseif ($hour < 18) { $greeting = 'Good afternoon'; }
+            else { $greeting = 'Good evening'; }
+            $greetName = auth()->user()->name ?? 'User';
+        @endphp
+        <div id="greeting-toast" style="position:fixed; left:24px; top:20px; z-index:1050; display:none;">
+            <div id="greeting-inner" style="min-width:260px; max-width:360px; background:#ffffff; border-left:4px solid #16a34a; box-shadow:0 6px 24px rgba(0,0,0,0.12); padding:14px 16px; border-radius:8px;">
+                <div style="font-weight:700; color:#0f766e;">{{ $greeting }}, {{ $greetName }}!</div>
+                <div style="font-size:13px; color:#555; margin-top:6px;">Welcome back — here's the latest on your quotes and tasks.</div>
+            </div>
+        </div>
+    @endauth
+
     <!-- ===== Footer (same structure as app.blade.php) ===== -->
     <footer class="site-footer">
         <div class="site-footer__wrap">
@@ -514,3 +531,25 @@ document.addEventListener('DOMContentLoaded', function() {
 @endif
 </body>
 </html>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    try{
+        // Show greeting once per browser session (localStorage key)
+        if (typeof localStorage !== 'undefined' && !localStorage.getItem('greetingShown')){
+            var toast = document.getElementById('greeting-toast');
+            if (toast){
+                toast.style.display = 'block';
+                toast.style.opacity = 0;
+                // fade in
+                var op = 0;
+                var fin = setInterval(function(){ op += 0.08; toast.style.opacity = op; if (op>=1) clearInterval(fin); }, 30);
+                // auto fade out after 4 seconds
+                setTimeout(function(){
+                    var ft = setInterval(function(){ op -= 0.06; toast.style.opacity = op; if (op<=0){ clearInterval(ft); toast.style.display='none'; } }, 40);
+                }, 4000);
+                localStorage.setItem('greetingShown', '1');
+            }
+        }
+    }catch(e){ console && console.log && console.log('greeting error', e); }
+});
+</script>

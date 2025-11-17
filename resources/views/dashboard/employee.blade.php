@@ -1,5 +1,6 @@
 @php
     use App\Models\Order;
+    use App\Models\Quote;
 
     // ---- Marketing datasets safe-fallback ({} instead of []) ----
     $mkDS = isset($mkDatasets) ? $mkDatasets : new \stdClass();
@@ -12,10 +13,7 @@
 @section('content')
 <div class="py-8">
     {{-- Header --}}
-    <div class="flex flex-col items-center justify-center mb-8 text-center">
-        <h1 class="text-3xl font-bold text-green-800 mb-2">Employee Dashboard</h1>
-        <p class="text-gray-700">Welcome, {{ auth()->user()->name }}! Manage products, inventory, and orders here.</p>
-    </div>
+    {{-- Top: visualizations will appear first for marketing employees (no welcome text) --}}
 
     @php
         $user = auth()->user();
@@ -23,6 +21,95 @@
         $isMarketing  = $user && $user->role === 'employee' && $user->department === 'marketing';
         // $isAccounting fully removed
     @endphp
+
+    {{-- ========= VISUALIZATIONS (TOP) ========= --}}
+    <div class="w-full max-w-6xl mx-auto mb-6">
+        @if($isMarketing)
+            @php
+                // Build quote-focused datasets (weekly/monthly/quarterly/yearly aggregation)
+                $db = config('database.default');
+                $Y = $db === 'sqlite' ? "cast(strftime('%Y', created_at) as integer)" : "YEAR(created_at)";
+                $M = $db === 'sqlite' ? "cast(strftime('%m', created_at) as integer)" : "MONTH(created_at)";
+                $Q = $db === 'sqlite' ? "((cast(strftime('%m', created_at) as integer)+2)/3)" : "QUARTER(created_at)";
+                $W = $db === 'sqlite' ? "cast(strftime('%W', created_at) as integer)" : "WEEK(created_at, 3)";
+
+                $months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+                $quotesByWeek = \App\Models\Quote::whereYear('created_at', now()->year)
+                    ->selectRaw("$W as w, COUNT(*) as c")->groupBy('w')->get();
+                $quotesByMonth = \App\Models\Quote::whereYear('created_at', now()->year)
+                    ->selectRaw("$M as m, COUNT(*) as c")->groupBy('m')->get();
+                $quotesByQuarter = \App\Models\Quote::whereYear('created_at', now()->year)
+                    ->selectRaw("$Q as q, COUNT(*) as c")->groupBy('q')->get();
+                $quotesByYear = \App\Models\Quote::selectRaw("$Y as y, COUNT(*) as c")->groupBy('y')->get();
+
+                $quotesConvertedByWeek = \App\Models\Quote::whereHas('order')->whereYear('created_at', now()->year)
+                    ->selectRaw("$W as w, COUNT(*) as c")->groupBy('w')->get();
+                $quotesConvertedByMonth = \App\Models\Quote::whereHas('order')->whereYear('created_at', now()->year)
+                    ->selectRaw("$M as m, COUNT(*) as c")->groupBy('m')->get();
+                $quotesConvertedByQuarter = \App\Models\Quote::whereHas('order')->whereYear('created_at', now()->year)
+                    ->selectRaw("$Q as q, COUNT(*) as c")->groupBy('q')->get();
+
+                $quoteStatusCountsAll = \App\Models\Quote::selectRaw('status, COUNT(*) as cnt')->groupBy('status')->pluck('cnt','status');
+                $quoteStatusCountsYear = \App\Models\Quote::whereYear('created_at', now()->year)
+                    ->selectRaw('status, COUNT(*) as cnt')->groupBy('status')->pluck('cnt','status');
+
+                // prepare empty containers
+                $weeklyLabels = array_map(fn($w)=>'W'.$w, range(1,53));
+                $weeklyCreated = array_fill(0,53,0);
+                $weeklyConverted = array_fill(0,53,0);
+                foreach ($quotesByWeek as $r) { $i=max(1,(int)$r->w)-1; if($i>=0&&$i<53) $weeklyCreated[$i]=(int)$r->c; }
+                foreach ($quotesConvertedByWeek as $r) { $i=max(1,(int)$r->w)-1; if($i>=0&&$i<53) $weeklyConverted[$i]=(int)$r->c; }
+
+                $monthlyCreated = array_fill(0,12,0);
+                $monthlyConverted = array_fill(0,12,0);
+                foreach ($quotesByMonth as $r) { $i=(int)$r->m-1; if($i>=0&&$i<12) $monthlyCreated[$i]=(int)$r->c; }
+                foreach ($quotesConvertedByMonth as $r) { $i=(int)$r->m-1; if($i>=0&&$i<12) $monthlyConverted[$i]=(int)$r->c; }
+
+                $quarterLabels = ['Q1','Q2','Q3','Q4'];
+                $quarterCreated = array_fill(0,4,0);
+                $quarterConverted = array_fill(0,4,0);
+                foreach ($quotesByQuarter as $r){ $i=(int)$r->q-1; if($i>=0&&$i<4) $quarterCreated[$i]=(int)$r->c; }
+                foreach ($quotesConvertedByQuarter as $r){ $i=(int)$r->q-1; if($i>=0&&$i<4) $quarterConverted[$i]=(int)$r->c; }
+
+                $yRows = $quotesByYear->sortBy('y')->values();
+                $yearlyLabels=[]; $yearlyCounts=[];
+                foreach($yRows as $r){ $yearlyLabels[]=(string)$r->y; $yearlyCounts[]=(int)$r->c; }
+
+                $qDatasets = [
+                    'weekly'=>['labels'=>$weeklyLabels,'created'=>$weeklyCreated,'converted'=>$weeklyConverted,'status'=>$quoteStatusCountsYear],
+                    'monthly'=>['labels'=>$months,'created'=>$monthlyCreated,'converted'=>$monthlyConverted,'status'=>$quoteStatusCountsYear],
+                    'quarterly'=>['labels'=>$quarterLabels,'created'=>$quarterCreated,'converted'=>$quarterConverted,'status'=>$quoteStatusCountsYear],
+                    'yearly'=>['labels'=>$yearlyLabels,'created'=>$yearlyCounts,'converted'=>array_fill(0,count($yearlyLabels),0),'status'=>$quoteStatusCountsAll]
+                ];
+            @endphp
+
+            <div class="mb-3 flex justify-end">
+                <label for="mkTimeframe" class="text-sm text-gray-600 mr-2 self-center">Timeframe:</label>
+                <select id="mkTimeframe" class="border rounded-md px-3 py-1.5 text-sm">
+                    <option value="weekly">Weekly ({{ now()->year }})</option>
+                    <option value="monthly" selected>Monthly ({{ now()->year }})</option>
+                    <option value="quarterly">Quarterly ({{ now()->year }})</option>
+                    <option value="yearly">Yearly (All)</option>
+                </select>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white rounded-xl shadow p-4">
+                    <div class="font-bold text-green-800 mb-2 text-center">Quotes Created</div>
+                    <div class="h-48"><canvas id="qCreatedBar"></canvas></div>
+                </div>
+                <div class="bg-white rounded-xl shadow p-4">
+                    <div class="font-bold text-green-800 mb-2 text-center">Quotes Converted</div>
+                    <div class="h-48"><canvas id="qConvertedBar"></canvas></div>
+                </div>
+                <div class="bg-white rounded-xl shadow p-4">
+                    <div class="font-bold text-green-800 mb-2 text-center">Quote Status Mix</div>
+                    <div class="h-40"><canvas id="qStatusPie"></canvas></div>
+                </div>
+            </div>
+        @endif
+    </div>
 
     {{-- ========= ACTION BUTTONS (TOP) ========= --}}
     <div class="w-full max-w-6xl mx-auto">
@@ -178,52 +265,7 @@
         ];
     @endphp
 
-    {{-- Timeframe selector --}}
-    <div class="w-full max-w-6xl mx-auto mb-3 flex items-center justify-end gap-2">
-        <label for="mkTimeframe" class="text-sm text-gray-600">Timeframe:</label>
-        <select id="mkTimeframe" class="border rounded-md px-3 py-1.5 text-sm">
-            <option value="weekly">Weekly ({{ now()->year }})</option>
-            <option value="monthly" selected>Monthly ({{ now()->year }})</option>
-            <option value="quarterly">Quarterly ({{ now()->year }})</option>
-            <option value="yearly">Yearly (All)</option>
-        </select>
-    </div>
-
-    {{-- KPI cards --}}
-    <div class="w-full max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4" id="mkKpis">
-        <div class="bg-white rounded-xl shadow p-4">
-            <div class="text-xs text-gray-500">Total Revenue</div>
-            <div class="text-2xl font-bold text-green-700" id="kpiRevenue">₱0</div>
-        </div>
-        <div class="bg-white rounded-xl shadow p-4">
-            <div class="text-xs text-gray-500">Total Orders</div>
-            <div class="text-2xl font-bold text-slate-700" id="kpiOrders">0</div>
-        </div>
-        <div class="bg-white rounded-xl shadow p-4">
-            <div class="text-xs text-gray-500">Avg Order Value</div>
-            <div class="text-2xl font-bold text-emerald-700" id="kpiAov">₱0</div>
-        </div>
-        <div class="bg-white rounded-xl shadow p-4">
-            <div class="text-xs text-gray-500">Paid Rate</div>
-            <div class="text-2xl font-bold text-indigo-700" id="kpiPaidRate">0%</div>
-        </div>
-    </div>
-
-    {{-- Charts --}}
-    <div class="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="bg-white rounded-xl shadow p-4">
-            <div class="font-bold text-green-800 mb-2 text-center">Orders (Count)</div>
-            <div class="h-48"><canvas id="mkOrdersBar"></canvas></div>
-        </div>
-        <div class="bg-white rounded-xl shadow p-4">
-            <div class="font-bold text-green-800 mb-2 text-center">Revenue (₱)</div>
-            <div class="h-48"><canvas id="mkRevenueBar"></canvas></div>
-        </div>
-        <div class="bg-white rounded-xl shadow p-4 md:col-span-2">
-            <div class="font-bold text-green-800 mb-2 text-center">Order Status Mix</div>
-            <div class="h-56"><canvas id="mkStatusPie"></canvas></div>
-        </div>
-    </div>
+    {{-- KPI cards removed for marketing dashboard (requested) --}}
 
 </div>
 @endsection
@@ -245,82 +287,52 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Purchasing charts removed
 
-    // ===== Marketing charts (updated logic) =====
+        // ===== Marketing charts (quotes-focused) =====
     if (IS_MARKETING) {
-        const DS = @json($mkDatasets ?? []);
-        const peso = v => ' ₱' + (v||0).toLocaleString(undefined,{maximumFractionDigits:2});
+        const DS = @json($qDatasets ?? []);
         const $ = id => document.getElementById(id);
 
-        const ctxOrders  = $('mkOrdersBar')?.getContext('2d');
-        const ctxBill    = $('mkRevenueBar')?.getContext('2d'); // reuse canvas
-        const ctxStatus  = $('mkStatusPie')?.getContext('2d');
+        const ctxCreated = $('qCreatedBar')?.getContext('2d');
+        const ctxConverted = $('qConvertedBar')?.getContext('2d');
+        const ctxQStatus = $('qStatusPie')?.getContext('2d');
 
-        let ordersChart, billChart, statusChart;
+        let createdChart, convertedChart, qStatusChart;
 
-        function setKpis(d){
-            const totalOrd = (d.orders||[]).reduce((a,b)=>a+(+b||0),0);
-            const totalBil = (d.billings||[]).reduce((a,b)=>a+(+b||0),0);
-            const aov = totalOrd ? totalBil/totalOrd : 0;
+        function buildQuoteCharts(tf='monthly'){
+            const d = DS[tf] || {labels:[], created:[], converted:[], status:{}};
 
-            const s = d.status || {};
-            const statusTotal = Object.values(s).reduce((a,b)=>a+(+b||0),0) || totalOrd;
-            const paid = (s.paid || s.PAID || s.done || s.completed || 0);
-            const paidRate = statusTotal ? Math.round((paid/statusTotal)*100) : (totalOrd?100:0);
-
-            if ($('kpiRevenue')) $('kpiRevenue').textContent = '₱' + totalBil.toLocaleString(undefined,{maximumFractionDigits:2});
-            if ($('kpiOrders'))  $('kpiOrders').textContent  = (totalOrd||0).toLocaleString();
-            if ($('kpiAov'))     $('kpiAov').textContent     = '₱' + aov.toLocaleString(undefined,{maximumFractionDigits:2});
-            if ($('kpiPaidRate'))$('kpiPaidRate').textContent= paidRate + '%';
-        }
-
-        function buildCharts(tf='monthly'){
-            const d = DS[tf] || {labels:[], orders:[], billings:[], status:{}};
-            setKpis(d);
-
-            // Orders (all statuses)
-            if (ctxOrders) {
-                if (ordersChart) ordersChart.destroy();
-                ordersChart = new Chart(ctxOrders, {
+            if (ctxCreated) {
+                if (createdChart) createdChart.destroy();
+                createdChart = new Chart(ctxCreated, {
                     type:'bar',
-                    data:{ labels:d.labels, datasets:[{ label:'Orders', data:d.orders, backgroundColor:'#3b82f6' }] },
-                    options:{ maintainAspectRatio:false, responsive:true, plugins:{ legend:{display:false} },
-                        scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } }
-                    }
+                    data:{ labels:d.labels, datasets:[{ label:'Quotes Created', data:d.created, backgroundColor:'#3b82f6' }] },
+                    options:{ maintainAspectRatio:false, responsive:true, plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } } }
                 });
             }
 
-            // Billings (₱) – paid/done only
-            if (ctxBill) {
-                if (billChart) billChart.destroy();
-                // update heading text if present
-                const titleDiv = ctxBill.canvas.closest('.bg-white')?.querySelector('.font-bold');
-                if (titleDiv) titleDiv.textContent = 'Billings (₱)';
-
-                billChart = new Chart(ctxBill, {
+            if (ctxConverted) {
+                if (convertedChart) convertedChart.destroy();
+                convertedChart = new Chart(ctxConverted, {
                     type:'bar',
-                    data:{ labels:d.labels, datasets:[{ label:'Billings (₱)', data:d.billings, backgroundColor:'#16a34a' }] },
-                    options:{ maintainAspectRatio:false, responsive:true,
-                        plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>peso(c.parsed.y) } } },
-                        scales:{ y:{ beginAtZero:true, ticks:{ callback:v=>'₱'+Number(v).toLocaleString() } } }
-                    }
+                    data:{ labels:d.labels, datasets:[{ label:'Quotes Converted', data:d.converted, backgroundColor:'#16a34a' }] },
+                    options:{ maintainAspectRatio:false, responsive:true, plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } } }
                 });
             }
 
-            // Status mix
-            if (ctxStatus) {
-                if (statusChart) statusChart.destroy();
+            if (ctxQStatus) {
+                if (qStatusChart) qStatusChart.destroy();
                 const sLabels = Object.keys(d.status||{});
                 const sValues = Object.values(d.status||{});
-                statusChart = new Chart(ctxStatus, {
+                qStatusChart = new Chart(ctxQStatus, {
                     type:'doughnut',
                     data:{ labels:sLabels, datasets:[{ data:sValues, backgroundColor:['#22c55e','#f59e0b','#ef4444','#3b82f6','#a855f7','#64748b'] }] },
-                    options:{ maintainAspectRatio:false, responsive:true, plugins:{ legend:{ position:'bottom' } } }
+                    options:{ maintainAspectRatio:false, responsive:true, cutout:'65%', plugins:{ legend:{ position:'bottom' } } }
                 });
             }
         }
 
-        buildCharts('monthly');
-        $('mkTimeframe')?.addEventListener('change', e => buildCharts(e.target.value));
+        buildQuoteCharts('monthly');
+        $('mkTimeframe')?.addEventListener('change', e => buildQuoteCharts(e.target.value));
     }
 
     // Accounting charts removed

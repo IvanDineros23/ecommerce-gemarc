@@ -62,7 +62,6 @@
 <div class="py-8">
     <div class="flex flex-col items-center justify-center mb-8 text-center">
         <h1 class="text-3xl font-bold text-purple-800 mb-2 text-center">Quote Management</h1>
-        <p class="text-gray-700 text-center">View and manage all customer quote requests here.</p>
     </div>
 
     <div class="flex justify-between items-center mb-4">

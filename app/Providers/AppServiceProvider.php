@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Laravel\Fortify\Fortify;
+use App\Actions\Fortify\UpdateUserPassword;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register custom password update action for Fortify
+        if (class_exists(Fortify::class)) {
+            Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
+        }
     }
 }

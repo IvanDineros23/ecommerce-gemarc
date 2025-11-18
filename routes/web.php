@@ -235,7 +235,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
     // Settings
-    Route::view('/settings', 'dashboard.settings')->name('settings');
+    Route::get('/settings', [SettingsController::class, 'show'])->name('settings');
     Route::post('/settings/delivery-address', [SettingsController::class, 'saveDeliveryAddress'])->name('settings.saveDeliveryAddress');
     Route::post('/settings/payment-details',  [SettingsController::class, 'savePaymentDetails'])->name('settings.savePaymentDetails');
     Route::post('/settings/basic-info',       [SettingsController::class, 'saveBasicInfo'])->name('settings.saveBasicInfo');

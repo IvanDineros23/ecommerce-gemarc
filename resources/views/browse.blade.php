@@ -64,6 +64,75 @@
 }
 .browse-wrapper .product-card::after,
 .browse-wrapper .product-card::before{display:none !important;content:none !important;opacity:0 !important;}
+
+/* Custom pagination styles */
+.pagination-custom nav {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ❌ Remove the first block (yung may « Previous | Next ») */
+.pagination-custom nav > div:first-child {
+  display: none !important;
+}
+
+/* ✅ Only show & layout the second block (yung numbered pills) */
+.pagination-custom nav > div:last-child {
+  display: flex;
+}
+
+/* Hide the default "Showing X to Y of Z results" text inside nav (if meron pa) */
+.pagination-custom nav p {
+  display: none !important;
+}
+
+/* Lahat ng page buttons (numbers, arrows sa kanan) */
+.pagination-custom nav a,
+.pagination-custom nav span {
+  background: #ffffff !important;          /* WHITE background */
+  color: #17643b !important;               /* GREEN text */
+  border: 1.5px solid #17643b !important;  /* GREEN border */
+  border-radius: 9999px !important;        /* pill shape */
+  padding: 0.4rem 0.9rem !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  line-height: 1 !important;
+  margin-left: 0.25rem !important;
+  margin-right: 0.25rem !important;
+  box-shadow: none !important;
+}
+
+/* ACTIVE page (current) */
+.pagination-custom nav [aria-current="page"] {
+  background: #17643b !important;          /* GREEN background */
+  color: #ffffff !important;               /* WHITE text */
+}
+
+/* DISABLED buttons (kung meron) */
+.pagination-custom nav span[aria-disabled="true"] {
+  background: #f1f1f1 !important;
+  color: #bdbdbd !important;
+  border-color: #e0e0e0 !important;
+  cursor: default !important;
+}
+
+/* HOVER effect sa clickable buttons */
+.pagination-custom nav a:hover {
+  background: #e4f7eb !important;          /* light green */
+  color: #17643b !important;
+}
+
+/* Hide Previous and Next buttons */
+.pagination-custom nav a[rel="prev"],
+.pagination-custom nav a[rel="next"] {
+  display: none !important;
+}
+
+/* Optional: Hide disabled versions too */
+.pagination-custom nav span[aria-disabled="true"][aria-label="« Previous"],
+.pagination-custom nav span[aria-disabled="true"][aria-label="Next »"] {
+  display: none !important;
+}
 </style>
 @endpush
 
@@ -75,6 +144,7 @@
         @include('components.searchbar', ['mode' => 'browse'])
       </div>
     </div>
+
 
     <div id="productGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem;">
       @forelse($products as $product)
@@ -96,6 +166,18 @@
       @empty
         <div class="col-span-full"><div class="alert alert-light border">No products to display yet.</div></div>
       @endforelse
+    </div>
+
+    <div class="mt-8 flex items-center justify-between gap-4" style="min-height:48px;">
+      <div class="text-gray-500 text-sm" style="min-width:220px;">
+        @if($products->total() > 0)
+          Showing <b>{{ $products->firstItem() }}</b> to <b>{{ $products->lastItem() }}</b> of <b>{{ $products->total() }}</b> results
+        @endif
+      </div>
+      <div class="flex-1"></div>
+      <div class="pagination-custom">
+        {{ $products->appends(['q' => request('q')])->links() }}
+      </div>
     </div>
 
     <div id="noResults" style="display:none;text-align:center;padding:2rem;color:#666;font-size:1.1rem;">
@@ -200,68 +282,32 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeBrowseModal()
   }, { passive: true });
 })();
 
-/* ---------- ENTER-ONLY SEARCH (no live filtering) ---------- */
+// ---------- ENTER-ONLY SEARCH (server-side, resets to page 1) ----------
 document.addEventListener('DOMContentLoaded', function () {
   const input = document.getElementById('productSearch') || document.getElementById('product-search-input');
-  const grid  = document.getElementById('productGrid');
-  const cards = Array.from(document.querySelectorAll('.product-card'));
-  const noResults = document.getElementById('noResults');
-  if (!input || !grid) return;
-
-  const searchWrap = input.closest('.products-search');
+  const searchWrap = input ? input.closest('.products-search') : null;
   const searchBtn  = searchWrap ? searchWrap.querySelector('.search-btn') : null;
+  if (!input) return;
 
-  const normalize = s => (s||'').toLowerCase().replace(/\s+/g,' ').trim();
-
-  function filterGrid(q){
-    const term = normalize(q);
-    let shown = 0;
-    cards.forEach(c=>{
-      const terms = (c.getAttribute('data-search-terms')||'').toLowerCase();
-      const match = !term || terms.includes(term);
-      c.style.display = match ? 'flex' : 'none';
-      if(match) shown++;
-    });
-    const hasQ = !!term;
-    if(noResults){
-      noResults.style.display = (hasQ && shown===0) ? 'block' : 'none';
-      grid.style.display      = (hasQ && shown===0) ? 'none'  : 'grid';
-    }
-  }
-
-  function setQueryParam(q){
+  function submitSearch() {
+    const q = input.value.trim();
     const url = new URL(window.location.href);
-    if(q) url.searchParams.set('q', q); else url.searchParams.delete('q');
-    window.history.replaceState({},'',url);
+    url.searchParams.set('q', q);
+    url.searchParams.delete('page'); // always reset to page 1
+    window.location.href = url.toString();
   }
 
-  function commit(){
-    const q = input.value;
-    setQueryParam(q);
-    filterGrid(q);
-  }
-
-  // ENTER to search
-  input.addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter'){
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
       e.preventDefault();
-      commit();
+      submitSearch();
     }
   });
-
-  // click magnifier to search (kung button)
-  if (searchBtn){
-    searchBtn.addEventListener('click', (e)=>{
+  if (searchBtn) {
+    searchBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      commit();
+      submitSearch();
     });
-  }
-
-  // restore from ?q= (supports deep-link/back button)
-  const initialQ = new URL(window.location.href).searchParams.get('q') || '';
-  if(initialQ){
-    input.value = initialQ;
-    filterGrid(initialQ);
   }
 });
 </script>

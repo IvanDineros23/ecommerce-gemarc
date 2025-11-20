@@ -156,13 +156,20 @@ Route::get('/landing-search', function (Request $request) {
 Route::get('/', fn () => view('website.index'))->name('home');
 
 // Browse (simple)
-Route::get('/browse', function () {
+Route::get('/browse', function (Request $request) {
+    $q = $request->input('q');
     $products = Product::where('is_active', 1)
         ->where('stock', '>', 0)
+        ->when($q, function ($query) use ($q) {
+            $query->where(function ($sub) use ($q) {
+                $sub->where('name', 'like', "%{$q}%")
+                    ->orWhere('description', 'like', "%{$q}%");
+            });
+        })
         ->orderByDesc('created_at')
-        ->get();
+        ->paginate(10);
 
-    return view('browse', compact('products'));
+    return view('browse', compact('products', 'q'));
 })->name('browse');
 
 // Shop with search

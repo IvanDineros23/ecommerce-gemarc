@@ -44,7 +44,7 @@
                                         <p style="margin:0;font-size:13px;color:#666;">Gemarc Enterprises Inc.<br>
                                         No. 15 Chile St. Ph1 Greenheights Subdivision,<br>
                                         Concepcion 1, Marikina City, Philippines 1807<br>
-                                        Phone: (632) 8-997-7959</p>
+                                        Phone: +639090879416</p>
                                     </td>
                                     <td align="right" style="vertical-align:top;">
                                         <p style="margin:0;font-size:13px;color:#666;">&copy; {{ date('Y') }} Gemarc Enterprises Inc.</p>

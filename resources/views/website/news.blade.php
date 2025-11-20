@@ -218,20 +218,7 @@
                                 <p>Celebrating our outstanding employees for their exceptional performance in the first half of 2025</p>
                             </div>
                         </div>
-                        <div class="slide">
-                            <img src="{{ asset('images/highlights/news/viber_image_2025-09-05_10-41-23-189.jpg') }}" alt="Award Presentation">
-                            <div class="slide-caption">
-                                <h3>Award Presentation</h3>
-                                <p>Management presenting awards to recognize outstanding contributions and achievements</p>
-                            </div>
-                        </div>
-                        <div class="slide">
-                            <img src="{{ asset('images/highlights/news/viber_image_2025-09-05_10-41-23-439.jpg') }}" alt="Team Celebration">
-                            <div class="slide-caption">
-                                <h3>Team Celebration</h3>
-                                <p>Team members celebrating their achievements and contributions to company success</p>
-                            </div>
-                        </div>
+
                         <div class="slide">
                             <img src="{{ asset('images/highlights/news/viber_image_2025-09-05_13-17-06-854.jpg') }}" alt="Recognition Event">
                             <div class="slide-caption">
@@ -253,14 +240,6 @@
                                 <p>Acknowledging exceptional performance and dedication to company values</p>
                             </div>
                         </div>
-                        <div class="slide">
-                            <img src="{{ asset('images/highlights/news/viber_image_2025-09-05_13-18-06-635.jpg') }}" alt="Team Success">
-                            <div class="slide-caption">
-                                <h3>Team Success</h3>
-                                <p>Celebrating the success and achievements of our dedicated team members</p>
-                            </div>
-                        </div>
-
                         <!-- Navigation arrows -->
                         <button class="slide-btn prev-btn" onclick="changeEmployeeSlide(-1)">
                             <i class="fas fa-chevron-left"></i>
@@ -276,11 +255,9 @@
                             <span class="indicator" onclick="currentEmployeeSlide(3)"></span>
                             <span class="indicator" onclick="currentEmployeeSlide(4)"></span>
                             <span class="indicator" onclick="currentEmployeeSlide(5)"></span>
-                            <span class="indicator" onclick="currentEmployeeSlide(6)"></span>
-                            <span class="indicator" onclick="currentEmployeeSlide(7)"></span>
-                            <span class="indicator" onclick="currentEmployeeSlide(8)"></span>
                         </div>
                     </div>
+                    
 
                     <div class="news-body">
                         <h3>Celebrating Excellence and Dedication</h3>

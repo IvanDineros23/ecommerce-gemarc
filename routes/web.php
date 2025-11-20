@@ -167,7 +167,7 @@ Route::get('/browse', function (Request $request) {
             });
         })
         ->orderByDesc('created_at')
-        ->paginate(10);
+        ->paginate(12);
 
     return view('browse', compact('products', 'q'));
 })->name('browse');
@@ -185,7 +185,7 @@ Route::get('/shop', function (Request $request) {
             });
         })
         ->orderByDesc('created_at')
-        ->paginate(10);
+        ->paginate(12);
 
     return view('shop.index', compact('products', 'q'));
 })->name('shop.index');

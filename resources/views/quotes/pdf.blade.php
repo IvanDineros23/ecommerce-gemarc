@@ -174,25 +174,14 @@
             <div style="font-size:12px;">{{ $employee->email }}</div>
         @endif
         @php
-            // Determine a validity end date to display in the PDF (shown as "Valid Until").
-            // Priority: explicit `effectivity_date` -> `expires_at`/`valid_until` -> created_at + 15 days (default validity).
-            $eff = null;
-            if (!empty($quote->effectivity_date)) {
-                $eff = \Carbon\Carbon::parse($quote->effectivity_date);
-            } elseif (!empty($quote->expires_at)) {
-                $eff = \Carbon\Carbon::parse($quote->expires_at);
-            } elseif (!empty($quote->valid_until)) {
-                $eff = \Carbon\Carbon::parse($quote->valid_until);
-            } else {
-                $created = $quote->created_at ? \Carbon\Carbon::parse($quote->created_at) : \Carbon\Carbon::now();
-                $eff = $created->copy()->addDays(15);
-            }
+            // Display the generated date for the PDF.
+            $generatedDate = \Carbon\Carbon::now();
         @endphp
 
         <div style="margin-top:40px; font-size:11px;">
             Quotation for Goods &nbsp;
             <a href="https://www.gemarcph.com" style="color:#333; text-decoration:none;">www.gemarcph.com</a>
-            &nbsp; Valid Until: {{ $eff ? $eff->format('d F Y') : '' }}
+            &nbsp; Generated Date: {{ $generatedDate->format('d F Y') }}
         </div>
     </div>
 </body>

@@ -140,4 +140,21 @@ class QuoteController extends Controller
 
         return back()->with('success', 'Notes updated successfully!');
     }
+
+    // Fetch paginated quote items for live search
+    public function getQuoteItems(Request $request)
+    {
+        $search = $request->input('search', '');
+
+        $items = Product::where('name', 'LIKE', "%$search%")
+            ->orderBy('name')
+            ->paginate(12);
+
+        return response()->json([
+            'items' => $items->items(),
+            'page' => $items->currentPage(),
+            'has_prev' => $items->currentPage() > 1,
+            'has_next' => $items->hasMorePages()
+        ]);
+    }
 }

@@ -235,13 +235,13 @@ class EmployeeQuoteController extends Controller
         $validated = $request->validate([
             'customer_name'      => 'required|string|max:255',
             'customer_email'     => 'required|email',
-                'customer_address'   => 'nullable|string',
-                'customer_contact'   => 'nullable|string',
+            'customer_address'   => 'nullable|string',
+            'customer_contact'   => 'nullable|string',
             'notes'              => 'nullable|string',
-            'items'              => 'required|array|min:1',
-            'items.*.name'       => 'required|string',
-            'items.*.quantity'   => 'required|integer|min:1',
-            'items.*.unit_price' => 'required|numeric|min:0',
+            'product_ids'        => 'nullable|array',
+            'product_ids.*'      => 'integer',
+            'product_quantities' => 'nullable|array',
+            'product_prices'     => 'nullable|array',
         ]);
 
         if ($quote->user) {
@@ -255,19 +255,23 @@ class EmployeeQuoteController extends Controller
         $quote->items()->delete();
 
         $total = 0;
-        foreach ($validated['items'] as $item) {
-            $quote->items()->create([
-                'product_id' => null,
-                'name'       => $item['name'],
-                'quantity'   => (int) $item['quantity'],
-                'unit_price' => (float) $item['unit_price'],
-            ]);
+        if (!empty($validated['product_ids'])) {
+            foreach ($validated['product_ids'] as $productId) {
+                $quantity = (int)($validated['product_quantities'][$productId] ?? 1);
+                $price = (float)($validated['product_prices'][$productId] ?? 0);
 
-            $total += (int) $item['quantity'] * (float) $item['unit_price'];
+                $quote->items()->create([
+                    'product_id' => $productId,
+                    'name'       => Product::find($productId)->name ?? 'Unknown Product',
+                    'quantity'   => $quantity,
+                    'unit_price' => $price,
+                ]);
+
+                $total += $quantity * $price;
+            }
         }
 
         $quote->total = $total;
-        // Save notes if present
         if (array_key_exists('notes', $validated)) {
             $quote->notes = $validated['notes'];
         }
@@ -276,7 +280,7 @@ class EmployeeQuoteController extends Controller
         AuditLogger::log(Auth::id(), 'employee', 'update_quote', [
             'quote_id' => $quote->id,
             'total'    => $quote->total,
-            'items'    => count($validated['items']),
+            'items'    => count($validated['product_ids'] ?? []),
         ]);
 
         return redirect()

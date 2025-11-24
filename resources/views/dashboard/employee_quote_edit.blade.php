@@ -184,6 +184,28 @@
             </div>
         </div>
 
+        <!-- Totals block: Subtotal, VAT, Total -->
+        <div class="mb-6 p-4 bg-gray-50 rounded border">
+            <h3 class="font-semibold mb-3">Totals</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Subtotal</label>
+                    <input type="number" step="0.01" id="subtotal_input" name="subtotal"
+                           class="border rounded p-2 w-full" value="{{ number_format($quote->subtotal ?? 0, 2, '.', '') }}">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">VAT (12%)</label>
+                    <input type="number" step="0.01" id="vat_input" name="vat"
+                           class="border rounded p-2 w-full" value="{{ number_format($quote->vat ?? 0, 2, '.', '') }}">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Total</label>
+                    <input type="number" step="0.01" id="total_input" name="total"
+                           class="border rounded p-2 w-full" value="{{ number_format($quote->total ?? 0, 2, '.', '') }}">
+                </div>
+            </div>
+        </div>
+
         <button type="submit"
                 class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
             Save Changes
@@ -339,6 +361,103 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // initial render
     applySearch();
+
+    // --------- Totals calculation (subtotal, VAT, total) ----------
+    const subtotalEl = document.getElementById('subtotal_input');
+    const vatEl      = document.getElementById('vat_input');
+    const totalInput = document.getElementById('total_input');
+
+    function toNumber(v) {
+        const n = parseFloat(String(v).replace(/,/g, ''));
+        return isFinite(n) ? n : 0;
+    }
+    function fmt(n) { return Number(n || 0).toFixed(2); }
+
+    function recalcFromItems() {
+        let subtotal = 0;
+
+        // Manual items
+        document.querySelectorAll('#items-list .item-row').forEach(function (row) {
+            const q = row.querySelector('input[name$="[quantity]"]');
+            const p = row.querySelector('input[name$="[unit_price]"]');
+            const qty = q ? toNumber(q.value) : 0;
+            const price = p ? toNumber(p.value) : 0;
+            subtotal += qty * price;
+        });
+
+        // Selected products from checklist
+        document.querySelectorAll('.checklist-row').forEach(function (row) {
+            const cb = row.querySelector('.product-check');
+            if (!cb || !cb.checked) return;
+            const q = row.querySelector('.product-qty');
+            const p = row.querySelector('.product-price');
+            const qty = q ? toNumber(q.value) : 0;
+            const price = p ? toNumber(p.value) : 0;
+            subtotal += qty * price;
+        });
+
+        const vat = subtotal * 0.12;
+        const total = subtotal + vat;
+
+        subtotalEl.value = fmt(subtotal);
+        vatEl.value = fmt(vat);
+        totalInput.value = fmt(total);
+    }
+
+    function recalcFromTotal() {
+        const total = toNumber(totalInput.value);
+        const subtotal = total / 1.12;
+        const vat = total - subtotal;
+
+        subtotalEl.value = fmt(subtotal);
+        vatEl.value = fmt(vat);
+    }
+
+    // When user edits subtotal directly, recalc VAT only (do NOT auto-update Total)
+    if (subtotalEl) {
+        subtotalEl.addEventListener('input', function () {
+            const subtotal = toNumber(subtotalEl.value);
+            const vat = subtotal * 0.12;
+            // update VAT field but do not override Total here — user requested Total not auto-updated
+            vatEl.value = fmt(vat);
+        });
+    }
+
+    // When user edits VAT directly, do NOT auto-update Total (VAT is independent)
+    if (vatEl) {
+        vatEl.addEventListener('input', function () {
+            // Leave Total unchanged when VAT is manually edited
+            // Optionally validate numeric format for VAT
+            vatEl.value = fmt(toNumber(vatEl.value));
+        });
+    }
+
+    // Bind events: any change in quantities/prices or checkboxes -> recalcFromItems
+    document.querySelectorAll('.product-qty, .product-price').forEach(function (el) {
+        el.addEventListener('input', recalcFromItems);
+    });
+    document.querySelectorAll('.product-check').forEach(function (el) {
+        el.addEventListener('change', recalcFromItems);
+    });
+    // Manual items binding (dynamic rows may be added)
+    const itemsList = document.getElementById('items-list');
+    if (itemsList) {
+        itemsList.addEventListener('input', function (e) {
+            if (e.target && (e.target.name && (e.target.name.includes('[quantity]') || e.target.name.includes('[unit_price]')))) {
+                recalcFromItems();
+            }
+        });
+    }
+
+    // When user edits total directly, propagate back to subtotal & vat
+    if (totalInput) {
+        totalInput.addEventListener('input', function () {
+            recalcFromTotal();
+        });
+    }
+
+    // Initialize totals on load
+    recalcFromItems();
 });
 </script>
 @endsection

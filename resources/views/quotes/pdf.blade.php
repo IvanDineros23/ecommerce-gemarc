@@ -103,18 +103,30 @@
         </table>
     </div>
 
+    @php
+        // Compute totals from items to ensure PDF always reflects current items
+        $computedSubtotal = 0.0;
+        foreach ($quote->items as $it) {
+            $qty = isset($it->quantity) ? (float) $it->quantity : 0;
+            $price = isset($it->unit_price) ? (float) $it->unit_price : 0;
+            $computedSubtotal += $qty * $price;
+        }
+        $computedVat = $computedSubtotal * 0.12;
+        $computedTotal = $computedSubtotal + $computedVat;
+    @endphp
+
     <table class="totals">
         <tr>
             <td><strong>Subtotal:</strong></td>
-            <td>{{ number_format($quote->subtotal, 2) }}</td>
+            <td>{{ number_format($computedSubtotal, 2) }}</td>
         </tr>
         <tr>
             <td><strong>VAT (12%):</strong></td>
-            <td>{{ number_format($quote->vat, 2) }}</td>
+            <td>{{ number_format($computedVat, 2) }}</td>
         </tr>
         <tr>
             <td><strong>Total:</strong></td>
-            <td><strong>{{ number_format($quote->total, 2) }}</strong></td>
+            <td><strong>{{ number_format($computedTotal, 2) }}</strong></td>
         </tr>
     </table>
 

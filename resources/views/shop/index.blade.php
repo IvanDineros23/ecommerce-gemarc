@@ -11,6 +11,13 @@ function productModal() {
         show: false,
         modalProduct: { name: '', price: 0, description: '', image: '' },
 
+        init() {
+            // lock/unlock body scroll pag open/close modal
+            this.$watch('show', (value) => {
+                document.body.classList.toggle('overflow-hidden', value);
+            });
+        },
+
         openModal(product) {
             this.modalProduct = {
                 ...product,
@@ -156,7 +163,12 @@ async function unsaveProduct(savedItemId, productName, e) {
     </template>
 </div>
 
-<div class="py-8" x-data="productModal()" x-cloak @keydown.window.escape="close()">
+<div class="py-8"
+     x-data="productModal()"
+     x-init="init()"
+     x-cloak
+     @keydown.window.escape="close()">
+
     <div class="flex flex-col items-center justify-center mb-8">
         <h1 class="text-3xl font-bold text-green-800 mb-2">Shop All Products</h1>
         <p class="text-gray-700 mb-4">
@@ -293,6 +305,9 @@ async function unsaveProduct(savedItemId, productName, e) {
                         <div class="text-gray-600 text-sm mb-2 line-clamp-2">
                             {{ $product->description }}
                         </div>
+                        <div class="text-xs text-gray-500 mb-2">
+                            <span class="font-semibold">Stock:</span> {{ $product->stock ?? 0 }}
+                        </div>
 
                         <div class="mt-auto flex gap-2 justify-center">
                             <div class="flex gap-2">
@@ -355,14 +370,27 @@ async function unsaveProduct(savedItemId, productName, e) {
         </div>
 
         {{-- MODAL --}}
-        <div x-cloak x-show="show" x-transition
-             class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+        <div x-cloak
+             x-show="show"
+             x-transition.opacity.duration.250ms
+             class="fixed inset-0 z-[9998] flex items-center justify-center bg-black/40 px-4"
              @click.self="close()">
-            <div class="bg-white rounded-xl shadow-lg max-w-4xl w-full p-6 md:p-8 relative">
 
-                {{-- CLOSE BUTTON – upper right --}}
-                <button @click="close()"
-                        class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl leading-none">
+            <!-- WHITE MODAL BOX -->
+            <div
+                x-show="show"
+                x-transition:enter="transform ease-out duration-300"
+                x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                x-transition:leave="transform ease-in duration-200"
+                x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                class="relative bg-white rounded-xl shadow-lg max-w-4xl w-full p-6 md:p-8">
+
+                {{-- CLOSE BUTTON – upper right of the white modal --}}
+                <button
+                    @click.stop="close()"
+                    class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl leading-none z-[10000]">
                     &times;
                 </button>
 
@@ -387,6 +415,11 @@ async function unsaveProduct(savedItemId, productName, e) {
                         </div>
 
                         <div class="flex flex-wrap items-center gap-4 mt-2 mb-2">
+                            <div class="text-xs text-gray-500 mb-2">
+                                <span class="font-semibold">Stock:</span>
+                                <span x-text="modalProduct.stock ?? 0"></span>
+                            </div>
+
                             {{-- SAVE / UNSAVE SA MODAL --}}
                             @auth
                                 <template x-if="!modalProduct.already_saved">

@@ -214,6 +214,9 @@ Route::get('/dashboard/search', fn (Request $request) => view('dashboard.search'
 */
 Route::middleware(['auth', 'verified'])->group(function () {
 
+    // Employee dashboard product stats (for live search widget)
+    Route::get('/employee/product-stats', [\App\Http\Controllers\EmployeeProductStatsController::class, 'index'])->name('employee.product-stats');
+
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

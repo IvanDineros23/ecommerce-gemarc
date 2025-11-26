@@ -104,29 +104,42 @@
     </div>
 
     @php
-        // Compute totals from items to ensure PDF always reflects current items
-        $computedSubtotal = 0.0;
-        foreach ($quote->items as $it) {
-            $qty = isset($it->quantity) ? (float) $it->quantity : 0;
-            $price = isset($it->unit_price) ? (float) $it->unit_price : 0;
-            $computedSubtotal += $qty * $price;
+        // Prefer stored subtotal/vat/total when present (employees can manually edit these on the edit form).
+        // Otherwise compute totals from items so the PDF always has sensible defaults.
+        $displaySubtotal = null;
+        $displayVat = null;
+        $displayTotal = null;
+
+        // Use stored values if they exist and are non-null (allow zero as valid value)
+        if (isset($quote->subtotal) && $quote->subtotal !== null) {
+            $displaySubtotal = (float) $quote->subtotal;
+            $displayVat = isset($quote->vat) && $quote->vat !== null ? (float) $quote->vat : $displaySubtotal * 0.12;
+            $displayTotal = isset($quote->total) && $quote->total !== null ? (float) $quote->total : ($displaySubtotal + $displayVat);
+        } else {
+            $computedSubtotal = 0.0;
+            foreach ($quote->items as $it) {
+                $qty = isset($it->quantity) ? (float) $it->quantity : 0;
+                $price = isset($it->unit_price) ? (float) $it->unit_price : 0;
+                $computedSubtotal += $qty * $price;
+            }
+            $displaySubtotal = $computedSubtotal;
+            $displayVat = $computedSubtotal * 0.12;
+            $displayTotal = $displaySubtotal + $displayVat;
         }
-        $computedVat = $computedSubtotal * 0.12;
-        $computedTotal = $computedSubtotal + $computedVat;
     @endphp
 
     <table class="totals">
         <tr>
             <td><strong>Subtotal:</strong></td>
-            <td>{{ number_format($computedSubtotal, 2) }}</td>
+            <td>{{ number_format($displaySubtotal, 2) }}</td>
         </tr>
         <tr>
             <td><strong>VAT (12%):</strong></td>
-            <td>{{ number_format($computedVat, 2) }}</td>
+            <td>{{ number_format($displayVat, 2) }}</td>
         </tr>
         <tr>
             <td><strong>Total:</strong></td>
-            <td><strong>{{ number_format($computedTotal, 2) }}</strong></td>
+            <td><strong>{{ number_format($displayTotal, 2) }}</strong></td>
         </tr>
     </table>
 

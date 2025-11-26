@@ -53,6 +53,7 @@ class QuoteController extends Controller
     $year = date('Y');
     $random = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
     $quote->number = 'GEI-GDS-' . $year . '-' . $random;
+    $quote->reference_number = $quote->number;
     $quote->save();
 
         $total = 0;
@@ -69,6 +70,10 @@ class QuoteController extends Controller
             $total += $product->unit_price * $qty;
         }
         $quote->total = $total;
+        // Also persist subtotal and VAT for consistency
+        $quote->subtotal = $total;
+        $quote->vat = $total * 0.12;
+        $quote->total = $quote->subtotal + $quote->vat;
         $quote->save();
 
         // Audit log: user created quote

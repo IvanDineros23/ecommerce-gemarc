@@ -14,7 +14,17 @@ class Quote extends Model
         'number',
         'status',
         'total',
+        'subtotal',
+        'vat',
         'notes', // Added 'notes' field
+        'use_manual_totals',
+    ];
+
+    protected $casts = [
+        'subtotal' => 'decimal:2',
+        'vat' => 'decimal:2',
+        'total' => 'decimal:2',
+        'use_manual_totals' => 'boolean',
     ];
 
     public function user()

@@ -82,7 +82,7 @@
                         $quoteProductMap = collect($quote->items)->keyBy('product_id');
                     @endphp
 
-                    {{-- 🔍 SEARCH + PAGINATION BAR (single horizontal line) --}}
+                    {{-- 🔍 SEARCH + PAGINATION BAR --}}
                     <div class="flex flex-row items-center gap-3 mb-3">
                         <input type="text" id="quote-item-search"
                                class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
@@ -100,7 +100,7 @@
                         </div>
                     </div>
 
-                    {{-- 📄 ITEMS LIST (will be paginated client-side) --}}
+                    {{-- 📄 ITEMS LIST --}}
                     <div id="quote-items-pagination" class="space-y-2 max-h-80 overflow-y-auto pr-1">
                         @foreach($products as $product)
                             @php
@@ -152,28 +152,51 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                     </svg>
                 </button>
+
                 <div id="manual-items" class="bg-gray-50 rounded-b p-4" style="display:none;">
-                    <div id="items-list" class="space-y-3 mb-4">
+                    <div id="items-list" class="space-y-2 mb-4">
+                        {{-- Header row --}}
+                        <div class="grid grid-cols-12 gap-3 font-semibold text-gray-700">
+                            <span class="col-span-6">Product Name</span>
+                            <span class="col-span-2">Quantity</span>
+                            <span class="col-span-3">Unit Price</span>
+                            <span class="col-span-1 text-right">Action</span>
+                        </div>
+
+                        {{-- Data rows --}}
                         @foreach($quote->items as $i => $item)
-                            <div class="flex flex-wrap items-center gap-3 item-row">
-                                <input type="text" name="items[{{ $i }}][name]"
+                            <div class="grid grid-cols-12 gap-3 items-center item-row">
+                                <input type="text"
+                                       name="items[{{ $i }}][name]"
                                        value="{{ $item->name }}"
-                                       class="border rounded p-2 w-1/2 min-w-[180px]"
-                                       required placeholder="e.g. Product Name">
-                                <input type="number" name="items[{{ $i }}][quantity]"
-                                       value="{{ $item->quantity }}" min="1"
-                                       class="border rounded p-2 w-20 min-w-[80px]" required placeholder="e.g. 1">
-                                <input type="number" name="items[{{ $i }}][unit_price]"
-                                       value="{{ $item->unit_price }}" min="0" step="0.01"
-                                       class="border rounded p-2 w-28 min-w-[100px]"
-                                       required placeholder="e.g. 1000.00">
+                                       class="col-span-6 border rounded p-2"
+                                       required
+                                       placeholder="e.g. Product Name">
+
+                                <input type="number"
+                                       name="items[{{ $i }}][quantity]"
+                                       value="{{ $item->quantity }}"
+                                       min="1"
+                                       class="col-span-2 border rounded p-2"
+                                       required
+                                       placeholder="e.g. 1">
+
+                                <input type="number"
+                                       name="items[{{ $i }}][unit_price]"
+                                       value="{{ $item->unit_price }}"
+                                       min="0" step="0.01"
+                                       class="col-span-3 border rounded p-2"
+                                       required
+                                       placeholder="e.g. 1000.00">
+
                                 <button type="button"
-                                        class="remove-item bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                                        class="col-span-1 justify-self-end remove-item bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">
                                     Remove
                                 </button>
                             </div>
                         @endforeach
                     </div>
+
                     <div class="flex justify-end">
                         <button type="button" id="add-item"
                                 class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 transition">
@@ -184,9 +207,16 @@
             </div>
         </div>
 
-        <!-- Totals block: Subtotal, VAT, Total -->
+        {{-- Totals block: Subtotal, VAT, Total --}}
         <div class="mb-6 p-4 bg-gray-50 rounded border">
             <h3 class="font-semibold mb-3">Totals</h3>
+            <div class="mb-2">
+                <label class="inline-flex items-center">
+                    <input type="checkbox" id="use_manual_totals" name="use_manual_totals" value="1" class="mr-2"
+                        {{ isset($quote->use_manual_totals) && $quote->use_manual_totals ? 'checked' : '' }}>
+                    <span class="text-sm">Allow manual Total edit (use submitted Total)</span>
+                </label>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Subtotal</label>
@@ -413,51 +443,118 @@ document.addEventListener('DOMContentLoaded', function () {
         vatEl.value = fmt(vat);
     }
 
-    // When user edits subtotal directly, recalc VAT only (do NOT auto-update Total)
+    // When user edits subtotal directly
     if (subtotalEl) {
         subtotalEl.addEventListener('input', function () {
             const subtotal = toNumber(subtotalEl.value);
             const vat = subtotal * 0.12;
-            // update VAT field but do not override Total here — user requested Total not auto-updated
             vatEl.value = fmt(vat);
+            if (manualTotalsCheckbox && !manualTotalsCheckbox.checked) {
+                totalInput.value = fmt(subtotal + vat);
+            }
         });
     }
 
-    // When user edits VAT directly, do NOT auto-update Total (VAT is independent)
+    // When user edits VAT directly
     if (vatEl) {
         vatEl.addEventListener('input', function () {
-            // Leave Total unchanged when VAT is manually edited
-            // Optionally validate numeric format for VAT
             vatEl.value = fmt(toNumber(vatEl.value));
+            if (manualTotalsCheckbox && !manualTotalsCheckbox.checked) {
+                totalInput.value = fmt(toNumber(subtotalEl.value) + toNumber(vatEl.value));
+            }
         });
     }
 
-    // Bind events: any change in quantities/prices or checkboxes -> recalcFromItems
-    document.querySelectorAll('.product-qty, .product-price').forEach(function (el) {
-        el.addEventListener('input', recalcFromItems);
-    });
-    document.querySelectorAll('.product-check').forEach(function (el) {
-        el.addEventListener('change', recalcFromItems);
-    });
     // Manual items binding (dynamic rows may be added)
     const itemsList = document.getElementById('items-list');
     if (itemsList) {
+        // recalc on quantity/price change
         itemsList.addEventListener('input', function (e) {
             if (e.target && (e.target.name && (e.target.name.includes('[quantity]') || e.target.name.includes('[unit_price]')))) {
                 recalcFromItems();
             }
         });
+
+        // remove button via delegation
+        itemsList.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-item')) {
+                const row = e.target.closest('.item-row');
+                if (row) row.remove();
+                recalcFromItems();
+            }
+        });
     }
 
-    // When user edits total directly, propagate back to subtotal & vat
+    // Add new manual item (grid layout)
+    const addItemBtn = document.getElementById('add-item');
+    if (addItemBtn && itemsList) {
+        addItemBtn.addEventListener('click', function () {
+            const i = itemIndex++;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'grid grid-cols-12 gap-3 items-center item-row';
+
+            wrapper.innerHTML = `
+                <input type="text"
+                       name="items[${i}][name]"
+                       class="col-span-6 border rounded p-2"
+                       required
+                       placeholder="e.g. Product Name">
+
+                <input type="number"
+                       name="items[${i}][quantity]"
+                       min="1"
+                       class="col-span-2 border rounded p-2"
+                       required
+                       placeholder="e.g. 1">
+
+                <input type="number"
+                       name="items[${i}][unit_price]"
+                       min="0" step="0.01"
+                       class="col-span-3 border rounded p-2"
+                       required
+                       placeholder="e.g. 1000.00">
+
+                <button type="button"
+                        class="col-span-1 justify-self-end remove-item bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">
+                    Remove
+                </button>
+            `;
+
+            itemsList.appendChild(wrapper);
+        });
+    }
+
+    // When user edits total directly, propagate back
     if (totalInput) {
         totalInput.addEventListener('input', function () {
             recalcFromTotal();
         });
     }
 
+    const manualTotalsCheckbox = document.getElementById('use_manual_totals');
+    const initialUseManualTotals = {{ isset($quote->use_manual_totals) && $quote->use_manual_totals ? 'true' : 'false' }};
+
+    function setManualTotalsMode(enabled) {
+        if (enabled) {
+            totalInput.readOnly = false;
+        } else {
+            totalInput.readOnly = true;
+            totalInput.value = fmt(toNumber(subtotalEl.value) + toNumber(vatEl.value));
+        }
+    }
+
+    if (manualTotalsCheckbox) {
+        manualTotalsCheckbox.addEventListener('change', function () {
+            setManualTotalsMode(this.checked);
+        });
+    }
+
     // Initialize totals on load
-    recalcFromItems();
+    setManualTotalsMode(initialUseManualTotals);
+    if (!initialUseManualTotals) {
+        recalcFromItems();
+    }
 });
 </script>
 @endsection

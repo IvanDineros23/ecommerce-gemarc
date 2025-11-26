@@ -153,6 +153,7 @@ class EmployeeQuoteController extends Controller
 
         $quote = Quote::create([
             'number'  => null,
+            'reference_number' => null,
             'status'  => 'open',
             'total'   => 0,
             'user_id' => Auth::id(),
@@ -170,7 +171,14 @@ class EmployeeQuoteController extends Controller
             $total += (int) $item['quantity'] * (float) $item['unit_price'];
         }
 
-        $quote->total = $total;
+        // Persist subtotal & VAT for manual-created quote
+        $quote->subtotal = $total;
+        $quote->vat = $total * 0.12;
+        $quote->total = $quote->subtotal + $quote->vat;
+        // Set reference_number to match number if number is set
+        if ($quote->number) {
+            $quote->reference_number = $quote->number;
+        }
         $quote->save();
 
         AuditLogger::log(Auth::id(), 'employee', 'manual_create_quote_details', [
@@ -242,6 +250,17 @@ class EmployeeQuoteController extends Controller
             'product_ids.*'      => 'integer',
             'product_quantities' => 'nullable|array',
             'product_prices'     => 'nullable|array',
+            // Allow manual items block (items[0][name], items[0][quantity], items[0][unit_price])
+            'items'              => 'nullable|array',
+            'items.*.name'       => 'required_with:items|string|max:255',
+            'items.*.quantity'   => 'required_with:items|integer|min:1',
+            'items.*.unit_price' => 'required_with:items|numeric|min:0',
+            // Allow employees to manually adjust subtotal/vat/total in the edit form
+            'subtotal'           => 'nullable|numeric',
+            'vat'                => 'nullable|numeric',
+            'total'              => 'nullable|numeric',
+            // When true, treat the submitted `total` as authoritative; otherwise compute server-side
+            'use_manual_totals'  => 'nullable|boolean',
         ]);
 
         if ($quote->user) {
@@ -252,29 +271,108 @@ class EmployeeQuoteController extends Controller
             $quote->user->save();
         }
 
+        // Remove existing items and rebuild from submitted inputs (manual items + selected products)
         $quote->items()->delete();
 
         $total = 0;
-        if (!empty($validated['product_ids'])) {
-            foreach ($validated['product_ids'] as $productId) {
-                $quantity = (int)($validated['product_quantities'][$productId] ?? 1);
-                $price = (float)($validated['product_prices'][$productId] ?? 0);
+        // Keep track of created item signatures to avoid duplicates when both manual and checklist data
+        $createdKeys = [];
 
-                $quote->items()->create([
-                    'product_id' => $productId,
-                    'name'       => Product::find($productId)->name ?? 'Unknown Product',
-                    'quantity'   => $quantity,
-                    'unit_price' => $price,
-                ]);
+        // 1) Manual items (preferred when provided)
+        $hasManualItems = !empty($validated['items']) && is_array($validated['items']);
+        if ($hasManualItems) {
+            foreach ($validated['items'] as $mitem) {
+                $mname = $mitem['name'] ?? null;
+                $mqty = isset($mitem['quantity']) ? (int) $mitem['quantity'] : 1;
+                $mprice = isset($mitem['unit_price']) ? (float) str_replace(',', '', (string) $mitem['unit_price']) : 0.0;
 
-                $total += $quantity * $price;
+                if ($mname) {
+                    $sig = 'manual|' . trim(strtolower($mname)) . '|' . (int)$mqty . '|' . number_format((float)$mprice, 2, '.', '');
+                    if (!in_array($sig, $createdKeys, true)) {
+                        $quote->items()->create([
+                            'product_id' => null,
+                            'name'       => $mname,
+                            'quantity'   => $mqty,
+                            'unit_price' => $mprice,
+                        ]);
+                        $createdKeys[] = $sig;
+                        $total += $mqty * $mprice;
+                    }
+                }
             }
         }
 
-        $quote->total = $total;
+        // 2) Selected products checklist (only when manual items were NOT provided)
+        if (!$hasManualItems && !empty($validated['product_ids'])) {
+            foreach ($validated['product_ids'] as $productId) {
+                $quantity = (int)($validated['product_quantities'][$productId] ?? 1);
+                $price = isset($validated['product_prices'][$productId]) ? (float) str_replace(',', '', (string) $validated['product_prices'][$productId]) : 0;
+
+                $prodName = Product::find($productId)->name ?? 'Unknown Product';
+                $sig = 'prod|' . $productId . '|' . (int)$quantity . '|' . number_format((float)$price, 2, '.', '');
+                if (!in_array($sig, $createdKeys, true)) {
+                    $quote->items()->create([
+                        'product_id' => $productId,
+                        'name'       => $prodName,
+                        'quantity'   => $quantity,
+                        'unit_price' => $price,
+                    ]);
+                    $createdKeys[] = $sig;
+                    $total += $quantity * $price;
+                }
+            }
+        }
+
+        // If the employee provided manual subtotal/vat/total values, prefer those
+        // otherwise compute from the items we rebuilt above.
+        // Sanitize numeric inputs: remove thousands separators if any, then cast to float
+        $submittedSubtotal = null;
+        $submittedVat = null;
+        $submittedTotal = null;
+        if (array_key_exists('subtotal', $validated)) {
+            $submittedSubtotal = (float) str_replace(',', '', (string) $validated['subtotal']);
+        }
+        if (array_key_exists('vat', $validated)) {
+            $submittedVat = (float) str_replace(',', '', (string) $validated['vat']);
+        }
+        if (array_key_exists('total', $validated)) {
+            $submittedTotal = (float) str_replace(',', '', (string) $validated['total']);
+        }
+
+        $useManualTotals = !empty($validated['use_manual_totals']);
+
+        // Subtotal: prefer submitted subtotal when present, otherwise use computed $total
+        if (!is_null($submittedSubtotal)) {
+            $quote->subtotal = $submittedSubtotal;
+        } else {
+            $quote->subtotal = $total;
+        }
+
+        // VAT: prefer submitted VAT when present, otherwise compute 12% of subtotal
+        if (!is_null($submittedVat)) {
+            $quote->vat = $submittedVat;
+        } else {
+            $quote->vat = $quote->subtotal * 0.12;
+        }
+
+        // Total: if useManualTotals is true, accept submitted total when present, otherwise always compute
+        if ($useManualTotals) {
+            if (!is_null($submittedTotal)) {
+                $quote->total = $submittedTotal;
+            } else {
+                $quote->total = $quote->subtotal + $quote->vat;
+            }
+        } else {
+            $quote->total = $quote->subtotal + $quote->vat;
+        }
+
+        $quote->use_manual_totals = $useManualTotals;
+
         if (array_key_exists('notes', $validated)) {
             $quote->notes = $validated['notes'];
         }
+        // Always sync reference_number to number
+        $quote->reference_number = $quote->number;
         $quote->save();
 
         AuditLogger::log(Auth::id(), 'employee', 'update_quote', [
@@ -308,6 +406,7 @@ class EmployeeQuoteController extends Controller
             'status'  => 'open',
             'user_id' => Auth::id(),
             'total'   => 0,
+            'reference_number' => null,
         ]);
 
         $total = 0;
@@ -340,7 +439,13 @@ class EmployeeQuoteController extends Controller
         }
 
         if ($total > 0) {
-            $quote->total = $total;
+            $quote->subtotal = $total;
+            $quote->vat = $total * 0.12;
+            $quote->total = $quote->subtotal + $quote->vat;
+            // Set reference_number to match number if number is set
+            if ($quote->number) {
+                $quote->reference_number = $quote->number;
+            }
             $quote->save();
         }
 
@@ -461,6 +566,7 @@ class EmployeeQuoteController extends Controller
 
         $quote = Quote::create([
             'number'  => null,
+            'reference_number' => null,
             'status'  => 'open',
             'total'   => 0,
             'user_id' => $order->user_id,
@@ -482,7 +588,13 @@ class EmployeeQuoteController extends Controller
             $total += (int) $orderItem->quantity * (float) $orderItem->unit_price;
         }
 
-        $quote->total = $total;
+        $quote->subtotal = $total;
+        $quote->vat = $total * 0.12;
+        $quote->total = $quote->subtotal + $quote->vat;
+        // Set reference_number to match number if number is set
+        if ($quote->number) {
+            $quote->reference_number = $quote->number;
+        }
         $quote->save();
 
         AuditLogger::log(Auth::id(), 'employee', 'create_quote_from_order', [

@@ -38,8 +38,8 @@
             <div class="inline-flex rounded-lg overflow-hidden bg-gray-50">
                 <button type="button"
                         class="tab-trigger px-4 py-2 text-sm font-semibold text-green-700 bg-white border-b-2 border-green-600"
-                        data-tab="manual-orders">
-                    Manual Orders
+                        data-tab="all-orders">
+                    All Orders
                 </button>
                 <button type="button"
                         class="tab-trigger px-4 py-2 text-sm font-semibold text-gray-500 hover:text-green-700 hover:bg-green-50 border-b-2 border-transparent"
@@ -48,13 +48,13 @@
                 </button>
                 <button type="button"
                         class="tab-trigger px-4 py-2 text-sm font-semibold text-gray-500 hover:text-green-700 hover:bg-green-50 border-b-2 border-transparent"
-                        data-tab="done-orders">
-                    Done Orders
+                        data-tab="manual-orders">
+                    Manual Orders
                 </button>
                 <button type="button"
                         class="tab-trigger px-4 py-2 text-sm font-semibold text-gray-500 hover:text-green-700 hover:bg-green-50 border-b-2 border-transparent"
-                        data-tab="all-orders">
-                    All Orders
+                        data-tab="done-orders">
+                    Done Orders
                 </button>
                 <button type="button"
                         class="tab-trigger px-4 py-2 text-sm font-semibold text-gray-500 hover:text-green-700 hover:bg-green-50 border-b-2 border-transparent"
@@ -68,7 +68,7 @@
         <div class="p-4 md:p-6 space-y-6">
 
             {{-- Manual Orders --}}
-            <div id="manual-orders" class="tab-panel">
+            <div id="manual-orders" class="tab-panel hidden">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
                     <div class="w-full md:w-1/3">
                         <input type="text"
@@ -128,7 +128,7 @@
             </div>
 
             {{-- All Orders --}}
-            <div id="all-orders" class="tab-panel hidden">
+            <div id="all-orders" class="tab-panel">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
                     <div class="w-full md:w-1/3">
                         <input type="text"
@@ -444,7 +444,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        setActiveTab('manual-orders');
+        setActiveTab('all-orders');
 
         document.querySelectorAll('.tab-trigger').forEach(btn => {
             btn.addEventListener('click', function () {

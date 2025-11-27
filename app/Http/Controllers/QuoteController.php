@@ -117,10 +117,43 @@ class QuoteController extends Controller
         $quotes = \App\Models\Quote::with('user')->latest()->get();
         $cancelledQuotes = \App\Models\Quote::with('user')->where('status', 'cancelled')->latest()->get();
         $manualQuotes = \App\Models\Quote::with('user')->where('status', '!=', 'cancelled')->latest()->get();
-        $ordersNeedingQuote = \App\Models\Quote::with('user')->where('status', 'pending')->latest()->get();
+            // Orders from the ecommerce site that require a quotation.
+            // We select orders where payment_method is 'pending_quote' and order status is still 'pending'.
+            $ordersNeedingQuote = \App\Models\Order::with('user')->where('payment_method', 'pending_quote')->where('status', 'pending')->latest()->get();
         
-        // Define all quotes
-        $allQuotes = \App\Models\Quote::all();
+        // Define all quotes and include pending orders so they appear in "All Quotes"
+        $quoteModels = \App\Models\Quote::with(['user','items','order'])->orderByDesc('created_at')->get();
+        $allQuotes = $quoteModels->map(function ($q) {
+            $q->is_order = false;
+            return $q;
+        })->values()->toBase();
+
+        $pendingOrdersForAll = \App\Models\Order::with(['user','items'])
+            ->whereNull('quote_id')
+            ->where('status', 'pending')
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(function ($order) {
+                $obj = new \stdClass();
+                $obj->is_order = true;
+                $obj->order = $order;
+                $obj->id = null;
+                $obj->number = $order->reference_number;
+                $obj->user = $order->user;
+                $obj->created_at = $order->created_at;
+                $obj->status = $order->status;
+                $obj->items = $order->items->map(function ($it) {
+                    $itm = new \stdClass();
+                    $itm->name = $it->name ?? optional($it->product)->name ?? 'Item';
+                    $itm->quantity = $it->quantity;
+                    $itm->unit_price = $it->unit_price;
+                    return $itm;
+                });
+                $obj->total = $order->total_amount;
+                return $obj;
+            })->toBase();
+
+        $allQuotes = $allQuotes->merge($pendingOrdersForAll)->values();
 
         return view('dashboard.employee_quotes', compact('quotes', 'cancelledQuotes', 'manualQuotes', 'ordersNeedingQuote', 'search', 'allQuotes'));
     }

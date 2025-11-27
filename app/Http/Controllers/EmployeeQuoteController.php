@@ -47,7 +47,44 @@ class EmployeeQuoteController extends Controller
             });
         }
 
-        $allQuotes = $allQuotesQuery->get();
+        $quoteModels = $allQuotesQuery->get();
+
+        // Convert Quote models to a unified collection and mark as not orders
+        $allQuotes = $quoteModels->map(function ($q) {
+            $q->is_order = false;
+            return $q;
+        })->values()->toBase();
+
+        // Also include pending orders (orders that need a quote) into the All Quotes
+        $pendingOrdersForAll = Order::with(['user', 'items'])
+            ->whereNull('quote_id')
+            ->where('status', 'pending')
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(function ($order) {
+                // Build a lightweight object that mimics the fields used by the view
+                $obj = new \stdClass();
+                $obj->is_order = true;
+                $obj->order = $order;
+                $obj->id = null;
+                $obj->number = $order->reference_number;
+                $obj->user = $order->user;
+                $obj->created_at = $order->created_at;
+                $obj->status = $order->status;
+                // Map order items into item-like objects for the modal/table
+                $obj->items = $order->items->map(function ($it) {
+                    $itm = new \stdClass();
+                    $itm->name = $it->name ?? optional($it->product)->name ?? 'Item';
+                    $itm->quantity = $it->quantity;
+                    $itm->unit_price = $it->unit_price;
+                    return $itm;
+                });
+                $obj->total = $order->total_amount;
+                return $obj;
+            })->toBase();
+
+        // Merge quotes and pending orders, preserving order (quotes first then orders)
+        $allQuotes = $allQuotes->merge($pendingOrdersForAll)->values();
 
         // 3) Orders that still need a quote
         $ordersNeedingQuote = Order::with('user')

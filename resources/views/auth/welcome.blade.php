@@ -17,7 +17,7 @@
                     <div class="text-center mb-4">
                         <img src="{{ asset('images/gemarclogo.png') }}" alt="Gemarc" class="logo">
                     </div>
-                    <h2 class="fw-bold mb-3 text-center" style="color:#222;">Welcome to GEMARC Ecommerce</h2>
+                    <h2 class="fw-bold mb-3 text-center" style="color:#222;">Welcome to GEMARC Purchasing Hub</h2>
                     <div class="d-grid gap-2 mb-2">
                         <a href="{{ route('login') }}" class="btn btn-industrial">Sign in</a>
                         <a href="{{ route('register') }}" class="btn btn-success" style="background:#28a745; color:#fff; border:none;">Create account</a>

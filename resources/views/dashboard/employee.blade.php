@@ -1,6 +1,7 @@
 @php
     use App\Models\Order;
     use App\Models\Quote;
+    use App\Models\Product;
 @endphp
 
 @extends('layouts.ecommerce')
@@ -127,6 +128,15 @@
                         'status'   => $quoteStatusCountsAll,
                     ],
                 ];
+                // ---- TOTAL STOCK (only in-stock units) ----
+                // Sum only products that have stock > 0 so the card reflects
+                // units actually available (matches the 'in stock' rows in the grid)
+                $totalStock = (int) Product::where('stock', '>', 0)->sum('stock');
+                $skuCount = (int) Product::count();
+                $inStockSkus = (int) Product::where('stock', '>', 0)->count();
+                $outOfStockSkus = (int) Product::where('stock', '=', 0)->count();
+                $lowStockSkus = (int) Product::where('stock', '<=', 5)->count();
+                $inStockPercent = $skuCount > 0 ? round(($inStockSkus / $skuCount) * 100, 0) : 0;
             @endphp
 
             <div class="mb-3 flex justify-end">
@@ -146,8 +156,24 @@
                 </div>
 
                 <div class="bg-white rounded-xl shadow p-4">
-                    <div class="font-bold text-green-800 mb-2 text-center">Quotes Converted</div>
-                    <div class="h-48"><canvas id="qConvertedBar"></canvas></div>
+                    <div class="font-bold text-green-800 mb-2 text-center">Total Stock</div>
+                    <div class="h-48 flex flex-col items-center justify-center">
+                        <div class="text-4xl font-bold text-green-700">{{ number_format($totalStock) }}</div>
+                        <div class="text-sm text-gray-500 mt-1">Total units across all products</div>
+
+                        <div class="w-full mt-3">
+                            <div class="flex justify-between text-xs text-gray-500 mb-2">
+                                <div>Count of products: <span class="font-semibold text-green-700">{{ $inStockSkus }}</span></div>
+                                <div>Out: <span class="font-semibold text-red-500">{{ $outOfStockSkus }}</span></div>
+                            </div>
+
+                            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-green-400" style="width: {{ $inStockPercent }}%"></div>
+                            </div>
+
+                            <div class="mt-2 text-xs text-gray-500">Low stock (≤5): <span class="font-semibold text-amber-600">{{ $lowStockSkus }}</span></div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="bg-white rounded-xl shadow p-4">
